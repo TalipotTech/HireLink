@@ -103,6 +103,7 @@ public class BookingService {
         return mapToBookingResponse(booking);
     }
 
+    @Transactional(readOnly = true)
     public BookingDTO.BookingListResponse getUserBookings(Long userId, String status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Booking> bookingPage;
@@ -117,6 +118,7 @@ public class BookingService {
         return mapToBookingListResponse(bookingPage);
     }
 
+    @Transactional(readOnly = true)
     public BookingDTO.BookingListResponse getProviderBookings(Long providerId, String status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Booking> bookingPage;
@@ -131,12 +133,14 @@ public class BookingService {
         return mapToBookingListResponse(bookingPage);
     }
 
+    @Transactional(readOnly = true)
     public BookingDTO.BookingResponse getBookingById(Long bookingId) {
-        Booking booking = bookingRepository.findById(bookingId)
+        Booking booking = bookingRepository.findByIdWithDetails(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
         return mapToBookingResponse(booking);
     }
 
+    @Transactional(readOnly = true)
     public BookingDTO.BookingResponse getBookingByNumber(String bookingNumber) {
         Booking booking = bookingRepository.findByBookingNumber(bookingNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found: " + bookingNumber));
@@ -308,6 +312,48 @@ public class BookingService {
         ServiceProvider provider = booking.getProvider();
         User user = booking.getUser();
 
+        // Build service summary with null safety
+        BookingDTO.ServiceSummary serviceSummary = null;
+        if (service != null) {
+            ServiceCategory category = service.getCategory();
+            serviceSummary = BookingDTO.ServiceSummary.builder()
+                    .serviceId(service.getServiceId())
+                    .serviceName(service.getServiceName())
+                    .basePrice(service.getBasePrice())
+                    .priceType(service.getPriceType() != null ? service.getPriceType().name() : "FIXED")
+                    .estimatedDurationMinutes(service.getEstimatedDurationMinutes())
+                    .categoryName(category != null ? category.getCategoryName() : null)
+                    .categoryIcon(category != null ? category.getCategoryIcon() : null)
+                    .build();
+        }
+
+        // Build provider info with null safety
+        BookingDTO.ProviderInfo providerInfo = null;
+        if (provider != null) {
+            User providerUser = provider.getUser();
+            providerInfo = BookingDTO.ProviderInfo.builder()
+                    .providerId(provider.getProviderId())
+                    .businessName(provider.getBusinessName())
+                    .providerName(providerUser != null ? providerUser.getName() : "Unknown")
+                    .phone(providerUser != null ? providerUser.getPhone() : null)
+                    .profileImageUrl(providerUser != null ? providerUser.getProfileImageUrl() : null)
+                    .averageRating(provider.getAverageRating())
+                    .completedBookings(provider.getCompletedBookings())
+                    .build();
+        }
+
+        // Build customer info with null safety
+        BookingDTO.CustomerInfo customerInfo = null;
+        if (user != null) {
+            customerInfo = BookingDTO.CustomerInfo.builder()
+                    .userId(user.getUserId())
+                    .name(user.getName())
+                    .phone(user.getPhone())
+                    .email(user.getEmail())
+                    .profileImageUrl(user.getProfileImageUrl())
+                    .build();
+        }
+
         return BookingDTO.BookingResponse.builder()
                 .bookingId(booking.getBookingId())
                 .bookingNumber(booking.getBookingNumber())
@@ -320,7 +366,7 @@ public class BookingService {
                 .issueTitle(booking.getIssueTitle())
                 .issueDescription(booking.getIssueDescription())
                 .issueImages(issueImages)
-                .urgencyLevel(booking.getUrgencyLevel().name())
+                .urgencyLevel(booking.getUrgencyLevel() != null ? booking.getUrgencyLevel().name() : "MEDIUM")
                 .estimatedAmount(booking.getEstimatedAmount())
                 .materialCost(booking.getMaterialCost())
                 .laborCost(booking.getLaborCost())
@@ -328,7 +374,7 @@ public class BookingService {
                 .discountAmount(booking.getDiscountAmount())
                 .taxAmount(booking.getTaxAmount())
                 .finalAmount(booking.getFinalAmount())
-                .bookingStatus(booking.getBookingStatus().name())
+                .bookingStatus(booking.getBookingStatus() != null ? booking.getBookingStatus().name() : "PENDING")
                 .cancelledBy(booking.getCancelledBy() != null ? booking.getCancelledBy().name() : null)
                 .cancellationReason(booking.getCancellationReason())
                 .cancelledAt(booking.getCancelledAt())
@@ -337,31 +383,9 @@ public class BookingService {
                 .userRating(booking.getUserRating())
                 .createdAt(booking.getCreatedAt())
                 .updatedAt(booking.getUpdatedAt())
-                .service(BookingDTO.ServiceSummary.builder()
-                        .serviceId(service.getServiceId())
-                        .serviceName(service.getServiceName())
-                        .basePrice(service.getBasePrice())
-                        .priceType(service.getPriceType().name())
-                        .estimatedDurationMinutes(service.getEstimatedDurationMinutes())
-                        .categoryName(service.getCategory().getCategoryName())
-                        .categoryIcon(service.getCategory().getCategoryIcon())
-                        .build())
-                .provider(BookingDTO.ProviderInfo.builder()
-                        .providerId(provider.getProviderId())
-                        .businessName(provider.getBusinessName())
-                        .providerName(provider.getUser().getName())
-                        .phone(provider.getUser().getPhone())
-                        .profileImageUrl(provider.getUser().getProfileImageUrl())
-                        .averageRating(provider.getAverageRating())
-                        .completedBookings(provider.getCompletedBookings())
-                        .build())
-                .customer(BookingDTO.CustomerInfo.builder()
-                        .userId(user.getUserId())
-                        .name(user.getName())
-                        .phone(user.getPhone())
-                        .email(user.getEmail())
-                        .profileImageUrl(user.getProfileImageUrl())
-                        .build())
+                .service(serviceSummary)
+                .provider(providerInfo)
+                .customer(customerInfo)
                 .build();
     }
 }
