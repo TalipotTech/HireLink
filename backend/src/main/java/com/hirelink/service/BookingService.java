@@ -103,6 +103,32 @@ public class BookingService {
         return mapToBookingResponse(booking);
     }
 
+    /**
+     * Get bookings based on user type:
+     * - CUSTOMER: Returns bookings where they are the customer
+     * - PROVIDER: Returns bookings where they are the service provider
+     * - ADMIN/SUPER_ADMIN: Returns all bookings
+     */
+    @Transactional(readOnly = true)
+    public BookingDTO.BookingListResponse getBookingsForUser(Long userId, User.UserType userType, String status, int page, int size) {
+        switch (userType) {
+            case CUSTOMER:
+                return getUserBookings(userId, status, page, size);
+            case PROVIDER:
+                // Get provider ID for this user
+                User user = userRepository.findById(userId)
+                        .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                ServiceProvider provider = providerRepository.findByUserUserId(userId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Provider profile not found for this user"));
+                return getProviderBookings(provider.getProviderId(), status, page, size);
+            case ADMIN:
+            case SUPER_ADMIN:
+                return getAllBookings(status, page, size);
+            default:
+                throw new BadRequestException("Invalid user type");
+        }
+    }
+
     @Transactional(readOnly = true)
     public BookingDTO.BookingListResponse getUserBookings(Long userId, String status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -134,9 +160,36 @@ public class BookingService {
     }
 
     @Transactional(readOnly = true)
+    public BookingDTO.BookingListResponse getAllBookings(String status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Booking> bookingPage;
+
+        if (status != null && !status.isEmpty()) {
+            BookingStatus bookingStatus = BookingStatus.valueOf(status.toUpperCase());
+            bookingPage = bookingRepository.findByBookingStatusOrderByCreatedAtDesc(bookingStatus, pageable);
+        } else {
+            bookingPage = bookingRepository.findAllByOrderByCreatedAtDesc(pageable);
+        }
+
+        return mapToBookingListResponse(bookingPage);
+    }
+
+    @Transactional(readOnly = true)
     public BookingDTO.BookingResponse getBookingById(Long bookingId) {
         Booking booking = bookingRepository.findByIdWithDetails(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
+        return mapToBookingResponse(booking);
+    }
+
+    /**
+     * Get booking by ID with authorization check based on user type
+     */
+    @Transactional(readOnly = true)
+    public BookingDTO.BookingResponse getBookingByIdForUser(Long bookingId, Long userId, User.UserType userType) {
+        Booking booking = bookingRepository.findByIdWithDetails(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
+        
+        validateBookingAccess(booking, userId, userType);
         return mapToBookingResponse(booking);
     }
 
@@ -145,6 +198,44 @@ public class BookingService {
         Booking booking = bookingRepository.findByBookingNumber(bookingNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found: " + bookingNumber));
         return mapToBookingResponse(booking);
+    }
+
+    /**
+     * Get booking by number with authorization check based on user type
+     */
+    @Transactional(readOnly = true)
+    public BookingDTO.BookingResponse getBookingByNumberForUser(String bookingNumber, Long userId, User.UserType userType) {
+        Booking booking = bookingRepository.findByBookingNumber(bookingNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found: " + bookingNumber));
+        
+        validateBookingAccess(booking, userId, userType);
+        return mapToBookingResponse(booking);
+    }
+
+    /**
+     * Validate that the user has access to view/modify the booking
+     */
+    private void validateBookingAccess(Booking booking, Long userId, User.UserType userType) {
+        switch (userType) {
+            case CUSTOMER:
+                // Customer can only access their own bookings
+                if (!booking.getUser().getUserId().equals(userId)) {
+                    throw new BadRequestException("You can only access your own bookings");
+                }
+                break;
+            case PROVIDER:
+                // Provider can only access bookings where they are the service provider
+                if (!booking.getProvider().getUser().getUserId().equals(userId)) {
+                    throw new BadRequestException("You can only access bookings assigned to you");
+                }
+                break;
+            case ADMIN:
+            case SUPER_ADMIN:
+                // Admins can access all bookings
+                break;
+            default:
+                throw new BadRequestException("Invalid user type");
+        }
     }
 
     @Transactional

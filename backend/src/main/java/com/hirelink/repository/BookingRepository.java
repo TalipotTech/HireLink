@@ -52,4 +52,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     
     @Query("SELECT b FROM Booking b LEFT JOIN FETCH b.user LEFT JOIN FETCH b.provider p LEFT JOIN FETCH p.user LEFT JOIN FETCH b.service s LEFT JOIN FETCH s.category WHERE b.bookingId = :id")
     Optional<Booking> findByIdWithDetails(@Param("id") Long id);
+    
+    @Query("SELECT b FROM Booking b LEFT JOIN FETCH b.user LEFT JOIN FETCH b.provider p LEFT JOIN FETCH p.user LEFT JOIN FETCH b.service s LEFT JOIN FETCH s.category ORDER BY b.createdAt DESC")
+    Page<Booking> findAllByOrderByCreatedAtDesc(Pageable pageable);
+    
+    @Query("SELECT b FROM Booking b LEFT JOIN FETCH b.user LEFT JOIN FETCH b.provider p LEFT JOIN FETCH p.user LEFT JOIN FETCH b.service s LEFT JOIN FETCH s.category WHERE b.bookingStatus = :status ORDER BY b.createdAt DESC")
+    Page<Booking> findByBookingStatusOrderByCreatedAtDesc(@Param("status") BookingStatus status, Pageable pageable);
 }
