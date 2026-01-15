@@ -2,13 +2,16 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from 'react-query'
 import { bookingsAPI } from '../services/api'
+import { useAuthStore } from '../context/authStore'
 import { format } from 'date-fns'
 import { 
   CalendarDaysIcon,
   ClockIcon,
   CurrencyRupeeIcon,
   ChevronRightIcon,
-  FunnelIcon
+  FunnelIcon,
+  UserIcon,
+  WrenchScrewdriverIcon
 } from '@heroicons/react/24/outline'
 
 const statusColors = {
@@ -32,6 +35,11 @@ const statusFilters = [
 
 export default function Bookings() {
   const [statusFilter, setStatusFilter] = useState('')
+  const { user } = useAuthStore()
+  
+  const isProvider = user?.userType === 'PROVIDER'
+  const isAdmin = user?.userType === 'ADMIN' || user?.userType === 'SUPER_ADMIN'
+  const isCustomer = user?.userType === 'CUSTOMER'
 
   const { data, isLoading } = useQuery(
     ['myBookings', statusFilter],
@@ -39,6 +47,28 @@ export default function Bookings() {
   )
 
   const bookings = data?.data?.data?.bookings || []
+  
+  // Get page title and description based on user type
+  const getPageContent = () => {
+    if (isProvider) {
+      return {
+        title: 'Service Requests',
+        description: 'View and manage bookings from customers'
+      }
+    }
+    if (isAdmin) {
+      return {
+        title: 'All Bookings',
+        description: 'View and manage all system bookings'
+      }
+    }
+    return {
+      title: 'My Bookings',
+      description: 'View and manage your service bookings'
+    }
+  }
+  
+  const pageContent = getPageContent()
 
   if (isLoading) {
     return (
@@ -56,10 +86,10 @@ export default function Bookings() {
   return (
     <div className="animate-fadeIn">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-12">
+      <div className={`bg-gradient-to-r ${isProvider ? 'from-emerald-600 to-emerald-800' : isAdmin ? 'from-purple-600 to-purple-800' : 'from-primary-600 to-primary-800'} text-white py-12`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold mb-2">My Bookings</h1>
-          <p className="text-primary-100">View and manage your service bookings</p>
+          <h1 className="text-3xl font-bold mb-2">{pageContent.title}</h1>
+          <p className={`${isProvider ? 'text-emerald-100' : isAdmin ? 'text-purple-100' : 'text-primary-100'}`}>{pageContent.description}</p>
         </div>
       </div>
 
@@ -94,7 +124,7 @@ export default function Bookings() {
               >
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl flex items-center justify-center text-white font-semibold flex-shrink-0">
+                    <div className={`w-12 h-12 bg-gradient-to-br ${isProvider ? 'from-emerald-400 to-emerald-600' : 'from-primary-400 to-primary-600'} rounded-xl flex items-center justify-center text-white font-semibold flex-shrink-0`}>
                       {booking.service?.categoryName?.charAt(0) || 'S'}
                     </div>
                     <div>
@@ -104,9 +134,34 @@ export default function Bookings() {
                           {booking.bookingStatus?.replace('_', ' ')}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-500 mt-1">
-                        {booking.provider?.businessName || booking.provider?.providerName}
-                      </p>
+                      
+                      {/* Show different info based on user type */}
+                      {isProvider ? (
+                        // Provider sees customer info
+                        <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
+                          <UserIcon className="h-4 w-4" />
+                          <span>Customer: <span className="font-medium text-gray-700">{booking.customer?.name}</span></span>
+                          {booking.customer?.phone && <span>• {booking.customer.phone}</span>}
+                        </div>
+                      ) : isAdmin ? (
+                        // Admin sees both customer and provider info
+                        <div className="space-y-1 mt-1">
+                          <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <UserIcon className="h-4 w-4" />
+                            <span>Customer: <span className="font-medium text-gray-700">{booking.customer?.name}</span></span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <WrenchScrewdriverIcon className="h-4 w-4" />
+                            <span>Provider: <span className="font-medium text-gray-700">{booking.provider?.businessName || booking.provider?.providerName}</span></span>
+                          </div>
+                        </div>
+                      ) : (
+                        // Customer sees provider info
+                        <p className="text-sm text-gray-500 mt-1">
+                          {booking.provider?.businessName || booking.provider?.providerName}
+                        </p>
+                      )}
+                      
                       <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-500">
                         <div className="flex items-center gap-1">
                           <CalendarDaysIcon className="h-4 w-4" />
@@ -121,7 +176,7 @@ export default function Bookings() {
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <div className="flex items-center text-primary-600">
+                      <div className={`flex items-center ${isProvider ? 'text-emerald-600' : 'text-primary-600'}`}>
                         <CurrencyRupeeIcon className="h-4 w-4" />
                         <span className="font-bold">{booking.finalAmount || booking.estimatedAmount}</span>
                       </div>
@@ -136,13 +191,22 @@ export default function Bookings() {
         ) : (
           <div className="text-center py-16">
             <CalendarDaysIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No bookings found</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              {isProvider ? 'No service requests yet' : 'No bookings found'}
+            </h3>
             <p className="text-gray-500 mb-6">
-              {statusFilter ? 'No bookings match the selected filter' : "You haven't made any bookings yet"}
+              {statusFilter 
+                ? 'No bookings match the selected filter' 
+                : isProvider 
+                  ? "You don't have any service requests yet"
+                  : "You haven't made any bookings yet"
+              }
             </p>
-            <Link to="/categories" className="btn-primary">
-              Browse Services
-            </Link>
+            {isCustomer && (
+              <Link to="/categories" className="btn-primary">
+                Browse Services
+              </Link>
+            )}
           </div>
         )}
       </div>

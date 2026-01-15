@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from 'react-query'
 import { bookingsAPI } from '../services/api'
+import { useAuthStore } from '../context/authStore'
 import { format } from 'date-fns'
 import toast from 'react-hot-toast'
 import { 
@@ -12,7 +13,11 @@ import {
   PhoneIcon,
   CheckCircleIcon,
   XCircleIcon,
-  StarIcon
+  StarIcon,
+  UserIcon,
+  EnvelopeIcon,
+  PlayIcon,
+  CheckIcon
 } from '@heroicons/react/24/outline'
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid'
 
@@ -29,11 +34,17 @@ const statusColors = {
 export default function BookingDetail() {
   const { id } = useParams()
   const queryClient = useQueryClient()
+  const { user } = useAuthStore()
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [cancelReason, setCancelReason] = useState('')
   const [showReviewModal, setShowReviewModal] = useState(false)
   const [rating, setRating] = useState(5)
   const [reviewText, setReviewText] = useState('')
+  const [workSummary, setWorkSummary] = useState('')
+
+  const isProvider = user?.userType === 'PROVIDER'
+  const isAdmin = user?.userType === 'ADMIN' || user?.userType === 'SUPER_ADMIN'
+  const isCustomer = user?.userType === 'CUSTOMER'
 
   const { data, isLoading } = useQuery(
     ['booking', id],
@@ -50,6 +61,26 @@ export default function BookingDetail() {
       },
       onError: (error) => {
         toast.error(error.response?.data?.message || 'Failed to cancel booking')
+      }
+    }
+  )
+
+  const statusUpdateMutation = useMutation(
+    (data) => bookingsAPI.updateStatus(id, data),
+    {
+      onSuccess: (_, variables) => {
+        queryClient.invalidateQueries(['booking', id])
+        const statusMessages = {
+          ACCEPTED: 'Booking accepted!',
+          REJECTED: 'Booking rejected',
+          CONFIRMED: 'Booking confirmed!',
+          IN_PROGRESS: 'Service started!',
+          COMPLETED: 'Service completed!'
+        }
+        toast.success(statusMessages[variables.status] || 'Status updated')
+      },
+      onError: (error) => {
+        toast.error(error.response?.data?.message || 'Failed to update status')
       }
     }
   )
@@ -91,7 +122,14 @@ export default function BookingDetail() {
   }
 
   const canCancel = ['PENDING', 'ACCEPTED', 'CONFIRMED'].includes(booking.bookingStatus)
-  const canReview = booking.bookingStatus === 'COMPLETED' && !booking.userRating
+  const canReview = booking.bookingStatus === 'COMPLETED' && !booking.userRating && isCustomer
+  
+  // Provider actions based on current status
+  const canAccept = isProvider && booking.bookingStatus === 'PENDING'
+  const canReject = isProvider && booking.bookingStatus === 'PENDING'
+  const canConfirm = isProvider && booking.bookingStatus === 'ACCEPTED'
+  const canStart = isProvider && booking.bookingStatus === 'CONFIRMED'
+  const canComplete = isProvider && booking.bookingStatus === 'IN_PROGRESS'
 
   return (
     <div className="animate-fadeIn">
@@ -165,31 +203,87 @@ export default function BookingDetail() {
               </div>
             </div>
 
-            {/* Provider Details */}
-            <div className="card p-6">
-              <h2 className="font-semibold text-gray-900 mb-4">Service Provider</h2>
-              <Link to={`/providers/${booking.provider?.providerId}`} className="flex items-center gap-4 group">
-                <div className="w-14 h-14 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                  {booking.provider?.providerName?.charAt(0) || 'P'}
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
-                    {booking.provider?.businessName || booking.provider?.providerName}
-                  </h3>
-                  <div className="flex items-center gap-1 text-sm text-gray-500">
-                    <StarIconSolid className="h-4 w-4 text-amber-400" />
-                    <span>{booking.provider?.averageRating?.toFixed(1) || '5.0'}</span>
-                    <span>• {booking.provider?.completedBookings || 0} jobs</span>
+            {/* Show Provider Details for Customers, Customer Details for Providers */}
+            {isProvider ? (
+              // Provider sees Customer Details
+              <div className="card p-6 border-2 border-emerald-200 bg-emerald-50/50">
+                <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <UserIcon className="h-5 w-5 text-emerald-600" />
+                  Customer Details
+                </h2>
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                    {booking.customer?.name?.charAt(0) || 'C'}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">
+                      {booking.customer?.name}
+                    </h3>
                   </div>
                 </div>
-              </Link>
-              {booking.provider?.phone && (
-                <div className="mt-4 flex items-center gap-2 text-gray-600">
-                  <PhoneIcon className="h-4 w-4" />
-                  <span>{booking.provider.phone}</span>
+                <div className="mt-4 space-y-2">
+                  {booking.customer?.phone && (
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <PhoneIcon className="h-4 w-4" />
+                      <a href={`tel:${booking.customer.phone}`} className="hover:text-emerald-600">{booking.customer.phone}</a>
+                    </div>
+                  )}
+                  {booking.customer?.email && (
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <EnvelopeIcon className="h-4 w-4" />
+                      <a href={`mailto:${booking.customer.email}`} className="hover:text-emerald-600">{booking.customer.email}</a>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              // Customer/Admin sees Provider Details
+              <div className="card p-6">
+                <h2 className="font-semibold text-gray-900 mb-4">Service Provider</h2>
+                <Link to={`/providers/${booking.provider?.providerId}`} className="flex items-center gap-4 group">
+                  <div className="w-14 h-14 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                    {booking.provider?.providerName?.charAt(0) || 'P'}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
+                      {booking.provider?.businessName || booking.provider?.providerName}
+                    </h3>
+                    <div className="flex items-center gap-1 text-sm text-gray-500">
+                      <StarIconSolid className="h-4 w-4 text-amber-400" />
+                      <span>{booking.provider?.averageRating?.toFixed(1) || '5.0'}</span>
+                      <span>• {booking.provider?.completedBookings || 0} jobs</span>
+                    </div>
+                  </div>
+                </Link>
+                {booking.provider?.phone && (
+                  <div className="mt-4 flex items-center gap-2 text-gray-600">
+                    <PhoneIcon className="h-4 w-4" />
+                    <span>{booking.provider.phone}</span>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {/* Admin also sees Customer Details */}
+            {isAdmin && (
+              <div className="card p-6 border-2 border-purple-200 bg-purple-50/50">
+                <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <UserIcon className="h-5 w-5 text-purple-600" />
+                  Customer Details
+                </h2>
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                    {booking.customer?.name?.charAt(0) || 'C'}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{booking.customer?.name}</h3>
+                    {booking.customer?.phone && (
+                      <p className="text-sm text-gray-500">{booking.customer.phone}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Work Summary (if completed) */}
             {booking.workSummary && (
@@ -262,6 +356,59 @@ export default function BookingDetail() {
 
               {/* Actions */}
               <div className="mt-6 space-y-3">
+                {/* Provider Actions */}
+                {canAccept && (
+                  <button
+                    onClick={() => statusUpdateMutation.mutate({ status: 'ACCEPTED' })}
+                    disabled={statusUpdateMutation.isLoading}
+                    className="w-full btn bg-emerald-600 text-white hover:bg-emerald-700 flex items-center justify-center gap-2"
+                  >
+                    <CheckCircleIcon className="h-5 w-5" />
+                    Accept Request
+                  </button>
+                )}
+                {canReject && (
+                  <button
+                    onClick={() => statusUpdateMutation.mutate({ status: 'REJECTED', reason: 'Service unavailable' })}
+                    disabled={statusUpdateMutation.isLoading}
+                    className="w-full btn-secondary text-red-600 border-red-200 hover:bg-red-50 flex items-center justify-center gap-2"
+                  >
+                    <XCircleIcon className="h-5 w-5" />
+                    Reject Request
+                  </button>
+                )}
+                {canConfirm && (
+                  <button
+                    onClick={() => statusUpdateMutation.mutate({ status: 'CONFIRMED' })}
+                    disabled={statusUpdateMutation.isLoading}
+                    className="w-full btn bg-blue-600 text-white hover:bg-blue-700 flex items-center justify-center gap-2"
+                  >
+                    <CheckCircleIcon className="h-5 w-5" />
+                    Confirm Booking
+                  </button>
+                )}
+                {canStart && (
+                  <button
+                    onClick={() => statusUpdateMutation.mutate({ status: 'IN_PROGRESS' })}
+                    disabled={statusUpdateMutation.isLoading}
+                    className="w-full btn bg-purple-600 text-white hover:bg-purple-700 flex items-center justify-center gap-2"
+                  >
+                    <PlayIcon className="h-5 w-5" />
+                    Start Service
+                  </button>
+                )}
+                {canComplete && (
+                  <button
+                    onClick={() => statusUpdateMutation.mutate({ status: 'COMPLETED', workSummary: 'Service completed successfully' })}
+                    disabled={statusUpdateMutation.isLoading}
+                    className="w-full btn bg-green-600 text-white hover:bg-green-700 flex items-center justify-center gap-2"
+                  >
+                    <CheckIcon className="h-5 w-5" />
+                    Complete Service
+                  </button>
+                )}
+                
+                {/* Customer Actions */}
                 {canReview && (
                   <button
                     onClick={() => setShowReviewModal(true)}

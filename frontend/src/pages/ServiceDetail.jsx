@@ -15,7 +15,7 @@ import {
 export default function ServiceDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, user } = useAuthStore()
 
   const { data, isLoading } = useQuery(
     ['service', id],
@@ -23,6 +23,9 @@ export default function ServiceDetail() {
   )
 
   const service = data?.data?.data
+
+  // Only customers can book services
+  const canBook = !isAuthenticated || user?.userType === 'CUSTOMER'
 
   const handleBookNow = () => {
     if (!isAuthenticated) {
@@ -197,16 +200,25 @@ export default function ServiceDetail() {
                 </div>
               </div>
 
-              <button 
-                onClick={handleBookNow}
-                className="w-full btn-primary py-3.5 text-lg"
-              >
-                Book Now
-              </button>
-
-              <p className="text-center text-xs text-gray-500 mt-4">
-                Free cancellation up to {service.cancellationHours || 4} hours before
-              </p>
+              {canBook ? (
+                <>
+                  <button 
+                    onClick={handleBookNow}
+                    className="w-full btn-primary py-3.5 text-lg"
+                  >
+                    Book Now
+                  </button>
+                  <p className="text-center text-xs text-gray-500 mt-4">
+                    Free cancellation up to {service.cancellationHours || 4} hours before
+                  </p>
+                </>
+              ) : (
+                <div className="text-center p-4 bg-gray-50 rounded-xl">
+                  <p className="text-gray-600 text-sm">
+                    {user?.userType === 'PROVIDER' ? 'Service providers cannot book services' : 'Only customers can book services'}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
