@@ -1,0 +1,1722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HireLink Login Workflow - Complete Code Documentation</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Mermaid for diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    
+    <!-- Highlight.js for syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --bg-code: #0d1117;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --accent-react: #61dafb;
+            --accent-java: #f89820;
+            --accent-sql: #336791;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 4rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(255,255,255,0.2);
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            margin-top: 1rem;
+            position: relative;
+        }
+
+        /* Navigation */
+        .nav {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 2rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+
+        .nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            transition: color 0.2s;
+        }
+
+        .nav a:hover {
+            color: var(--primary);
+        }
+
+        /* Main content */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Sections */
+        section {
+            margin-bottom: 4rem;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        h2 .number {
+            background: var(--primary);
+            color: white;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+            color: var(--secondary);
+        }
+
+        h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .card-header .icon {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .card-header .icon.react { background: rgba(97, 218, 251, 0.2); color: var(--accent-react); }
+        .card-header .icon.java { background: rgba(248, 152, 32, 0.2); color: var(--accent-java); }
+        .card-header .icon.sql { background: rgba(51, 103, 145, 0.2); color: var(--accent-sql); }
+
+        /* Code blocks */
+        pre {
+            background: var(--bg-code) !important;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem !important;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        :not(pre) > code {
+            background: var(--bg-card);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            color: var(--accent-react);
+        }
+
+        /* ASCII Diagrams */
+        .ascii-diagram {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            white-space: pre;
+            color: var(--secondary);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-card);
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        tr:nth-child(even) {
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        /* Mermaid diagrams */
+        .mermaid {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+
+        /* Step indicators */
+        .step {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            position: relative;
+            border-left: 4px solid var(--primary);
+        }
+
+        .step-number {
+            position: absolute;
+            top: -0.75rem;
+            left: 1rem;
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .step h4 {
+            margin-top: 0.5rem;
+            color: var(--text);
+        }
+
+        /* Info boxes */
+        .info-box {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .info-box.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: #f59e0b;
+        }
+
+        .info-box.success {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--secondary);
+        }
+
+        /* Flow diagram */
+        .flow-section {
+            background: linear-gradient(180deg, var(--bg-card) 0%, transparent 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        /* Tech badges */
+        .tech-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .tech-badge {
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .tech-badge.react { background: rgba(97, 218, 251, 0.2); color: var(--accent-react); }
+        .tech-badge.java { background: rgba(248, 152, 32, 0.2); color: var(--accent-java); }
+        .tech-badge.sql { background: rgba(51, 103, 145, 0.2); color: var(--accent-sql); }
+        .tech-badge.security { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+        /* Separator */
+        hr {
+            border: none;
+            height: 1px;
+            background: var(--border);
+            margin: 3rem 0;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* TOC */
+        .toc {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+        }
+
+        .toc h3 {
+            margin-top: 0;
+            color: var(--text);
+        }
+
+        .toc ol {
+            counter-reset: toc;
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .toc li {
+            counter-increment: toc;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .toc li:last-child {
+            border-bottom: none;
+        }
+
+        .toc a {
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: color 0.2s;
+        }
+
+        .toc a:hover {
+            color: var(--primary);
+        }
+
+        .toc a::before {
+            content: counter(toc);
+            background: var(--primary);
+            color: white;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* Print styles */
+        @media print {
+            .nav { display: none; }
+            .header { padding: 2rem; }
+            body { background: white; color: black; }
+            .card, pre { border: 1px solid #ccc; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.75rem; }
+            .container { padding: 1rem; }
+            pre { font-size: 0.75rem; }
+        }
+
+        /* Comment highlighting */
+        .hljs-comment {
+            color: #8b949e;
+            font-style: italic;
+        }
+
+        /* Keyword highlighting */
+        .code-keyword {
+            color: #ff7b72;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1>🔐 HireLink Login Workflow</h1>
+        <p>Complete Code Documentation for Beginners - Understanding Full-Stack Authentication</p>
+        <span class="badge">Academic Project - ENSATE 2026</span>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-content">
+            <a href="#architecture">Architecture</a>
+            <a href="#diagrams">Flow Diagrams</a>
+            <a href="#frontend">Frontend Code</a>
+            <a href="#backend">Backend Code</a>
+            <a href="#database">Database</a>
+            <a href="#security">Security</a>
+            <a href="#complete-flow">Complete Flow</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Introduction -->
+        <section>
+            <p>This document explains how the login process works in the HireLink application, from when a user clicks "Sign In" to when they're authenticated and can access protected features. We'll trace the journey of data through:</p>
+            
+            <ol>
+                <li><strong>Frontend (React)</strong> - User interface and state management</li>
+                <li><strong>Backend (Spring Boot)</strong> - Business logic and authentication</li>
+                <li><strong>Database (MySQL)</strong> - Data storage and retrieval</li>
+            </ol>
+
+            <!-- Table of Contents -->
+            <div class="toc">
+                <h3>📑 Table of Contents</h3>
+                <ol>
+                    <li><a href="#architecture">Architecture Overview</a></li>
+                    <li><a href="#diagrams">Visual Flow Diagrams</a></li>
+                    <li><a href="#frontend">Frontend Code Explained</a></li>
+                    <li><a href="#backend">Backend Code Explained</a></li>
+                    <li><a href="#database">Database Layer</a></li>
+                    <li><a href="#security">Security Concepts</a></li>
+                    <li><a href="#complete-flow">Complete Data Flow Example</a></li>
+                </ol>
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- Section 1: Architecture -->
+        <section id="architecture">
+            <h2><span class="number">1</span> Architecture Overview</h2>
+            
+            <h3>What is Full-Stack Authentication?</h3>
+            <p>When you log into any application, three main things happen:</p>
+
+            <div class="ascii-diagram">┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│    FRONTEND     │     │     BACKEND     │     │    DATABASE     │
+│   (React App)   │────▶│  (Spring Boot)  │────▶│    (MySQL)      │
+│                 │◀────│                 │◀────│                 │
+│  User Interface │     │  Business Logic │     │   Data Storage  │
+└─────────────────┘     └─────────────────┘     └─────────────────┘</div>
+
+            <h3>Technologies Used</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Layer</th>
+                        <th>Technology</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Frontend</td>
+                        <td><span class="tech-badge react">React + Vite</span></td>
+                        <td>Build user interface</td>
+                    </tr>
+                    <tr>
+                        <td>State Management</td>
+                        <td><span class="tech-badge react">Zustand</span></td>
+                        <td>Manage user session data</td>
+                    </tr>
+                    <tr>
+                        <td>HTTP Client</td>
+                        <td><span class="tech-badge react">Axios</span></td>
+                        <td>Make API requests</td>
+                    </tr>
+                    <tr>
+                        <td>Backend</td>
+                        <td><span class="tech-badge java">Spring Boot</span></td>
+                        <td>Handle business logic</td>
+                    </tr>
+                    <tr>
+                        <td>Security</td>
+                        <td><span class="tech-badge security">Spring Security + JWT</span></td>
+                        <td>Authenticate users</td>
+                    </tr>
+                    <tr>
+                        <td>Database</td>
+                        <td><span class="tech-badge sql">MySQL</span></td>
+                        <td>Store user data</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <hr>
+
+        <!-- Section 2: Diagrams -->
+        <section id="diagrams">
+            <h2><span class="number">2</span> Visual Flow Diagrams</h2>
+
+            <h3>High-Level Login Flow</h3>
+            <div class="mermaid">
+sequenceDiagram
+    participant U as User
+    participant F as Frontend (React)
+    participant B as Backend (Spring Boot)
+    participant D as Database (MySQL)
+
+    U->>F: 1. Enter phone & password
+    U->>F: 2. Click "Sign In"
+    F->>F: 3. Validate form inputs
+    F->>B: 4. POST /api/auth/login
+    B->>D: 5. Query: Find user by phone
+    D-->>B: 6. Return user record
+    B->>B: 7. Verify password hash
+    B->>B: 8. Generate JWT tokens
+    B-->>F: 9. Return tokens + user data
+    F->>F: 10. Store tokens in localStorage
+    F->>F: 11. Update auth state
+    F-->>U: 12. Redirect to home page
+            </div>
+
+            <h3>Detailed Component Interaction</h3>
+            <div class="ascii-diagram">┌──────────────────────────────────────────────────────────────────────────────────────┐
+│                              FRONTEND (React Application)                             │
+├──────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                      │
+│  ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────────────────────┐  │
+│  │   Login.jsx     │───▶│  authStore.js    │───▶│         api.js                  │  │
+│  │                 │    │  (Zustand Store) │    │    (Axios HTTP Client)          │  │
+│  │ - Form UI       │    │                  │    │                                 │  │
+│  │ - useForm hook  │    │ - login()        │    │ - authAPI.login()               │  │
+│  │ - Validation    │    │ - User state     │    │ - Request interceptors          │  │
+│  │ - Submit handler│    │ - Tokens         │    │ - Response interceptors         │  │
+│  └─────────────────┘    └──────────────────┘    └─────────────────────────────────┘  │
+│                                                              │                        │
+└──────────────────────────────────────────────────────────────│────────────────────────┘
+                                                               │
+                                            HTTP POST /api/auth/login
+                                            { phone, password }
+                                                               │
+                                                               ▼
+┌──────────────────────────────────────────────────────────────────────────────────────┐
+│                           BACKEND (Spring Boot Application)                           │
+├──────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                      │
+│  ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────────────────────┐  │
+│  │ AuthController  │───▶│  AuthService     │───▶│       Security Layer            │  │
+│  │                 │    │                  │    │                                 │  │
+│  │ @PostMapping    │    │ - authenticate   │    │ - AuthenticationManager         │  │
+│  │ /api/auth/login │    │ - generateTokens │    │ - PasswordEncoder               │  │
+│  │                 │    │ - update login   │    │ - JwtService                    │  │
+│  └─────────────────┘    └──────────────────┘    └─────────────────────────────────┘  │
+│                                │                                                     │
+│                                ▼                                                     │
+│  ┌─────────────────────────────────────────────────────────────────────────────────┐ │
+│  │                          Data Access Layer                                       │ │
+│  │  ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────────────────┐  │ │
+│  │  │ UserRepository  │───▶│ User Entity      │───▶│ CustomUserDetails           │  │ │
+│  │  │                 │    │                  │    │                             │  │ │
+│  │  │ findByPhone()   │    │ JPA Entity       │    │ Spring Security wrapper     │  │ │
+│  │  └─────────────────┘    └──────────────────┘    └─────────────────────────────┘  │ │
+│  └─────────────────────────────────────────────────────────────────────────────────┘ │
+│                                │                                                     │
+└────────────────────────────────│─────────────────────────────────────────────────────┘
+                                 │
+                      SQL: SELECT * FROM users WHERE phone = ?
+                                 │
+                                 ▼
+┌──────────────────────────────────────────────────────────────────────────────────────┐
+│                             DATABASE (MySQL)                                          │
+├──────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                      │
+│   ┌─────────────────────────────────────────────────────────────────────────────┐    │
+│   │                           users TABLE                                        │    │
+│   ├─────────────────────────────────────────────────────────────────────────────┤    │
+│   │ user_id | name  | phone      | password_hash                    | user_type │    │
+│   │ --------|-------|------------|----------------------------------|-----------|    │
+│   │ 1       | Priya | 9876543210 | $2a$12$b/tFjZCh... (BCrypt hash) | CUSTOMER  │    │
+│   └─────────────────────────────────────────────────────────────────────────────┘    │
+│                                                                                      │
+└──────────────────────────────────────────────────────────────────────────────────────┘</div>
+        </section>
+
+        <hr>
+
+        <!-- Section 3: Frontend -->
+        <section id="frontend">
+            <h2><span class="number">3</span> Frontend Code Explained</h2>
+
+            <!-- Login.jsx -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon react">⚛️</span>
+                    <span>3.1 Login Page Component (Login.jsx)</span>
+                </div>
+                <p>This is the React component that renders the login form and handles user input.</p>
+                
+                <pre><code class="language-jsx">// ============================================================================
+// FILE: frontend/src/pages/auth/Login.jsx
+// PURPOSE: Renders the login form and handles user authentication
+// ============================================================================
+
+// ============================================================================
+// IMPORTS - External libraries and internal modules we need
+// ============================================================================
+
+import { useState } from 'react'
+// useState is a React Hook - a special function that lets you add "state" 
+// (data that can change) to your component. When state changes, React 
+// automatically re-renders (redraws) the component with the new data.
+
+import { Link, useNavigate } from 'react-router-dom'
+// Link: Creates clickable links that navigate without full page reload
+// useNavigate: Hook that returns a function to programmatically navigate
+// These are from React Router - the library that handles page navigation
+
+import { useForm } from 'react-hook-form'
+// useForm is from the 'react-hook-form' library
+// It provides easy form validation and handling without writing lots of code
+// Returns functions like: register (connect input), handleSubmit, formState
+
+import { useAuthStore } from '../../context/authStore'
+// This imports our custom Zustand store (explained later)
+// It contains the login function and authentication state
+
+import toast from 'react-hot-toast'
+// A library for showing popup notifications (toasts)
+// toast.success() shows green success message
+// toast.error() shows red error message
+
+// ============================================================================
+// MAIN COMPONENT FUNCTION
+// ============================================================================
+
+export default function Login() {
+  // 'export default' makes this the main export of the file
+  // Other files can import it as: import Login from './Login'
+
+  // --------------------------------------------------------------------------
+  // HOOKS - Special React functions that add features to our component
+  // --------------------------------------------------------------------------
+
+  const navigate = useNavigate()
+  // Returns a function we can call to navigate to different pages
+  // Example: navigate('/') goes to home page
+
+  const { login, isLoading, error, clearError } = useAuthStore()
+  // DESTRUCTURING: Extracts specific values from the auth store
+  // login: async function to authenticate user
+  // isLoading: boolean - true while login is in progress
+  // error: string - error message if login failed
+  // clearError: function to clear any previous errors
+
+  const [showPassword, setShowPassword] = useState(false)
+  // useState returns an array with 2 items:
+  // [0] showPassword: the current value (starts as false)
+  // [1] setShowPassword: function to update the value
+  // This controls whether password is visible or hidden (dots)
+
+  const { 
+    register,      // Function to register input fields for form handling
+    handleSubmit,  // Function that wraps our submit handler with validation
+    formState: { errors }  // Object containing validation errors
+  } = useForm()
+
+  // --------------------------------------------------------------------------
+  // EVENT HANDLERS - Functions that respond to user actions
+  // --------------------------------------------------------------------------
+
+  const onSubmit = async (data) => {
+    // 'async' keyword: This function contains asynchronous operations
+    // (operations that take time, like network requests)
+    // 'data' parameter: Form values { phone: "...", password: "..." }
+    
+    clearError()  // Clear any previous error messages
+    
+    const result = await login(data.phone, data.password)
+    // 'await' pauses execution until login() completes
+    // login() makes API call and returns { success: boolean, error?: string }
+    
+    if (result.success) {
+      toast.success('Welcome back!')  // Show success notification
+      navigate('/')                   // Redirect to home page
+    } else {
+      toast.error(result.error)       // Show error notification
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // JSX RETURN - The HTML-like syntax that defines what to render
+  // --------------------------------------------------------------------------
+
+  return (
+    &lt;form onSubmit={handleSubmit(onSubmit)}&gt;
+      {/* handleSubmit(onSubmit) wraps our handler:
+          1. Prevents default form submission (page reload)
+          2. Validates all fields
+          3. Only calls onSubmit if validation passes */}
+
+      {/* PHONE NUMBER INPUT */}
+      &lt;input
+        type="tel"
+        {...register('phone', { 
+          required: 'Phone number is required',
+          pattern: {
+            value: /^[+]?[0-9]{10,15}$/,
+            // REGEX explained:
+            // ^        = start of string
+            // [+]?     = optional + character
+            // [0-9]    = any digit 0-9
+            // {10,15}  = between 10 and 15 of the previous
+            // $        = end of string
+            message: 'Enter a valid phone number'
+          }
+        })}
+        placeholder="+91 9876543210"
+      /&gt;
+      
+      {/* VALIDATION ERROR MESSAGE */}
+      {errors.phone && (
+        // CONDITIONAL RENDERING: Only render if errors.phone exists
+        &lt;p className="error"&gt;{errors.phone.message}&lt;/p&gt;
+      )}
+
+      {/* PASSWORD INPUT */}
+      &lt;input
+        type={showPassword ? 'text' : 'password'}
+        // TERNARY OPERATOR: condition ? valueIfTrue : valueIfFalse
+        {...register('password', { 
+          required: 'Password is required',
+          minLength: { value: 8, message: 'Min 8 characters' }
+        })}
+      /&gt;
+
+      {/* SUBMIT BUTTON */}
+      &lt;button type="submit" disabled={isLoading}&gt;
+        {isLoading ? 'Signing in...' : 'Sign In'}
+      &lt;/button&gt;
+    &lt;/form&gt;
+  )
+}</code></pre>
+            </div>
+
+            <!-- api.js -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon react">📡</span>
+                    <span>3.2 API Service (api.js)</span>
+                </div>
+                <p>This file configures Axios to make HTTP requests to our backend.</p>
+                
+                <pre><code class="language-javascript">// ============================================================================
+// FILE: frontend/src/services/api.js
+// PURPOSE: Configure HTTP client for API communication
+// ============================================================================
+
+import axios from 'axios'
+// Axios is a popular HTTP client library for making API requests
+
+// ============================================================================
+// BASE CONFIGURATION
+// ============================================================================
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
+// import.meta.env: Vite's way to access environment variables
+// || '/api': Fallback value if env variable not set
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  // All requests will be prefixed with this URL
+  // api.get('/users') → GET http://localhost:8080/api/users
+  
+  headers: {
+    'Content-Type': 'application/json',
+    // Tells server we're sending JSON data
+  },
+})
+
+// ============================================================================
+// REQUEST INTERCEPTOR - Runs BEFORE every request
+// ============================================================================
+
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('accessToken')
+    // localStorage: Browser's persistent storage
+    
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+      // Add Authorization header with JWT token
+      // Format: "Bearer eyJhbGciOiJIUzI1NiIsIn..."
+    }
+    
+    return config
+  },
+  (error) => Promise.reject(error)
+)
+
+// ============================================================================
+// RESPONSE INTERCEPTOR - Runs AFTER every response
+// ============================================================================
+
+api.interceptors.response.use(
+  (response) => response,
+  // If successful, just pass through
+  
+  async (error) => {
+    const originalRequest = error.config
+    
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      // 401 = Unauthorized (token expired)
+      originalRequest._retry = true
+      
+      try {
+        const refreshToken = localStorage.getItem('refreshToken')
+        if (refreshToken) {
+          // Try to get new access token
+          const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
+            refreshToken,
+          })
+          
+          const { accessToken, refreshToken: newRefreshToken } = response.data.data
+          localStorage.setItem('accessToken', accessToken)
+          localStorage.setItem('refreshToken', newRefreshToken)
+          
+          // Retry original request with new token
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`
+          return api(originalRequest)
+        }
+      } catch (refreshError) {
+        // Refresh failed - redirect to login
+        localStorage.removeItem('accessToken')
+        localStorage.removeItem('refreshToken')
+        window.location.href = '/login'
+      }
+    }
+    
+    return Promise.reject(error)
+  }
+)
+
+// ============================================================================
+// API ENDPOINTS
+// ============================================================================
+
+export const authAPI = {
+  login: (data) => api.post('/auth/login', data),
+  // POST /api/auth/login with data as request body
+  
+  register: (data) => api.post('/auth/register', data),
+  refresh: (refreshToken) => api.post('/auth/refresh', { refreshToken }),
+}
+
+export default api</code></pre>
+            </div>
+
+            <!-- authStore.js -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon react">🗄️</span>
+                    <span>3.3 Authentication State Store (authStore.js)</span>
+                </div>
+                <p>Zustand is a simple state management library. This store holds our authentication state.</p>
+                
+                <pre><code class="language-javascript">// ============================================================================
+// FILE: frontend/src/context/authStore.js
+// PURPOSE: Manage authentication state across the entire application
+// ============================================================================
+
+import { create } from 'zustand'
+// create: Function to create a Zustand store
+
+import { persist } from 'zustand/middleware'
+// persist: Middleware that saves state to localStorage
+
+import { authAPI } from '../services/api'
+
+// ============================================================================
+// CREATE THE STORE
+// ============================================================================
+
+export const useAuthStore = create(
+  persist(
+    (set, get) => ({
+      // set: Function to update state
+      // get: Function to read current state
+      
+      // ======================================================================
+      // STATE - The data we're storing
+      // ======================================================================
+      
+      user: null,           // User object after login
+      accessToken: null,    // JWT access token (short-lived)
+      refreshToken: null,   // JWT refresh token (long-lived)
+      isAuthenticated: false,
+      isLoading: false,
+      error: null,
+      
+      // ======================================================================
+      // ACTIONS - Functions that modify state
+      // ======================================================================
+      
+      login: async (phone, password) => {
+        set({ isLoading: true, error: null })
+        // Update state: start loading, clear errors
+        
+        try {
+          const response = await authAPI.login({ phone, password })
+          const { accessToken, refreshToken, user } = response.data.data
+          
+          // Store tokens in localStorage for API interceptor
+          localStorage.setItem('accessToken', accessToken)
+          localStorage.setItem('refreshToken', refreshToken)
+          
+          set({
+            user,
+            accessToken,
+            refreshToken,
+            isAuthenticated: true,
+            isLoading: false,
+          })
+          
+          return { success: true }
+          
+        } catch (error) {
+          const message = error.response?.data?.message || 'Login failed'
+          // Optional chaining (?.) safely accesses nested properties
+          
+          set({ error: message, isLoading: false })
+          return { success: false, error: message }
+        }
+      },
+      
+      logout: () => {
+        localStorage.removeItem('accessToken')
+        localStorage.removeItem('refreshToken')
+        
+        set({
+          user: null,
+          accessToken: null,
+          refreshToken: null,
+          isAuthenticated: false,
+        })
+      },
+      
+      clearError: () => set({ error: null }),
+    }),
+    
+    // PERSIST CONFIGURATION
+    {
+      name: 'auth-storage',
+      // Key name in localStorage
+      
+      partialize: (state) => ({
+        // Select which state to persist (NOT isLoading/error)
+        user: state.user,
+        accessToken: state.accessToken,
+        refreshToken: state.refreshToken,
+        isAuthenticated: state.isAuthenticated,
+      }),
+    }
+  )
+)</code></pre>
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- Section 4: Backend -->
+        <section id="backend">
+            <h2><span class="number">4</span> Backend Code Explained</h2>
+
+            <!-- AuthController -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon java">☕</span>
+                    <span>4.1 Authentication Controller (AuthController.java)</span>
+                </div>
+                <p>The controller is the entry point for HTTP requests.</p>
+                
+                <pre><code class="language-java">// ============================================================================
+// FILE: backend/src/main/java/com/hirelink/controller/AuthController.java
+// PURPOSE: Handle HTTP requests for authentication endpoints
+// ============================================================================
+
+package com.hirelink.controller;
+
+import com.hirelink.dto.ApiResponse;
+import com.hirelink.dto.AuthDTO;
+import com.hirelink.service.AuthService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+// Marks this class as a REST controller
+// All methods return data directly (converted to JSON)
+
+@RequestMapping("/api/auth")
+// Base URL path: all methods start with /api/auth
+
+@RequiredArgsConstructor
+// Lombok: Generates constructor for dependency injection
+
+public class AuthController {
+
+    private final AuthService authService;
+    // DEPENDENCY INJECTION: Spring provides AuthService instance
+
+    // ========================================================================
+    // LOGIN ENDPOINT
+    // ========================================================================
+    
+    @PostMapping("/login")
+    // HTTP POST requests to /api/auth/login come here
+    
+    public ResponseEntity&lt;ApiResponse&lt;AuthDTO.AuthResponse&gt;&gt; login(
+            @Valid @RequestBody AuthDTO.LoginRequest request) {
+        // @Valid: Triggers validation on request object
+        // @RequestBody: Parse HTTP body as JSON → LoginRequest
+        
+        AuthDTO.AuthResponse response = authService.login(request);
+        // Call service layer for business logic
+        
+        return ResponseEntity.ok(ApiResponse.success("Login successful", response));
+        // ResponseEntity.ok(): 200 OK status
+        // Final JSON:
+        // {
+        //   "success": true,
+        //   "message": "Login successful",
+        //   "data": { "accessToken": "...", "user": {...} }
+        // }
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity&lt;ApiResponse&lt;AuthDTO.AuthResponse&gt;&gt; register(
+            @Valid @RequestBody AuthDTO.RegisterRequest request) {
+        AuthDTO.AuthResponse response = authService.register(request);
+        return ResponseEntity.ok(ApiResponse.success("Registration successful", response));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity&lt;ApiResponse&lt;AuthDTO.AuthResponse&gt;&gt; refreshToken(
+            @Valid @RequestBody AuthDTO.RefreshTokenRequest request) {
+        AuthDTO.AuthResponse response = authService.refreshToken(request.getRefreshToken());
+        return ResponseEntity.ok(ApiResponse.success("Token refreshed", response));
+    }
+}</code></pre>
+            </div>
+
+            <!-- AuthService -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon java">⚙️</span>
+                    <span>4.2 Authentication Service (AuthService.java)</span>
+                </div>
+                <p>The service contains the business logic for authentication.</p>
+                
+                <pre><code class="language-java">// ============================================================================
+// FILE: backend/src/main/java/com/hirelink/service/AuthService.java
+// PURPOSE: Business logic for authentication operations
+// ============================================================================
+
+@Service
+// Marks as Spring Service component (singleton)
+
+@RequiredArgsConstructor
+public class AuthService {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;  // BCrypt
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
+
+    // ========================================================================
+    // LOGIN METHOD
+    // ========================================================================
+    
+    @Transactional
+    // Database transaction: rollback on failure
+    
+    public AuthDTO.AuthResponse login(AuthDTO.LoginRequest request) {
+        
+        try {
+            authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    request.getPhone(), 
+                    request.getPassword()
+                )
+            );
+            // AUTHENTICATION PROCESS:
+            // 1. AuthenticationManager → AuthenticationProvider
+            // 2. Provider uses UserDetailsService to load user
+            // 3. Provider uses PasswordEncoder to verify password
+            // 4. Throws exception if invalid
+            
+        } catch (Exception e) {
+            throw new UnauthorizedException("Invalid phone or password");
+            // Generic message - don't reveal if phone exists
+        }
+
+        // Get user from database
+        User user = userRepository.findByPhone(request.getPhone())
+                .orElseThrow(() -> new UnauthorizedException("Invalid phone or password"));
+
+        // Update login tracking
+        user.setLastLoginAt(LocalDateTime.now());
+        user.setFailedLoginAttempts(0);
+        userRepository.save(user);
+
+        // Generate JWT tokens
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+        String accessToken = jwtService.generateAccessToken(userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
+
+        // Build response using Builder pattern
+        return AuthDTO.AuthResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .tokenType("Bearer")
+                .expiresIn(jwtService.getAccessTokenExpiration())
+                .user(mapToUserDTO(user))
+                .build();
+    }
+
+    private AuthDTO.UserDTO mapToUserDTO(User user) {
+        // Convert entity to DTO (hide sensitive fields)
+        return AuthDTO.UserDTO.builder()
+                .userId(user.getUserId())
+                .name(user.getName())
+                .phone(user.getPhone())
+                .userType(user.getUserType().name())
+                .build();
+    }
+}</code></pre>
+            </div>
+
+            <!-- JwtService -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon java">🔑</span>
+                    <span>4.3 JWT Service (JwtService.java)</span>
+                </div>
+                <p>This service creates and validates JSON Web Tokens.</p>
+                
+                <pre><code class="language-java">// ============================================================================
+// FILE: backend/src/main/java/com/hirelink/security/JwtService.java
+// PURPOSE: Create, parse, and validate JWT tokens
+// ============================================================================
+
+@Service
+public class JwtService {
+
+    @Value("${jwt.secret}")
+    private String secretKey;
+    // Injected from application.properties
+    // KEEP THIS SECRET!
+
+    @Value("${jwt.access-token-expiration}")
+    private long accessTokenExpiration;  // e.g., 3600000 (1 hour)
+
+    @Value("${jwt.refresh-token-expiration}")
+    private long refreshTokenExpiration;  // e.g., 604800000 (7 days)
+
+    // ========================================================================
+    // EXTRACT INFO FROM TOKEN
+    // ========================================================================
+    
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+        // Claims::getSubject is a method reference
+        // Gets "sub" claim (the phone number)
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(getSignInKey())  // Verify signature
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    // ========================================================================
+    // GENERATE TOKENS
+    // ========================================================================
+    
+    public String generateAccessToken(UserDetails userDetails) {
+        return buildToken(new HashMap&lt;&gt;(), userDetails, accessTokenExpiration);
+    }
+
+    public String generateRefreshToken(UserDetails userDetails) {
+        return buildToken(new HashMap&lt;&gt;(), userDetails, refreshTokenExpiration);
+    }
+
+    private String buildToken(Map&lt;String, Object&gt; extraClaims, 
+                              UserDetails userDetails, long expiration) {
+        return Jwts.builder()
+                .claims(extraClaims)
+                .subject(userDetails.getUsername())  // Phone number
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSignInKey(), Jwts.SIG.HS256)  // Sign with secret
+                .compact();
+        // Result: "eyJhbGciOiJIUzI1NiIs..."
+    }
+
+    // ========================================================================
+    // VALIDATE TOKEN
+    // ========================================================================
+    
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+    }
+
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    private SecretKey getSignInKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+}</code></pre>
+            </div>
+
+            <!-- UserRepository -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon java">💾</span>
+                    <span>4.4 User Repository (UserRepository.java)</span>
+                </div>
+                <p>Spring Data JPA automatically implements database operations.</p>
+                
+                <pre><code class="language-java">// ============================================================================
+// FILE: backend/src/main/java/com/hirelink/repository/UserRepository.java
+// PURPOSE: Data access layer for User entity
+// ============================================================================
+
+@Repository
+public interface UserRepository extends JpaRepository&lt;User, Long&gt; {
+    // JpaRepository&lt;User, Long&gt;:
+    // - User: Entity type
+    // - Long: Primary key type
+    
+    // JpaRepository provides:
+    // - save(entity): Insert or update
+    // - findById(id): Find by primary key
+    // - findAll(): Get all records
+    // - delete(entity): Remove record
+
+    // ========================================================================
+    // CUSTOM QUERY METHODS - Spring Data Magic!
+    // ========================================================================
+    
+    Optional&lt;User&gt; findByPhone(String phone);
+    // Method name → SQL query automatically!
+    // "findBy" + "Phone" → SELECT * FROM users WHERE phone = ?
+    
+    boolean existsByPhone(String phone);
+    // "existsBy" + "Phone" → SELECT COUNT(*) > 0 WHERE phone = ?
+    
+    Optional&lt;User&gt; findByPhoneAndDeletedAtIsNull(String phone);
+    // "findBy" + "Phone" + "And" + "DeletedAt" + "IsNull"
+    // → SELECT * FROM users WHERE phone = ? AND deleted_at IS NULL
+}</code></pre>
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- Section 5: Database -->
+        <section id="database">
+            <h2><span class="number">5</span> Database Layer</h2>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon sql">🗃️</span>
+                    <span>5.1 Users Table Schema</span>
+                </div>
+                
+                <pre><code class="language-sql">-- ============================================================================
+-- Database: MySQL
+-- Table: users
+-- Purpose: Store user account information
+-- ============================================================================
+
+CREATE TABLE users (
+    -- PRIMARY KEY
+    user_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    -- BIGINT: Large integer
+    -- AUTO_INCREMENT: Database assigns next number
+    -- PRIMARY KEY: Unique identifier
+    
+    -- USER INFORMATION
+    name VARCHAR(100) NOT NULL,
+    -- VARCHAR(100): Max 100 characters
+    -- NOT NULL: Required field
+    
+    email VARCHAR(150) UNIQUE,
+    -- UNIQUE: No duplicates allowed
+    
+    phone VARCHAR(15) NOT NULL UNIQUE,
+    -- Phone is required and unique
+    -- Used as login identifier
+    
+    password_hash VARCHAR(255) NOT NULL,
+    -- Stores BCrypt hash, NOT plain password!
+    -- BCrypt hashes are ~60 chars
+    
+    -- ACCOUNT STATUS
+    user_type ENUM('CUSTOMER', 'PROVIDER', 'ADMIN', 'SUPER_ADMIN') 
+        NOT NULL DEFAULT 'CUSTOMER',
+    -- ENUM: Restricts to listed values
+    -- DEFAULT: Used if not specified
+    
+    account_status ENUM('ACTIVE', 'INACTIVE', 'SUSPENDED', 'BANNED', 
+        'PENDING_VERIFICATION') DEFAULT 'ACTIVE',
+    
+    -- SECURITY
+    failed_login_attempts INT DEFAULT 0,
+    -- Track for account lockout
+    
+    locked_until DATETIME,
+    -- Account locked until this time
+    
+    last_login_at DATETIME,
+    -- For audit/analytics
+    
+    -- TIMESTAMPS
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    -- Auto-set on insert
+    
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    -- Auto-update on change
+);
+
+-- INDEX for fast lookups (essential for login performance)
+CREATE INDEX idx_users_phone ON users(phone);</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon sql">📝</span>
+                    <span>5.2 Sample User Data</span>
+                </div>
+                
+                <pre><code class="language-sql">-- Password: password123
+-- BCrypt hash (strength 12)
+
+INSERT INTO users (
+    user_id, name, email, phone, password_hash, 
+    user_type, account_status
+) VALUES (
+    1,
+    'Priya Sharma',
+    'priya.sharma@email.com',
+    '9876543210',
+    '$2a$12$b/tFjZChShbXoKZCK2YqYuKr8a501ns3RXwpTUE7bB3yySv.e2ePK',
+    -- BCrypt hash breakdown:
+    -- $2a$  = BCrypt algorithm identifier
+    -- $12$  = Cost factor (2^12 = 4096 iterations)
+    -- Rest  = Salt (22 chars) + Hash
+    'CUSTOMER',
+    'ACTIVE'
+);</code></pre>
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- Section 6: Security -->
+        <section id="security">
+            <h2><span class="number">6</span> Security Concepts</h2>
+
+            <h3>6.1 What is JWT (JSON Web Token)?</h3>
+            <div class="card">
+                <p>JWT is a secure way to transmit information between parties as a JSON object.</p>
+                
+                <div class="ascii-diagram">A JWT looks like this:
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ODc2NTQzMjEwIiwiaWF0IjoxNjE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+It has 3 parts separated by dots:
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        HEADER.PAYLOAD.SIGNATURE                          │
+└─────────────────────────────────────────────────────────────────────────┘
+
+1. HEADER (eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9)
+   Base64 encoded:
+   { "alg": "HS256", "typ": "JWT" }
+
+2. PAYLOAD (eyJzdWIiOiI5ODc2NTQzMjEwIiwiaWF0IjoxNjE2MjM5MDIyfQ)
+   Base64 encoded:
+   { "sub": "9876543210", "iat": 1616239022, "exp": 1616242622 }
+
+3. SIGNATURE
+   HMACSHA256(header + "." + payload, secret_key)
+   Ensures token wasn't tampered with</div>
+            </div>
+
+            <h3>6.2 Password Hashing with BCrypt</h3>
+            <div class="card">
+                <div class="ascii-diagram">Plain Password:  password123
+
+BCrypt Hash: $2a$12$b/tFjZChShbXoKZCK2YqYuKr8a501ns3RXwpTUE7bB3yySv.e2ePK
+             ─┬─ ─┬─ ────────────────────┬──────────────── ────────────┬────────
+              │   │                       │                            │
+              │   │                       └── Salt (22 chars)          │
+              │   │                                                    │
+              │   └── Cost factor (12 = 2^12 iterations)              │
+              │                                                        │
+              └── Algorithm ($2a$ = BCrypt)                           │
+                                                                       │
+                                    Hash result ──────────────────────┘
+
+WHY BCRYPT?
+✓ Salt prevents rainbow table attacks
+✓ Cost factor makes brute force impractical  
+✓ Same password = different hash each time (secure!)</div>
+            </div>
+
+            <h3>6.3 Security Measures Summary</h3>
+            <div class="info-box success">
+                <ul>
+                    <li><strong>HTTPS:</strong> Encrypts all data in transit</li>
+                    <li><strong>BCrypt:</strong> Passwords stored as one-way hashes</li>
+                    <li><strong>JWT Tokens:</strong> Stateless authentication</li>
+                    <li><strong>Token Expiration:</strong> Access tokens expire in 1 hour</li>
+                    <li><strong>Refresh Tokens:</strong> Get new tokens without re-login</li>
+                    <li><strong>Account Lockout:</strong> Prevents brute force attacks</li>
+                    <li><strong>CORS:</strong> Only allowed origins can call API</li>
+                </ul>
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- Section 7: Complete Flow -->
+        <section id="complete-flow">
+            <h2><span class="number">7</span> Complete Data Flow Example</h2>
+            
+            <p>Let's trace what happens when user "Priya" logs in with phone "9876543210" and password "password123".</p>
+
+            <div class="step">
+                <span class="step-number">STEP 1</span>
+                <h4>User Action</h4>
+                <p>Priya enters phone: <code>9876543210</code>, password: <code>password123</code>, clicks "Sign In"</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">STEP 2</span>
+                <h4>Frontend Form Handling (Login.jsx)</h4>
+                <pre><code class="language-javascript">const onSubmit = async (data) => {
+  // data = { phone: "9876543210", password: "password123" }
+  const result = await login(data.phone, data.password)
+}</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">STEP 3</span>
+                <h4>State Management (authStore.js)</h4>
+                <pre><code class="language-javascript">login: async (phone, password) => {
+  set({ isLoading: true })  // UI shows spinner
+  const response = await authAPI.login({ phone, password })
+}</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">STEP 4</span>
+                <h4>HTTP Request (api.js)</h4>
+                <pre><code class="language-javascript">HTTP POST http://localhost:8080/api/auth/login
+Headers: { "Content-Type": "application/json" }
+Body: { "phone": "9876543210", "password": "password123" }</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">STEP 5-6</span>
+                <h4>Backend Controller → Service</h4>
+                <pre><code class="language-java">authenticationManager.authenticate(
+    new UsernamePasswordAuthenticationToken("9876543210", "password123")
+);</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">STEP 7-8</span>
+                <h4>Database Query</h4>
+                <pre><code class="language-sql">SELECT * FROM users WHERE phone = '9876543210'
+-- Returns: user_id=1, name="Priya Sharma", password_hash="$2a$12$..."</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">STEP 9</span>
+                <h4>Password Verification</h4>
+                <pre><code class="language-java">passwordEncoder.matches("password123", stored_hash)
+// 1. Extract salt from stored hash
+// 2. Hash "password123" with same salt
+// 3. Compare → TRUE (match!)</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">STEP 10</span>
+                <h4>Generate JWT Tokens</h4>
+                <pre><code class="language-javascript">Access Token: {
+  "sub": "9876543210",
+  "iat": 1737000000,  // Issued now
+  "exp": 1737003600   // Expires in 1 hour
+}
+// + Signature → "eyJhbGciOiJIUzI1NiIs..."</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">STEP 11</span>
+                <h4>Backend Response</h4>
+                <pre><code class="language-json">{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIs...",
+    "tokenType": "Bearer",
+    "expiresIn": 3600000,
+    "user": {
+      "userId": 1,
+      "name": "Priya Sharma",
+      "userType": "CUSTOMER"
+    }
+  }
+}</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">STEP 12</span>
+                <h4>Frontend Stores Data</h4>
+                <pre><code class="language-javascript">localStorage.setItem('accessToken', accessToken)
+set({ user, isAuthenticated: true, isLoading: false })</code></pre>
+            </div>
+
+            <div class="step">
+                <span class="step-number">STEP 13</span>
+                <h4>UI Update</h4>
+                <pre><code class="language-javascript">toast.success('Welcome back!')  // Green notification
+navigate('/')                   // Redirect to home
+// ✓ Priya is now logged in!</code></pre>
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- Summary -->
+        <section>
+            <h2>📚 Summary</h2>
+            
+            <p>The login workflow demonstrates how modern web applications handle authentication:</p>
+            
+            <ol>
+                <li><strong>Frontend</strong> collects credentials and manages UI state</li>
+                <li><strong>Backend</strong> validates credentials and issues tokens</li>
+                <li><strong>Database</strong> stores user data securely with hashed passwords</li>
+                <li><strong>JWT tokens</strong> provide stateless authentication for subsequent requests</li>
+            </ol>
+
+            <h3>Key Technologies</h3>
+            <div class="tech-badges">
+                <span class="tech-badge react">React Hooks</span>
+                <span class="tech-badge react">Zustand</span>
+                <span class="tech-badge react">Axios</span>
+                <span class="tech-badge java">Spring Boot</span>
+                <span class="tech-badge java">Spring Security</span>
+                <span class="tech-badge java">JPA/Hibernate</span>
+                <span class="tech-badge security">BCrypt</span>
+                <span class="tech-badge security">JWT</span>
+                <span class="tech-badge sql">MySQL</span>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Document created for HireLink Academic Project - ENSATE 2026</p>
+        <p>Open this file in any web browser to view</p>
+    </footer>
+
+    <!-- Initialize Mermaid and Highlight.js -->
+    <script>
+        // Initialize Mermaid diagrams
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#6366f1',
+                primaryTextColor: '#e2e8f0',
+                primaryBorderColor: '#4f46e5',
+                lineColor: '#94a3b8',
+                secondaryColor: '#1e293b',
+                tertiaryColor: '#0f172a'
+            }
+        });
+
+        // Initialize syntax highlighting
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightElement(block);
+            });
+        });
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
