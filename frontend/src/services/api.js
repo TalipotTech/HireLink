@@ -95,6 +95,7 @@ export const providersAPI = {
 export const bookingsAPI = {
   create: (data) => api.post('/bookings', data),
   getMyBookings: (params) => api.get('/bookings/my-bookings', { params }),
+  getRecent: (limit = 3) => api.get('/bookings/recent', { params: { limit } }),
   getById: (id) => api.get(`/bookings/${id}`),
   getByNumber: (number) => api.get(`/bookings/number/${number}`),
   updateStatus: (id, data) => api.patch(`/bookings/${id}/status`, data),

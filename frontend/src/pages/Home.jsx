@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useQuery } from 'react-query'
-import { categoriesAPI, servicesAPI, providersAPI } from '../services/api'
+import { categoriesAPI, servicesAPI, providersAPI, bookingsAPI } from '../services/api'
+import { useAuthStore } from '../context/authStore'
+import { format } from 'date-fns'
 import { 
   MagnifyingGlassIcon, 
   BoltIcon,
@@ -11,9 +13,20 @@ import {
   ClockIcon,
   CurrencyRupeeIcon,
   StarIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  CalendarDaysIcon,
+  UserIcon
 } from '@heroicons/react/24/outline'
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid'
+
+const statusColors = {
+  PENDING: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+  ACCEPTED: 'bg-blue-100 text-blue-800 border-blue-200',
+  CONFIRMED: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+  IN_PROGRESS: 'bg-purple-100 text-purple-800 border-purple-200',
+  COMPLETED: 'bg-green-100 text-green-800 border-green-200',
+  CANCELLED: 'bg-red-100 text-red-800 border-red-200',
+}
 
 const categoryIcons = {
   electrical: BoltIcon,
@@ -57,14 +70,79 @@ const features = [
 ]
 
 export default function Home() {
+  const { isAuthenticated, user } = useAuthStore()
   const { data: categoriesData } = useQuery('categories', categoriesAPI.getAll)
   const { data: featuredProviders } = useQuery('featuredProviders', providersAPI.getFeatured)
+  const { data: recentBookingsData } = useQuery(
+    'recentBookings', 
+    () => bookingsAPI.getRecent(3),
+    { enabled: isAuthenticated && (user?.userType === 'CUSTOMER' || user?.userType === 'PROVIDER') }
+  )
   
   const categories = categoriesData?.data?.data?.slice(0, 8) || []
   const providers = featuredProviders?.data?.data?.slice(0, 4) || []
+  const recentBookings = recentBookingsData?.data?.data || []
+  
+  const isProvider = user?.userType === 'PROVIDER'
+  const isCustomer = user?.userType === 'CUSTOMER'
 
   return (
     <div className="animate-fadeIn">
+      {/* Recent Bookings Section - for logged in users */}
+      {isAuthenticated && (isCustomer || isProvider) && recentBookings.length > 0 && (
+        <section className={`py-6 ${isProvider ? 'bg-emerald-50' : 'bg-primary-50'}`}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className={`text-lg font-semibold ${isProvider ? 'text-emerald-900' : 'text-primary-900'}`}>
+                {isProvider ? '📋 Recent Service Requests' : '📋 Your Recent Bookings'}
+              </h2>
+              <Link 
+                to="/bookings" 
+                className={`text-sm font-medium ${isProvider ? 'text-emerald-600 hover:text-emerald-700' : 'text-primary-600 hover:text-primary-700'} flex items-center gap-1`}
+              >
+                View all <ChevronRightIcon className="h-4 w-4" />
+              </Link>
+            </div>
+            <div className="grid md:grid-cols-3 gap-4">
+              {recentBookings.map((booking) => (
+                <Link
+                  key={booking.bookingId}
+                  to={`/bookings/${booking.bookingId}`}
+                  className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all border border-gray-100"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-10 h-10 ${isProvider ? 'bg-emerald-100' : 'bg-primary-100'} rounded-lg flex items-center justify-center`}>
+                        <CalendarDaysIcon className={`h-5 w-5 ${isProvider ? 'text-emerald-600' : 'text-primary-600'}`} />
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-gray-900 text-sm">{booking.service?.serviceName}</h3>
+                        <p className="text-xs text-gray-500">
+                          {format(new Date(booking.scheduledDate), 'MMM d')} • {booking.scheduledTime}
+                        </p>
+                      </div>
+                    </div>
+                    <span className={`badge text-xs ${statusColors[booking.bookingStatus]}`}>
+                      {booking.bookingStatus?.replace('_', ' ')}
+                    </span>
+                  </div>
+                  {isProvider ? (
+                    <div className="flex items-center gap-1 text-xs text-gray-500 mt-2">
+                      <UserIcon className="h-3 w-3" />
+                      <span>{booking.customer?.name}</span>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-500 mt-2">
+                      {booking.provider?.businessName || booking.provider?.providerName}
+                    </p>
+                  )}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900"></div>

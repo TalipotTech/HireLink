@@ -174,6 +174,32 @@ public class BookingService {
         return mapToBookingListResponse(bookingPage);
     }
 
+    /**
+     * Get recent bookings for dashboard (sorted by PENDING first)
+     */
+    @Transactional(readOnly = true)
+    public List<BookingDTO.BookingResponse> getRecentBookingsForUser(Long userId, User.UserType userType, int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        List<Booking> bookings;
+        
+        switch (userType) {
+            case CUSTOMER:
+                bookings = bookingRepository.findRecentByUserIdPendingFirst(userId, pageable);
+                break;
+            case PROVIDER:
+                ServiceProvider provider = providerRepository.findByUserUserId(userId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Provider profile not found"));
+                bookings = bookingRepository.findRecentByProviderIdPendingFirst(provider.getProviderId(), pageable);
+                break;
+            default:
+                return Collections.emptyList();
+        }
+        
+        return bookings.stream()
+                .map(this::mapToBookingResponse)
+                .collect(Collectors.toList());
+    }
+
     @Transactional(readOnly = true)
     public BookingDTO.BookingResponse getBookingById(Long bookingId) {
         Booking booking = bookingRepository.findByIdWithDetails(bookingId)

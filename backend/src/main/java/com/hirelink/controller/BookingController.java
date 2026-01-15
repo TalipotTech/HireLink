@@ -15,6 +15,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/bookings")
 @RequiredArgsConstructor
@@ -45,6 +47,16 @@ public class BookingController {
             @RequestParam(defaultValue = "10") int size) {
         BookingDTO.BookingListResponse response = bookingService.getBookingsForUser(
                 userDetails.getUserId(), userDetails.getUserType(), status, page, size);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @GetMapping("/recent")
+    @Operation(summary = "Get recent bookings for dashboard (PENDING first)")
+    public ResponseEntity<ApiResponse<List<BookingDTO.BookingResponse>>> getRecentBookings(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam(defaultValue = "3") int limit) {
+        List<BookingDTO.BookingResponse> response = bookingService.getRecentBookingsForUser(
+                userDetails.getUserId(), userDetails.getUserType(), limit);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
