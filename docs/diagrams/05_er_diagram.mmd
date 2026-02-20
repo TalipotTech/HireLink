@@ -1,0 +1,127 @@
+erDiagram
+    USERS {
+        bigint user_id PK
+        varchar name
+        varchar email UK
+        varchar phone UK
+        varchar password_hash
+        enum user_type
+        enum account_status
+        boolean is_email_verified
+        boolean is_phone_verified
+        timestamp created_at
+    }
+
+    USER_ADDRESSES {
+        bigint address_id PK
+        bigint user_id FK
+        enum address_type
+        varchar address_line1
+        varchar city
+        varchar state
+        varchar pincode
+        decimal latitude
+        decimal longitude
+        boolean is_default
+    }
+
+    SERVICE_PROVIDERS {
+        bigint provider_id PK
+        bigint user_id FK_UK
+        varchar business_name
+        text business_description
+        int experience_years
+        json specializations
+        varchar base_pincode
+        int service_radius_km
+        enum kyc_status
+        decimal average_rating
+        int total_bookings
+        int completed_bookings
+        decimal completion_rate
+        boolean is_available
+    }
+
+    SERVICE_CATEGORIES {
+        bigint category_id PK
+        varchar category_name UK
+        varchar category_slug UK
+        text category_description
+        varchar category_icon
+        bigint parent_category_id FK
+        int category_level
+        decimal min_base_price
+        decimal max_base_price
+        boolean is_active
+        boolean is_featured
+    }
+
+    SERVICES {
+        bigint service_id PK
+        bigint provider_id FK
+        bigint category_id FK
+        varchar service_name
+        text service_description
+        decimal base_price
+        enum price_type
+        int estimated_duration_minutes
+        boolean is_active
+        int times_booked
+        decimal average_rating
+    }
+
+    BOOKINGS {
+        bigint booking_id PK
+        varchar booking_number UK
+        bigint user_id FK
+        bigint provider_id FK
+        bigint service_id FK
+        date scheduled_date
+        time scheduled_time
+        text service_address
+        varchar service_pincode
+        varchar issue_title
+        text issue_description
+        enum urgency_level
+        decimal estimated_amount
+        decimal final_amount
+        enum booking_status
+        timestamp created_at
+    }
+
+    REVIEWS {
+        bigint review_id PK
+        bigint booking_id FK_UK
+        bigint reviewer_id FK
+        bigint reviewee_provider_id FK
+        decimal overall_rating
+        decimal quality_rating
+        decimal punctuality_rating
+        varchar review_title
+        text review_text
+        boolean is_visible
+        int helpful_count
+    }
+
+    OTP_VERIFICATIONS {
+        bigint otp_id PK
+        varchar identifier
+        enum identifier_type
+        varchar otp_hash
+        enum purpose
+        int attempts
+        timestamp expires_at
+        boolean is_verified
+    }
+
+    USERS ||--o{ USER_ADDRESSES : "has"
+    USERS ||--o| SERVICE_PROVIDERS : "is"
+    USERS ||--o{ BOOKINGS : "makes"
+    USERS ||--o{ REVIEWS : "writes"
+    SERVICE_PROVIDERS ||--o{ SERVICES : "offers"
+    SERVICE_PROVIDERS ||--o{ BOOKINGS : "receives"
+    SERVICE_PROVIDERS ||--o{ REVIEWS : "receives"
+    SERVICE_CATEGORIES ||--o{ SERVICES : "contains"
+    SERVICE_CATEGORIES ||--o{ SERVICE_CATEGORIES : "has_subcategory"
+    SERVICES ||--o{ BOOKINGS : "booked_for"
+    BOOKINGS ||--o| REVIEWS : "has_review"

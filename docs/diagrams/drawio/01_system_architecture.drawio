@@ -1,0 +1,142 @@
+<mxfile host="app.diagrams.net" modified="2026-01-28T10:00:00.000Z" agent="HireLink" version="22.0.0">
+  <diagram name="System Architecture" id="system-arch">
+    <mxGraphModel dx="1434" dy="780" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Title -->
+        <mxCell id="title" value="&lt;b&gt;HireLink - System Architecture&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="300" height="40" as="geometry"/>
+        </mxCell>
+        
+        <!-- Client Layer Box -->
+        <mxCell id="client-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8EAF6;strokeColor=#3F51B5;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="200" y="80" width="700" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="client-label" value="&lt;b&gt;CLIENT LAYER&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#3F51B5;" vertex="1" parent="1">
+          <mxGeometry x="210" y="85" width="120" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Customer Browser -->
+        <mxCell id="customer" value="&lt;b&gt;👤 Customer&lt;/b&gt;&lt;br&gt;Browser" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#43A047;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="250" y="110" width="120" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- Provider Browser -->
+        <mxCell id="provider" value="&lt;b&gt;👷 Provider&lt;/b&gt;&lt;br&gt;Browser" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#FB8C00;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="490" y="110" width="120" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- Admin Browser -->
+        <mxCell id="admin" value="&lt;b&gt;👨‍💼 Admin&lt;/b&gt;&lt;br&gt;Browser" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#E53935;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="730" y="110" width="120" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- Frontend Layer Box -->
+        <mxCell id="frontend-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF9800;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="200" y="220" width="700" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="frontend-label" value="&lt;b&gt;FRONTEND - React.js Application&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#E65100;" vertex="1" parent="1">
+          <mxGeometry x="210" y="225" width="250" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Frontend Components -->
+        <mxCell id="vite" value="&lt;b&gt;Vite&lt;/b&gt;&lt;br&gt;Build Tool" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9800;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="230" y="260" width="100" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="tailwind" value="&lt;b&gt;TailwindCSS&lt;/b&gt;&lt;br&gt;Styling" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9800;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="360" y="260" width="100" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="reactquery" value="&lt;b&gt;React Query&lt;/b&gt;&lt;br&gt;Data Fetching" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9800;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="490" y="260" width="100" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="zustand" value="&lt;b&gt;Zustand&lt;/b&gt;&lt;br&gt;State Mgmt" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9800;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="620" y="260" width="100" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="axios" value="&lt;b&gt;Axios&lt;/b&gt;&lt;br&gt;HTTP Client" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9800;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="750" y="260" width="100" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- API Gateway -->
+        <mxCell id="gateway" value="&lt;b&gt;🌐 NGINX&lt;/b&gt;&lt;br&gt;Reverse Proxy / Load Balancer&lt;br&gt;SSL Termination" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#43A047;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="400" y="380" width="300" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- Backend Layer Box -->
+        <mxCell id="backend-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#E53935;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="200" y="480" width="700" height="200" as="geometry"/>
+        </mxCell>
+        <mxCell id="backend-label" value="&lt;b&gt;BACKEND - Spring Boot 3.2 (Java 17)&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#C62828;" vertex="1" parent="1">
+          <mxGeometry x="210" y="485" width="280" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Controller Layer -->
+        <mxCell id="ctrl-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E53935;strokeWidth=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="510" width="660" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="ctrl-label" value="&lt;b&gt;Controller Layer:&lt;/b&gt; AuthController | BookingController | ServiceController | ProviderController | UserController" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="230" y="520" width="640" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- Service Layer -->
+        <mxCell id="svc-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E53935;strokeWidth=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="570" width="660" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="svc-label" value="&lt;b&gt;Service Layer:&lt;/b&gt; AuthService | BookingService | ProviderService | EmailService | LocationService" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="230" y="580" width="640" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- Security & Repository Layer -->
+        <mxCell id="sec-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E53935;strokeWidth=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="630" width="320" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="sec-label" value="&lt;b&gt;Security:&lt;/b&gt; JWT | BCrypt | RBAC" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="230" y="637" width="300" height="26" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="repo-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E53935;strokeWidth=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="560" y="630" width="320" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="repo-label" value="&lt;b&gt;Repository:&lt;/b&gt; JPA / Hibernate ORM" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="570" y="637" width="300" height="26" as="geometry"/>
+        </mxCell>
+        
+        <!-- Database -->
+        <mxCell id="database" value="&lt;b&gt;🗄️ MySQL 8.0&lt;/b&gt;&lt;br&gt;Database&lt;br&gt;(users, bookings, services, reviews, providers)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#E8EAF6;strokeColor=#3F51B5;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="460" y="720" width="180" height="90" as="geometry"/>
+        </mxCell>
+        
+        <!-- Arrows -->
+        <mxCell id="arrow1" value="HTTPS" style="endArrow=classic;startArrow=classic;html=1;strokeWidth=2;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="550" y="180" as="sourcePoint"/>
+            <mxPoint x="550" y="220" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="arrow2" value="REST API" style="endArrow=classic;startArrow=classic;html=1;strokeWidth=2;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="550" y="340" as="sourcePoint"/>
+            <mxPoint x="550" y="380" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="arrow3" value="/api/*" style="endArrow=classic;startArrow=classic;html=1;strokeWidth=2;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="550" y="440" as="sourcePoint"/>
+            <mxPoint x="550" y="480" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="arrow4" value="JDBC" style="endArrow=classic;startArrow=classic;html=1;strokeWidth=2;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="550" y="680" as="sourcePoint"/>
+            <mxPoint x="550" y="720" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

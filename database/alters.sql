@@ -1,0 +1,1 @@
+ALTER TABLE payments MODIFY COLUMN payment_method VARCHAR(50) NULL;

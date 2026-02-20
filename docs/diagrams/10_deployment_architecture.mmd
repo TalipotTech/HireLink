@@ -1,0 +1,44 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#8B5CF6'}}}%%
+flowchart TB
+    subgraph USERS["🌐 Users"]
+        U1[("👤 Browser")]
+        U2[("📱 Mobile")]
+    end
+
+    subgraph CDN["☁️ CDN / Load Balancer"]
+        LB["Cloudflare / AWS ALB<br/>SSL Termination"]
+    end
+
+    subgraph FRONTEND_CLUSTER["⚛️ Frontend Containers"]
+        FE1["Frontend<br/>Container 1<br/>(Nginx)"]
+        FE2["Frontend<br/>Container 2<br/>(Nginx)"]
+        FE3["Frontend<br/>Container 3<br/>(Nginx)"]
+    end
+
+    subgraph API_GATEWAY["🔀 API Gateway"]
+        NGINX["NGINX<br/>Reverse Proxy"]
+    end
+
+    subgraph BACKEND_CLUSTER["☕ Backend Containers"]
+        BE1["Backend<br/>Container 1<br/>(Spring Boot)"]
+        BE2["Backend<br/>Container 2<br/>(Spring Boot)"]
+        BE3["Backend<br/>Container 3<br/>(Spring Boot)"]
+    end
+
+    subgraph DATABASE["🗄️ Database Layer"]
+        DB_PRIMARY[("MySQL Primary<br/>Read/Write")]
+        DB_REPLICA[("MySQL Replica<br/>Read Only")]
+    end
+
+    USERS -->|"HTTPS :443"| CDN
+    CDN --> FRONTEND_CLUSTER
+    FRONTEND_CLUSTER -->|"/api/*"| API_GATEWAY
+    API_GATEWAY --> BACKEND_CLUSTER
+    BACKEND_CLUSTER -->|"JDBC :3306"| DATABASE
+    DB_PRIMARY -->|"Replication"| DB_REPLICA
+
+    style CDN fill:#F59E0B,stroke:#D97706
+    style FRONTEND_CLUSTER fill:#3B82F6,stroke:#2563EB
+    style API_GATEWAY fill:#10B981,stroke:#059669
+    style BACKEND_CLUSTER fill:#EF4444,stroke:#DC2626
+    style DATABASE fill:#8B5CF6,stroke:#7C3AED

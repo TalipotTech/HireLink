@@ -1,0 +1,30 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4F46E5'}}}%%
+stateDiagram-v2
+    [*] --> PENDING: Booking Created
+
+    PENDING --> ACCEPTED: Provider Accepts
+    PENDING --> REJECTED: Provider Rejects
+    PENDING --> CANCELLED: Customer/Provider Cancels
+
+    ACCEPTED --> CONFIRMED: Both Parties Confirm
+    ACCEPTED --> CANCELLED: Cancellation
+
+    CONFIRMED --> IN_PROGRESS: Service Started
+    CONFIRMED --> CANCELLED: Cancellation
+
+    IN_PROGRESS --> PAUSED: Work Paused
+    IN_PROGRESS --> COMPLETED: Work Done
+    IN_PROGRESS --> CANCELLED: Cancellation
+
+    PAUSED --> IN_PROGRESS: Resume Work
+    PAUSED --> CANCELLED: Cancellation
+
+    COMPLETED --> DISPUTED: Customer Raises Issue
+    COMPLETED --> [*]: Successful Completion
+
+    DISPUTED --> REFUNDED: Refund Processed
+    DISPUTED --> COMPLETED: Issue Resolved
+
+    REJECTED --> [*]
+    CANCELLED --> [*]
+    REFUNDED --> [*]

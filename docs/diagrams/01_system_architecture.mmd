@@ -1,0 +1,59 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4F46E5', 'primaryTextColor': '#fff', 'primaryBorderColor': '#4338CA', 'lineColor': '#6B7280', 'secondaryColor': '#F59E0B', 'tertiaryColor': '#F3F4F6'}}}%%
+flowchart TB
+    subgraph CLIENT["🖥️ CLIENT LAYER"]
+        direction LR
+        C1[("👤 Customer<br/>Browser")]
+        C2[("👷 Provider<br/>Browser")]
+        C3[("👨‍💼 Admin<br/>Browser")]
+    end
+
+    subgraph FRONTEND["⚛️ FRONTEND - React.js Application"]
+        direction LR
+        F1["Vite<br/>Build Tool"]
+        F2["TailwindCSS<br/>Styling"]
+        F3["React Query<br/>Data Fetching"]
+        F4["Zustand<br/>State Mgmt"]
+    end
+
+    subgraph GATEWAY["🌐 API GATEWAY"]
+        NG["NGINX<br/>Reverse Proxy<br/>SSL Termination<br/>Load Balancing"]
+    end
+
+    subgraph BACKEND["☕ BACKEND - Spring Boot 3.2"]
+        direction TB
+        subgraph CTRL["Controller Layer"]
+            CT1["AuthController"]
+            CT2["BookingController"]
+            CT3["ServiceController"]
+        end
+        subgraph SVC["Service Layer"]
+            SV1["AuthService"]
+            SV2["BookingService"]
+            SV3["ProviderService"]
+        end
+        subgraph SEC["Security Layer"]
+            SE1["JWT Auth"]
+            SE2["BCrypt"]
+            SE3["RBAC"]
+        end
+        subgraph REPO["Repository Layer"]
+            RP1["UserRepository"]
+            RP2["BookingRepository"]
+            RP3["ServiceRepository"]
+        end
+    end
+
+    subgraph DATABASE["🗄️ DATA LAYER"]
+        DB[(MySQL 8.0<br/>Database)]
+    end
+
+    CLIENT --> FRONTEND
+    FRONTEND -->|"HTTPS/REST"| GATEWAY
+    GATEWAY --> BACKEND
+    BACKEND -->|"JPA/Hibernate"| DATABASE
+
+    style CLIENT fill:#E0E7FF,stroke:#4F46E5
+    style FRONTEND fill:#FEF3C7,stroke:#F59E0B
+    style GATEWAY fill:#D1FAE5,stroke:#10B981
+    style BACKEND fill:#FEE2E2,stroke:#EF4444
+    style DATABASE fill:#E0E7FF,stroke:#4F46E5

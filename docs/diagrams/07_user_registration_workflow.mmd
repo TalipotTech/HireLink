@@ -1,0 +1,42 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#10B981'}}}%%
+flowchart TD
+    A([Start]) --> B[User visits<br/>Registration Page]
+    B --> C[Select Account Type<br/>Customer/Provider]
+    C --> D[Enter Registration Details<br/>Name, Email/Phone, Password]
+    D --> E{Validate<br/>Input?}
+    
+    E -->|No| F[Show Validation<br/>Errors]
+    F --> D
+    
+    E -->|Yes| G{Email/Phone<br/>Already Exists?}
+    
+    G -->|Yes| H[Show Duplicate<br/>Error]
+    H --> D
+    
+    G -->|No| I[Hash Password<br/>using BCrypt]
+    I --> J[Create User Record<br/>Status: PENDING]
+    J --> K[Generate OTP<br/>Send via Email/SMS]
+    K --> L[User Enters OTP]
+    L --> M{Valid OTP?}
+    
+    M -->|No| N{Attempts<br/>< 3?}
+    N -->|Yes| L
+    N -->|No| O[Lock Account<br/>Temporarily]
+    O --> A
+    
+    M -->|Yes| P[Verify Account<br/>Status: ACTIVE]
+    P --> Q[Generate JWT<br/>Access Token]
+    Q --> R[Redirect to<br/>Dashboard]
+    R --> S([End])
+
+    style A fill:#10B981,stroke:#059669,color:#fff
+    style S fill:#10B981,stroke:#059669,color:#fff
+    style E fill:#F59E0B,stroke:#D97706,color:#fff
+    style G fill:#F59E0B,stroke:#D97706,color:#fff
+    style M fill:#F59E0B,stroke:#D97706,color:#fff
+    style N fill:#F59E0B,stroke:#D97706,color:#fff
+    style F fill:#EF4444,stroke:#DC2626,color:#fff
+    style H fill:#EF4444,stroke:#DC2626,color:#fff
+    style O fill:#EF4444,stroke:#DC2626,color:#fff
+    style P fill:#4F46E5,stroke:#4338CA,color:#fff
+    style Q fill:#4F46E5,stroke:#4338CA,color:#fff

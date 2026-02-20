@@ -1,0 +1,264 @@
+<mxfile host="app.diagrams.net" modified="2026-01-28T10:00:00.000Z" agent="HireLink" version="22.0.0">
+  <diagram name="Booking Status Flow" id="booking-status">
+    <mxGraphModel dx="1434" dy="780" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Title -->
+        <mxCell id="title" value="&lt;b&gt;Booking Status State Machine&lt;/b&gt;&lt;br&gt;HireLink - Booking Lifecycle" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="300" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- Start -->
+        <mxCell id="start" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="540" y="90" width="30" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- PENDING -->
+        <mxCell id="pending" value="&lt;b&gt;PENDING&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;Awaiting Provider Response&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#F59E0B;strokeWidth=2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="480" y="160" width="150" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- ACCEPTED -->
+        <mxCell id="accepted" value="&lt;b&gt;ACCEPTED&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;Provider Accepted&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#3B82F6;strokeWidth=2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="280" y="280" width="140" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- REJECTED -->
+        <mxCell id="rejected" value="&lt;b&gt;REJECTED&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;Provider Declined&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#EF4444;strokeWidth=2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="690" y="280" width="140" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- CANCELLED -->
+        <mxCell id="cancelled" value="&lt;b&gt;CANCELLED&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;Booking Cancelled&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#EF4444;strokeWidth=2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="880" y="400" width="140" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- CONFIRMED -->
+        <mxCell id="confirmed" value="&lt;b&gt;CONFIRMED&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;Both Parties Confirmed&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#6366F1;strokeWidth=2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="280" y="400" width="140" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- IN_PROGRESS -->
+        <mxCell id="inprogress" value="&lt;b&gt;IN_PROGRESS&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;Service Being Performed&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#8B5CF6;strokeWidth=2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="280" y="520" width="140" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- PAUSED -->
+        <mxCell id="paused" value="&lt;b&gt;PAUSED&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;Work Temporarily Paused&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3F4F6;strokeColor=#6B7280;strokeWidth=2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="100" y="520" width="130" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- COMPLETED -->
+        <mxCell id="completed" value="&lt;b&gt;COMPLETED&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;Service Successfully Done&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#10B981;strokeWidth=2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="480" y="520" width="150" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- DISPUTED -->
+        <mxCell id="disputed" value="&lt;b&gt;DISPUTED&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;Customer Raised Issue&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#F59E0B;strokeWidth=2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="480" y="640" width="150" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- REFUNDED -->
+        <mxCell id="refunded" value="&lt;b&gt;REFUNDED&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;Payment Refunded&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#EF4444;strokeWidth=2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="320" y="720" width="140" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- End -->
+        <mxCell id="end" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="540" y="760" width="30" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="end-ring" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="535" y="755" width="40" height="40" as="geometry"/>
+        </mxCell>
+        
+        <!-- Arrows -->
+        <!-- Start to Pending -->
+        <mxCell id="a1" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="555" y="120" as="sourcePoint"/>
+            <mxPoint x="555" y="160" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a1-l" value="Booking&lt;br&gt;Created" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="560" y="125" width="60" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- Pending to Accepted -->
+        <mxCell id="a2" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#3B82F6;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="480" y="200" as="sourcePoint"/>
+            <mxPoint x="350" y="280" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a2-l" value="Provider&lt;br&gt;Accepts" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="370" y="220" width="60" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- Pending to Rejected -->
+        <mxCell id="a3" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#EF4444;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="630" y="200" as="sourcePoint"/>
+            <mxPoint x="760" y="280" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a3-l" value="Provider&lt;br&gt;Rejects" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="670" y="220" width="60" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- Accepted to Confirmed -->
+        <mxCell id="a4" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#6366F1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="350" y="330" as="sourcePoint"/>
+            <mxPoint x="350" y="400" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a4-l" value="Confirm" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="355" y="355" width="50" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Confirmed to In_Progress -->
+        <mxCell id="a5" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#8B5CF6;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="350" y="450" as="sourcePoint"/>
+            <mxPoint x="350" y="520" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a5-l" value="Service&lt;br&gt;Started" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="355" y="470" width="50" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- In_Progress to Paused -->
+        <mxCell id="a6" value="" style="endArrow=classic;startArrow=classic;html=1;strokeWidth=2;strokeColor=#6B7280;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="280" y="545" as="sourcePoint"/>
+            <mxPoint x="230" y="545" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a6-l" value="Pause/Resume" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;" vertex="1" parent="1">
+          <mxGeometry x="220" y="520" width="70" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- In_Progress to Completed -->
+        <mxCell id="a7" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#10B981;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="420" y="545" as="sourcePoint"/>
+            <mxPoint x="480" y="545" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a7-l" value="Work Done" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="420" y="520" width="60" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Completed to Disputed -->
+        <mxCell id="a8" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#F59E0B;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="555" y="570" as="sourcePoint"/>
+            <mxPoint x="555" y="640" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a8-l" value="Dispute&lt;br&gt;Raised" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="560" y="590" width="50" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- Disputed to Refunded -->
+        <mxCell id="a9" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#EF4444;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="480" y="680" as="sourcePoint"/>
+            <mxPoint x="390" y="720" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a9-l" value="Refund" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="400" y="680" width="50" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Cancelled arrows from multiple states -->
+        <mxCell id="a10" value="" style="endArrow=classic;html=1;strokeWidth=1;strokeColor=#EF4444;dashed=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="630" y="195" as="sourcePoint"/>
+            <mxPoint x="880" y="410" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="a11" value="" style="endArrow=classic;html=1;strokeWidth=1;strokeColor=#EF4444;dashed=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="420" y="310" as="sourcePoint"/>
+            <mxPoint x="880" y="420" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- End states -->
+        <mxCell id="a12" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="555" y="570" as="sourcePoint"/>
+            <mxPoint x="555" y="760" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="680" y="570"/>
+              <mxPoint x="680" y="780"/>
+              <mxPoint x="555" y="780"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="a13" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="770" as="sourcePoint"/>
+            <mxPoint x="540" y="775" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Legend -->
+        <mxCell id="legend-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#E0E0E0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="100" width="180" height="200" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend-title" value="&lt;b&gt;STATUS LEGEND&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="55" y="110" width="120" height="20" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="leg1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#F59E0B;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="55" y="140" width="20" height="15" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg1-l" value="Pending/Warning" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="85" y="138" width="100" height="20" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="leg2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#3B82F6;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="55" y="165" width="20" height="15" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg2-l" value="Accepted" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="85" y="163" width="100" height="20" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="leg3" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#8B5CF6;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="55" y="190" width="20" height="15" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg3-l" value="In Progress" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="85" y="188" width="100" height="20" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="leg4" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#10B981;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="55" y="215" width="20" height="15" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg4-l" value="Completed (Success)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="85" y="213" width="110" height="20" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="leg5" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#EF4444;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="55" y="240" width="20" height="15" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg5-l" value="Rejected/Cancelled" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="85" y="238" width="110" height="20" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="leg6" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3F4F6;strokeColor=#6B7280;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="55" y="265" width="20" height="15" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg6-l" value="Paused/Inactive" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="85" y="263" width="100" height="20" as="geometry"/>
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

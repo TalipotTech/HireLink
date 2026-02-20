@@ -1,0 +1,49 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#F59E0B'}}}%%
+flowchart TB
+    CU([👤 Customer])
+    PR([👷 Provider])
+
+    subgraph BOOKING["3.0 BOOKING MANAGEMENT"]
+        P31[["3.1<br/>VALIDATE<br/>BOOKING DATA"]]
+        P32[["3.2<br/>CHECK<br/>AVAILABILITY"]]
+        P33[["3.3<br/>CREATE<br/>BOOKING"]]
+        P34[["3.4<br/>NOTIFY<br/>PROVIDER"]]
+        P35[["3.5<br/>UPDATE<br/>STATUS"]]
+    end
+
+    D2[(D2: Providers<br/>Database)]
+    D3[(D3: Bookings<br/>Database)]
+
+    CU -->|"Service ID, Schedule<br/>Address, Issue Details"| P31
+    P31 -->|"Validated Data"| P32
+    P32 <-->|"Check Provider<br/>Availability"| D2
+    P32 -->|"Provider Available"| P33
+    P33 -->|"Generate<br/>Booking Number"| D3
+    P33 -->|"Booking Created<br/>(PENDING)"| P34
+    P34 -->|"Booking Confirmation"| CU
+    P34 -->|"Notification Sent"| PR
+
+    PR -->|"Accept/Reject<br/>Response"| P35
+    P35 -->|"Status Update"| D3
+    P35 -->|"Status Notification"| CU
+
+    S1([ACCEPTED])
+    S2([REJECTED])
+    S3([IN_PROGRESS])
+    S4([COMPLETED])
+
+    P35 --> S1
+    P35 --> S2
+    S1 --> S3
+    S3 --> S4
+
+    style BOOKING fill:#FEF3C7,stroke:#F59E0B
+    style P31 fill:#F59E0B,stroke:#D97706,color:#fff
+    style P32 fill:#F59E0B,stroke:#D97706,color:#fff
+    style P33 fill:#F59E0B,stroke:#D97706,color:#fff
+    style P34 fill:#F59E0B,stroke:#D97706,color:#fff
+    style P35 fill:#F59E0B,stroke:#D97706,color:#fff
+    style S1 fill:#3B82F6,stroke:#2563EB,color:#fff
+    style S2 fill:#EF4444,stroke:#DC2626,color:#fff
+    style S3 fill:#8B5CF6,stroke:#7C3AED,color:#fff
+    style S4 fill:#10B981,stroke:#059669,color:#fff

@@ -1,0 +1,356 @@
+<mxfile host="app.diagrams.net" modified="2026-01-28T10:00:00.000Z" agent="HireLink" version="22.0.0">
+  <diagram name="Booking Workflow" id="booking-workflow">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Title -->
+        <mxCell id="title" value="&lt;b&gt;Service Booking Workflow&lt;/b&gt;&lt;br&gt;Sequence Diagram - Customer, System, Provider Interaction" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="450" y="20" width="500" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- Actors -->
+        <mxCell id="customer-head" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#10B981;strokeColor=#059669;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="180" y="90" width="40" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="customer-body" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#10B981;strokeColor=#059669;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="188" y="130" width="24" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="customer-label" value="&lt;b&gt;👤 CUSTOMER&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="140" y="165" width="120" height="25" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="system-box" value="&lt;b&gt;🖥️ SYSTEM&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4F46E5;strokeColor=#3730A3;strokeWidth=2;fontColor=#FFFFFF;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="620" y="100" width="160" height="50" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="provider-head" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#F59E0B;strokeColor=#D97706;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1180" y="90" width="40" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="provider-body" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F59E0B;strokeColor=#D97706;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1188" y="130" width="24" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="provider-label" value="&lt;b&gt;👷 PROVIDER&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1140" y="165" width="120" height="25" as="geometry"/>
+        </mxCell>
+        
+        <!-- Lifelines -->
+        <mxCell id="customer-line" value="" style="endArrow=none;dashed=1;html=1;strokeWidth=2;strokeColor=#10B981;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="200" y="190" as="sourcePoint"/>
+            <mxPoint x="200" y="1050" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="system-line" value="" style="endArrow=none;dashed=1;html=1;strokeWidth=2;strokeColor=#4F46E5;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="700" y="150" as="sourcePoint"/>
+            <mxPoint x="700" y="1050" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="provider-line" value="" style="endArrow=none;dashed=1;html=1;strokeWidth=2;strokeColor=#F59E0B;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1200" y="190" as="sourcePoint"/>
+            <mxPoint x="1200" y="1050" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Phase 1: Service Discovery -->
+        <mxCell id="phase1-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#10B981;strokeWidth=1;opacity=50;" vertex="1" parent="1">
+          <mxGeometry x="100" y="200" width="700" height="150" as="geometry"/>
+        </mxCell>
+        <mxCell id="phase1-label" value="&lt;b&gt;Phase 1: Service Discovery&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#059669;" vertex="1" parent="1">
+          <mxGeometry x="110" y="205" width="180" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 1 -->
+        <mxCell id="msg1" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#333333;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="200" y="240" as="sourcePoint"/>
+            <mxPoint x="700" y="240" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg1-label" value="1. Browse Categories" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="380" y="220" width="120" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 2 -->
+        <mxCell id="msg2" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#333333;dashed=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="700" y="270" as="sourcePoint"/>
+            <mxPoint x="200" y="270" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg2-label" value="2. Display Categories" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="380" y="250" width="120" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 3 -->
+        <mxCell id="msg3" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#333333;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="200" y="300" as="sourcePoint"/>
+            <mxPoint x="700" y="300" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg3-label" value="3. Select Service" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="380" y="280" width="120" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 4 -->
+        <mxCell id="msg4" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#333333;dashed=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="700" y="330" as="sourcePoint"/>
+            <mxPoint x="200" y="330" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg4-label" value="4. Show Service Details &amp; Provider Profile" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="340" y="310" width="220" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Phase 2: Booking Creation -->
+        <mxCell id="phase2-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#F59E0B;strokeWidth=1;opacity=50;" vertex="1" parent="1">
+          <mxGeometry x="100" y="370" width="1200" height="220" as="geometry"/>
+        </mxCell>
+        <mxCell id="phase2-label" value="&lt;b&gt;Phase 2: Booking Creation&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#D97706;" vertex="1" parent="1">
+          <mxGeometry x="110" y="375" width="180" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 5 -->
+        <mxCell id="msg5" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#333333;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="200" y="410" as="sourcePoint"/>
+            <mxPoint x="700" y="410" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg5-label" value="5. Click &quot;Book Now&quot;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="380" y="390" width="120" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Alt Box - Login Check -->
+        <mxCell id="alt-box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#666666;strokeWidth=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="430" width="600" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="alt-label" value="&lt;b&gt;[alt]&lt;/b&gt; Not Logged In" style="text;html=1;strokeColor=none;fillColor=#E5E7EB;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="150" y="430" width="100" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="msg-alt" value="" style="endArrow=classic;html=1;strokeWidth=1;strokeColor=#666666;dashed=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="700" y="460" as="sourcePoint"/>
+            <mxPoint x="200" y="460" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg-alt-label" value="Redirect to Login" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="400" y="445" width="100" height="15" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 6 -->
+        <mxCell id="msg6" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#333333;dashed=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="700" y="500" as="sourcePoint"/>
+            <mxPoint x="200" y="500" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg6-label" value="6. Show Booking Form" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="380" y="480" width="120" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 7 -->
+        <mxCell id="msg7" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#333333;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="200" y="530" as="sourcePoint"/>
+            <mxPoint x="700" y="530" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg7-label" value="7. Submit Booking (Date, Time, Address, Issue)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="340" y="510" width="220" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- System Self-Call -->
+        <mxCell id="self1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="700" y="540" width="80" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="self1-label" value="Create Booking&lt;br&gt;Generate #" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;" vertex="1" parent="1">
+          <mxGeometry x="700" y="542" width="80" height="26" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 8 -->
+        <mxCell id="msg8" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#333333;dashed=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="700" y="580" as="sourcePoint"/>
+            <mxPoint x="200" y="580" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg8-label" value="8. Booking Confirmation (HL2026XXXXXXX)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="340" y="560" width="220" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 9 to Provider -->
+        <mxCell id="msg9" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#F59E0B;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="700" y="580" as="sourcePoint"/>
+            <mxPoint x="1200" y="580" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg9-label" value="9. Notification (Email/Push)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#D97706;" vertex="1" parent="1">
+          <mxGeometry x="880" y="560" width="160" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Phase 3: Provider Response -->
+        <mxCell id="phase3-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;strokeWidth=1;opacity=50;" vertex="1" parent="1">
+          <mxGeometry x="600" y="610" width="700" height="150" as="geometry"/>
+        </mxCell>
+        <mxCell id="phase3-label" value="&lt;b&gt;Phase 3: Provider Response&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#3730A3;" vertex="1" parent="1">
+          <mxGeometry x="610" y="615" width="180" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 10 -->
+        <mxCell id="msg10" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#333333;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1200" y="650" as="sourcePoint"/>
+            <mxPoint x="700" y="650" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg10-label" value="10. View Booking Details" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="880" y="630" width="140" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 11 -->
+        <mxCell id="msg11" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#10B981;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1200" y="690" as="sourcePoint"/>
+            <mxPoint x="700" y="690" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg11-label" value="11. Accept Booking" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#059669;" vertex="1" parent="1">
+          <mxGeometry x="900" y="670" width="120" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- System Update -->
+        <mxCell id="self2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="700" y="700" width="80" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="self2-label" value="Status: ACCEPTED" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;" vertex="1" parent="1">
+          <mxGeometry x="700" y="702" width="80" height="21" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 12 -->
+        <mxCell id="msg12" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#333333;dashed=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="700" y="740" as="sourcePoint"/>
+            <mxPoint x="200" y="740" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg12-label" value="12. Notify: Booking Accepted" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="380" y="720" width="160" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Phase 4: Service Execution -->
+        <mxCell id="phase4-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#EF4444;strokeWidth=1;opacity=50;" vertex="1" parent="1">
+          <mxGeometry x="100" y="780" width="1200" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="phase4-label" value="&lt;b&gt;Phase 4: Service Execution&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#DC2626;" vertex="1" parent="1">
+          <mxGeometry x="110" y="785" width="180" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 13 -->
+        <mxCell id="msg13" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#8B5CF6;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1200" y="820" as="sourcePoint"/>
+            <mxPoint x="700" y="820" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg13-label" value="13. Start Work" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#7C3AED;" vertex="1" parent="1">
+          <mxGeometry x="910" y="800" width="100" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- System Update 2 -->
+        <mxCell id="self3" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#8B5CF6;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="700" y="825" width="80" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="self3-label" value="IN_PROGRESS" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;" vertex="1" parent="1">
+          <mxGeometry x="700" y="827" width="80" height="21" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 14 -->
+        <mxCell id="msg14" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#333333;dashed=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="700" y="860" as="sourcePoint"/>
+            <mxPoint x="200" y="860" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg14-label" value="14. Notify: Work Started" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="380" y="840" width="140" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 15 -->
+        <mxCell id="msg15" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#10B981;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1200" y="890" as="sourcePoint"/>
+            <mxPoint x="700" y="890" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg15-label" value="15. Complete Work" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#059669;" vertex="1" parent="1">
+          <mxGeometry x="900" y="870" width="120" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- System Update 3 -->
+        <mxCell id="self4" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#10B981;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="700" y="895" width="80" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="self4-label" value="COMPLETED" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;" vertex="1" parent="1">
+          <mxGeometry x="700" y="897" width="80" height="21" as="geometry"/>
+        </mxCell>
+        
+        <!-- Phase 5: Review -->
+        <mxCell id="phase5-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#8B5CF6;strokeWidth=1;opacity=50;" vertex="1" parent="1">
+          <mxGeometry x="100" y="940" width="700" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="phase5-label" value="&lt;b&gt;Phase 5: Review&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#7C3AED;" vertex="1" parent="1">
+          <mxGeometry x="110" y="945" width="120" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 16 -->
+        <mxCell id="msg16" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#333333;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="200" y="980" as="sourcePoint"/>
+            <mxPoint x="700" y="980" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg16-label" value="16. Submit Review &amp; Rating (⭐⭐⭐⭐⭐)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="340" y="960" width="220" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 17 -->
+        <mxCell id="msg17" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#333333;dashed=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="700" y="1010" as="sourcePoint"/>
+            <mxPoint x="200" y="1010" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg17-label" value="17. Thank You! Provider Stats Updated" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="360" y="990" width="200" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Legend -->
+        <mxCell id="legend-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#E0E0E0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="940" width="200" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend-title" value="&lt;b&gt;LEGEND&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1115" y="945" width="80" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg1" value="──── Request" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="1115" y="970" width="100" height="15" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg2" value="- - - Response" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="1115" y="990" width="100" height="15" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg3" value="█ System Process" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="1115" y="1010" width="100" height="15" as="geometry"/>
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

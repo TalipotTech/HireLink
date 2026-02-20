@@ -1,0 +1,38 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#EF4444'}}}%%
+sequenceDiagram
+    autonumber
+    participant C as 🖥️ Client
+    participant S as ☕ Server
+    participant DB as 🗄️ Database
+
+    rect rgb(254, 226, 226)
+        Note over C,DB: Login Flow
+        C->>S: POST /api/auth/login<br/>{email, password}
+        S->>DB: Fetch User by Email
+        DB-->>S: User Record
+        S->>S: Verify Password<br/>(BCrypt Compare)
+        
+        alt Password Valid
+            S->>S: Generate JWT Tokens<br/>- Access Token (24h)<br/>- Refresh Token (7d)
+            S-->>C: {accessToken, refreshToken, user}
+        else Password Invalid
+            S-->>C: 401 Unauthorized
+        end
+    end
+
+    rect rgb(240, 253, 244)
+        Note over C,S: API Request with Token
+        C->>S: GET /api/bookings<br/>Authorization: Bearer <token>
+        S->>S: Validate JWT<br/>- Verify Signature<br/>- Check Expiry<br/>- Extract Claims
+        S->>DB: Load User Context
+        DB-->>S: User Data
+        S-->>C: API Response
+    end
+
+    rect rgb(254, 243, 199)
+        Note over C,S: Token Refresh
+        C->>S: POST /api/auth/refresh<br/>{refreshToken}
+        S->>S: Validate Refresh Token
+        S->>S: Generate New Access Token
+        S-->>C: {accessToken}
+    end

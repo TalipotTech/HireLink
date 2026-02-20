@@ -1,0 +1,209 @@
+<mxfile host="app.diagrams.net" modified="2026-01-28T10:00:00.000Z" agent="HireLink" version="22.0.0">
+  <diagram name="Level 2 DFD - Booking" id="level2-booking">
+    <mxGraphModel dx="1434" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Title -->
+        <mxCell id="title" value="&lt;b&gt;Level 2 Data Flow Diagram&lt;/b&gt;&lt;br&gt;3.0 Booking Management (Expanded)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="450" y="20" width="400" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- Boundary Box -->
+        <mxCell id="boundary" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#FFA000;strokeWidth=3;strokeDasharray=8 8;" vertex="1" parent="1">
+          <mxGeometry x="280" y="100" width="740" height="600" as="geometry"/>
+        </mxCell>
+        <mxCell id="boundary-label" value="&lt;b&gt;3.0 BOOKING MANAGEMENT&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#E65100;" vertex="1" parent="1">
+          <mxGeometry x="300" y="110" width="250" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- External Entities -->
+        <mxCell id="customer" value="&lt;b&gt;👤 CUSTOMER&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#10B981;strokeColor=#059669;strokeWidth=2;fontColor=#FFFFFF;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="320" width="120" height="50" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="provider" value="&lt;b&gt;👷 PROVIDER&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F59E0B;strokeColor=#D97706;strokeWidth=2;fontColor=#FFFFFF;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1140" y="320" width="120" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- Sub-Processes -->
+        <mxCell id="p31" value="&lt;b&gt;3.1&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;VALIDATE&lt;/b&gt;&lt;br&gt;&lt;b&gt;BOOKING&lt;/b&gt;&lt;br&gt;&lt;b&gt;DATA&lt;/b&gt;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#F59E0B;strokeColor=#D97706;strokeWidth=2;fontColor=#FFFFFF;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="320" y="180" width="120" height="100" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="p32" value="&lt;b&gt;3.2&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;CHECK&lt;/b&gt;&lt;br&gt;&lt;b&gt;AVAILABILITY&lt;/b&gt;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#F59E0B;strokeColor=#D97706;strokeWidth=2;fontColor=#FFFFFF;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="520" y="180" width="120" height="100" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="p33" value="&lt;b&gt;3.3&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;CREATE&lt;/b&gt;&lt;br&gt;&lt;b&gt;BOOKING&lt;/b&gt;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#F59E0B;strokeColor=#D97706;strokeWidth=2;fontColor=#FFFFFF;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="720" y="180" width="120" height="100" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="p34" value="&lt;b&gt;3.4&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;NOTIFY&lt;/b&gt;&lt;br&gt;&lt;b&gt;PROVIDER&lt;/b&gt;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#F59E0B;strokeColor=#D97706;strokeWidth=2;fontColor=#FFFFFF;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="870" y="300" width="120" height="100" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="p35" value="&lt;b&gt;3.5&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;UPDATE&lt;/b&gt;&lt;br&gt;&lt;b&gt;STATUS&lt;/b&gt;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#F59E0B;strokeColor=#D97706;strokeWidth=2;fontColor=#FFFFFF;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="590" y="450" width="120" height="100" as="geometry"/>
+        </mxCell>
+        
+        <!-- Data Stores -->
+        <mxCell id="d2" value="&lt;b&gt;D2&lt;/b&gt;&amp;nbsp; PROVIDERS DATABASE" style="shape=partialRectangle;whiteSpace=wrap;html=1;left=0;right=0;fillColor=#E3F2FD;strokeColor=#1976D2;strokeWidth=2;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="480" y="320" width="200" height="35" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="d3" value="&lt;b&gt;D3&lt;/b&gt;&amp;nbsp; BOOKINGS DATABASE" style="shape=partialRectangle;whiteSpace=wrap;html=1;left=0;right=0;fillColor=#FFF3E0;strokeColor=#FF9800;strokeWidth=2;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="340" y="390" width="200" height="35" as="geometry"/>
+        </mxCell>
+        
+        <!-- Status Boxes -->
+        <mxCell id="s-accepted" value="&lt;b&gt;ACCEPTED&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#3B82F6;strokeColor=#2563EB;strokeWidth=2;fontColor=#FFFFFF;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="350" y="600" width="100" height="40" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="s-rejected" value="&lt;b&gt;REJECTED&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EF4444;strokeColor=#DC2626;strokeWidth=2;fontColor=#FFFFFF;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="480" y="600" width="100" height="40" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="s-progress" value="&lt;b&gt;IN_PROGRESS&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#8B5CF6;strokeColor=#7C3AED;strokeWidth=2;fontColor=#FFFFFF;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="610" y="600" width="100" height="40" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="s-completed" value="&lt;b&gt;COMPLETED&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#10B981;strokeColor=#059669;strokeWidth=2;fontColor=#FFFFFF;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="740" y="600" width="100" height="40" as="geometry"/>
+        </mxCell>
+        
+        <!-- Arrows -->
+        <!-- Customer to P31 -->
+        <mxCell id="c-p31" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#F59E0B;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="160" y="330" as="sourcePoint"/>
+            <mxPoint x="320" y="230" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c-p31-l" value="Service ID, Schedule,&lt;br&gt;Address, Issue Details" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="170" y="240" width="110" height="40" as="geometry"/>
+        </mxCell>
+        
+        <!-- P31 to P32 -->
+        <mxCell id="p31-p32" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#F59E0B;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="440" y="230" as="sourcePoint"/>
+            <mxPoint x="520" y="230" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p31-p32-l" value="Validated Data" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="445" y="205" width="80" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- P32 to D2 -->
+        <mxCell id="p32-d2" value="" style="endArrow=classic;startArrow=classic;html=1;strokeWidth=2;strokeColor=#1976D2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="580" y="280" as="sourcePoint"/>
+            <mxPoint x="580" y="320" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p32-d2-l" value="Check&lt;br&gt;Availability" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;" vertex="1" parent="1">
+          <mxGeometry x="590" y="285" width="60" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- P32 to P33 -->
+        <mxCell id="p32-p33" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#F59E0B;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="640" y="230" as="sourcePoint"/>
+            <mxPoint x="720" y="230" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p32-p33-l" value="Provider&lt;br&gt;Available" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="650" y="200" width="60" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- P33 to D3 -->
+        <mxCell id="p33-d3" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#FF9800;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="720" y="260" as="sourcePoint"/>
+            <mxPoint x="540" y="390" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p33-d3-l" value="Generate&lt;br&gt;Booking #" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="580" y="300" width="70" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- P33 to P34 -->
+        <mxCell id="p33-p34" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#F59E0B;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="840" y="250" as="sourcePoint"/>
+            <mxPoint x="900" y="300" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p33-p34-l" value="Booking Created&lt;br&gt;(PENDING)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="840" y="250" width="90" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- P34 to Customer -->
+        <mxCell id="p34-c" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#10B981;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="870" y="370" as="sourcePoint"/>
+            <mxPoint x="160" y="370" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p34-c-l" value="Booking Confirmation" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="460" y="372" width="110" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- P34 to Provider -->
+        <mxCell id="p34-prov" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#F59E0B;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="990" y="350" as="sourcePoint"/>
+            <mxPoint x="1140" y="350" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p34-prov-l" value="Notification" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="1030" y="325" width="70" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Provider to P35 -->
+        <mxCell id="prov-p35" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#F59E0B;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1140" y="370" as="sourcePoint"/>
+            <mxPoint x="710" y="480" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="prov-p35-l" value="Accept/Reject&lt;br&gt;Response" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="900" y="420" width="80" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- P35 to Status -->
+        <mxCell id="p35-s1" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#3B82F6;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="610" y="550" as="sourcePoint"/>
+            <mxPoint x="400" y="600" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="p35-s2" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#EF4444;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="640" y="550" as="sourcePoint"/>
+            <mxPoint x="530" y="600" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="p35-s3" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#8B5CF6;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="660" y="550" as="sourcePoint"/>
+            <mxPoint x="660" y="600" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="p35-s4" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#10B981;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="690" y="550" as="sourcePoint"/>
+            <mxPoint x="790" y="600" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,64 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#F59E0B'}}}%%
+sequenceDiagram
+    autonumber
+    participant C as 👤 Customer
+    participant S as 🖥️ System
+    participant P as 👷 Provider
+
+    rect rgb(240, 253, 244)
+        Note over C,S: Service Discovery
+        C->>S: Browse Categories
+        S-->>C: Display Categories
+        C->>S: Select Service
+        S-->>C: Show Service Details<br/>& Provider Profile
+    end
+
+    rect rgb(254, 243, 199)
+        Note over C,S: Booking Creation
+        C->>S: Click "Book Now"
+        
+        alt Not Logged In
+            S-->>C: Redirect to Login
+            C->>S: Login/Register
+        end
+        
+        S-->>C: Show Booking Form
+        C->>S: Enter Booking Details<br/>(Date, Time, Address, Issue)
+        S->>S: Validate & Create Booking<br/>Status: PENDING
+        S->>S: Generate Booking#<br/>(HL2026XXXXXXX)
+        S-->>C: Booking Confirmation
+        S->>P: Notification Email/Push
+    end
+
+    rect rgb(224, 231, 255)
+        Note over S,P: Provider Response
+        P->>S: View Booking Details
+        
+        alt Accept
+            P->>S: Accept Booking
+            S->>S: Update Status: ACCEPTED
+            S-->>C: Notify: Booking Accepted
+        else Reject
+            P->>S: Reject Booking
+            S->>S: Update Status: REJECTED
+            S-->>C: Notify: Booking Rejected
+        end
+    end
+
+    rect rgb(254, 226, 226)
+        Note over C,P: Service Execution
+        P->>S: Start Work
+        S->>S: Update Status: IN_PROGRESS
+        S-->>C: Notify: Work Started
+        
+        P->>S: Complete Work
+        S->>S: Update Status: COMPLETED
+        S-->>C: Notify: Work Completed
+    end
+
+    rect rgb(237, 233, 254)
+        Note over C,S: Review
+        C->>S: Submit Review & Rating
+        S->>S: Update Provider Stats
+        S-->>C: Thank You!
+    end

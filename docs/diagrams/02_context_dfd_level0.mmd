@@ -1,0 +1,29 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4F46E5', 'primaryTextColor': '#fff', 'lineColor': '#374151'}}}%%
+flowchart LR
+    subgraph CUSTOMER["👤 CUSTOMER"]
+        CU[Customer]
+    end
+
+    subgraph PROVIDER["👷 SERVICE PROVIDER"]
+        PR[Provider]
+    end
+
+    subgraph ADMIN["👨‍💼 ADMINISTRATOR"]
+        AD[Admin]
+    end
+
+    SYSTEM(("🏠 HIRELINK<br/>SYSTEM<br/><br/>Local Service<br/>Provider Platform"))
+
+    CU -->|"Registration Data<br/>Login Credentials<br/>Service Search<br/>Booking Requests<br/>Reviews & Ratings"| SYSTEM
+    SYSTEM -->|"Authentication<br/>Search Results<br/>Booking Status<br/>Service Details"| CU
+
+    PR -->|"Service Listings<br/>Provider Details<br/>KYC Documents<br/>Booking Response"| SYSTEM
+    SYSTEM -->|"Booking Notifications<br/>Status Updates<br/>Earnings Reports"| PR
+
+    AD -->|"User Management<br/>KYC Verification<br/>System Settings"| SYSTEM
+    SYSTEM -->|"Reports<br/>Analytics<br/>Audit Logs"| AD
+
+    style SYSTEM fill:#4F46E5,stroke:#4338CA,color:#fff
+    style CU fill:#10B981,stroke:#059669,color:#fff
+    style PR fill:#F59E0B,stroke:#D97706,color:#fff
+    style AD fill:#EF4444,stroke:#DC2626,color:#fff

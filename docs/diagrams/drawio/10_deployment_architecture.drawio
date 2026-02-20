@@ -1,0 +1,231 @@
+<mxfile host="app.diagrams.net" modified="2026-01-28T10:00:00.000Z" agent="HireLink" version="22.0.0">
+  <diagram name="Deployment Architecture" id="deployment-arch">
+    <mxGraphModel dx="1434" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Title -->
+        <mxCell id="title" value="&lt;b&gt;Deployment Architecture&lt;/b&gt;&lt;br&gt;HireLink - Containerized Multi-Tier Deployment" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="450" y="20" width="400" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- Users Section -->
+        <mxCell id="users-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3F4F6;strokeColor=#9CA3AF;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="540" y="90" width="220" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="users-label" value="&lt;b&gt;🌐 USERS&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="600" y="95" width="100" height="20" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="browser" value="&lt;b&gt;👤&lt;/b&gt;&lt;br&gt;Browser" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9CA3AF;strokeWidth=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="570" y="120" width="70" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="mobile" value="&lt;b&gt;📱&lt;/b&gt;&lt;br&gt;Mobile" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9CA3AF;strokeWidth=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="660" y="120" width="70" height="40" as="geometry"/>
+        </mxCell>
+        
+        <!-- Arrow Users to CDN -->
+        <mxCell id="arrow1" value="" style="endArrow=classic;html=1;strokeWidth=3;strokeColor=#6B7280;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="650" y="170" as="sourcePoint"/>
+            <mxPoint x="650" y="210" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrow1-label" value="HTTPS :443" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="655" y="180" width="70" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- CDN / Load Balancer -->
+        <mxCell id="cdn-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#F59E0B;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="470" y="210" width="360" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="cdn-label" value="&lt;b&gt;☁️ CDN / LOAD BALANCER&lt;/b&gt;&lt;br&gt;Cloudflare / AWS ALB&lt;br&gt;SSL Termination | Load Balancing | DDoS Protection" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="490" y="220" width="320" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- Arrow CDN to Frontend -->
+        <mxCell id="arrow2" value="" style="endArrow=classic;html=1;strokeWidth=3;strokeColor=#6B7280;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="650" y="280" as="sourcePoint"/>
+            <mxPoint x="650" y="320" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Frontend Cluster -->
+        <mxCell id="frontend-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#3B82F6;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="380" y="320" width="540" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="frontend-label" value="&lt;b&gt;⚛️ FRONTEND CONTAINERS&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#1E40AF;" vertex="1" parent="1">
+          <mxGeometry x="400" y="325" width="200" height="20" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="fe1" value="&lt;b&gt;Frontend&lt;/b&gt;&lt;br&gt;Container 1&lt;br&gt;&lt;font color=&quot;#6B7280&quot;&gt;(Nginx + React)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#3B82F6;strokeWidth=1;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="410" y="355" width="100" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="fe2" value="&lt;b&gt;Frontend&lt;/b&gt;&lt;br&gt;Container 2&lt;br&gt;&lt;font color=&quot;#6B7280&quot;&gt;(Nginx + React)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#3B82F6;strokeWidth=1;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="550" y="355" width="100" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="fe3" value="&lt;b&gt;Frontend&lt;/b&gt;&lt;br&gt;Container 3&lt;br&gt;&lt;font color=&quot;#6B7280&quot;&gt;(Nginx + React)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#3B82F6;strokeWidth=1;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="690" y="355" width="100" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="fe-port" value="Port: 80" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontColor=#3B82F6;" vertex="1" parent="1">
+          <mxGeometry x="820" y="380" width="80" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Arrow Frontend to API Gateway -->
+        <mxCell id="arrow3" value="" style="endArrow=classic;html=1;strokeWidth=3;strokeColor=#6B7280;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="650" y="440" as="sourcePoint"/>
+            <mxPoint x="650" y="480" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrow3-label" value="/api/* requests" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="655" y="450" width="80" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- API Gateway -->
+        <mxCell id="gateway-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#10B981;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="470" y="480" width="360" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="gateway-label" value="&lt;b&gt;🔀 API GATEWAY (NGINX)&lt;/b&gt;&lt;br&gt;Reverse Proxy | Rate Limiting | Request Routing" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="490" y="490" width="320" height="40" as="geometry"/>
+        </mxCell>
+        
+        <!-- Arrow Gateway to Backend -->
+        <mxCell id="arrow4" value="" style="endArrow=classic;html=1;strokeWidth=3;strokeColor=#6B7280;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="650" y="540" as="sourcePoint"/>
+            <mxPoint x="650" y="580" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Backend Cluster -->
+        <mxCell id="backend-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#EF4444;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="380" y="580" width="540" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="backend-label" value="&lt;b&gt;☕ BACKEND CONTAINERS&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#B91C1C;" vertex="1" parent="1">
+          <mxGeometry x="400" y="585" width="200" height="20" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="be1" value="&lt;b&gt;Backend&lt;/b&gt;&lt;br&gt;Container 1&lt;br&gt;&lt;font color=&quot;#6B7280&quot;&gt;(Spring Boot)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#EF4444;strokeWidth=1;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="410" y="615" width="100" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="be2" value="&lt;b&gt;Backend&lt;/b&gt;&lt;br&gt;Container 2&lt;br&gt;&lt;font color=&quot;#6B7280&quot;&gt;(Spring Boot)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#EF4444;strokeWidth=1;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="550" y="615" width="100" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="be3" value="&lt;b&gt;Backend&lt;/b&gt;&lt;br&gt;Container 3&lt;br&gt;&lt;font color=&quot;#6B7280&quot;&gt;(Spring Boot)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#EF4444;strokeWidth=1;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="690" y="615" width="100" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="be-port" value="Port: 8080" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontColor=#EF4444;" vertex="1" parent="1">
+          <mxGeometry x="815" y="640" width="80" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Arrow Backend to Database -->
+        <mxCell id="arrow5" value="" style="endArrow=classic;html=1;strokeWidth=3;strokeColor=#6B7280;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="650" y="700" as="sourcePoint"/>
+            <mxPoint x="650" y="750" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrow5-label" value="JDBC :3306" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="655" y="715" width="70" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Database Layer -->
+        <mxCell id="db-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#8B5CF6;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="380" y="750" width="540" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="db-label" value="&lt;b&gt;🗄️ DATABASE LAYER&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#6D28D9;" vertex="1" parent="1">
+          <mxGeometry x="400" y="755" width="200" height="20" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="db-primary" value="" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#FFFFFF;strokeColor=#8B5CF6;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="450" y="785" width="120" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="db-primary-label" value="&lt;b&gt;MySQL&lt;br&gt;Primary&lt;/b&gt;&lt;br&gt;Read/Write" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="465" y="810" width="90" height="45" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="db-replica" value="" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#F5F3FF;strokeColor=#8B5CF6;strokeWidth=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="720" y="785" width="120" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="db-replica-label" value="&lt;b&gt;MySQL&lt;br&gt;Replica&lt;/b&gt;&lt;br&gt;Read Only" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="735" y="810" width="90" height="45" as="geometry"/>
+        </mxCell>
+        
+        <!-- Replication Arrow -->
+        <mxCell id="rep-arrow" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#8B5CF6;dashed=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="825" as="sourcePoint"/>
+            <mxPoint x="720" y="825" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rep-label" value="Replication" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontColor=#8B5CF6;" vertex="1" parent="1">
+          <mxGeometry x="610" y="805" width="70" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Docker Logo/Info -->
+        <mxCell id="docker-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F9FF;strokeColor=#0EA5E9;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="320" width="180" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="docker-label" value="&lt;b&gt;🐳 Docker Compose&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#0369A1;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="330" width="140" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="docker-content" value="Services:&lt;br&gt;• frontend (nginx:alpine)&lt;br&gt;• backend (openjdk:17)&lt;br&gt;• db (mysql:8.0)&lt;br&gt;&lt;br&gt;Network: hirelink-net" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="355" width="150" height="80" as="geometry"/>
+        </mxCell>
+        
+        <!-- Tech Stack Info -->
+        <mxCell id="tech-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#E0E0E0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="480" width="180" height="180" as="geometry"/>
+        </mxCell>
+        <mxCell id="tech-label" value="&lt;b&gt;⚙️ Technology Stack&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="490" width="140" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="tech-content" value="&lt;b&gt;Frontend:&lt;/b&gt;&lt;br&gt;React 18 + Vite + Tailwind&lt;br&gt;&lt;br&gt;&lt;b&gt;Backend:&lt;/b&gt;&lt;br&gt;Spring Boot 3.2 + Java 17&lt;br&gt;&lt;br&gt;&lt;b&gt;Database:&lt;/b&gt;&lt;br&gt;MySQL 8.0&lt;br&gt;&lt;br&gt;&lt;b&gt;Auth:&lt;/b&gt; JWT + BCrypt" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="515" width="150" height="140" as="geometry"/>
+        </mxCell>
+        
+        <!-- Legend -->
+        <mxCell id="legend-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#E0E0E0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="320" width="200" height="170" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend-title" value="&lt;b&gt;LEGEND&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="120" y="330" width="80" height="20" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="leg1-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#3B82F6;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="360" width="30" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg1-label" value="Frontend Tier" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="160" y="360" width="80" height="20" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="leg2-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#10B981;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="390" width="30" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg2-label" value="API Gateway" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="160" y="390" width="80" height="20" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="leg3-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#EF4444;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="420" width="30" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg3-label" value="Backend Tier" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="160" y="420" width="80" height="20" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="leg4-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#8B5CF6;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="450" width="30" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg4-label" value="Database Tier" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="160" y="450" width="80" height="20" as="geometry"/>
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

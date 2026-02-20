@@ -1,0 +1,48 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4F46E5'}}}%%
+flowchart TB
+    CU([👤 Customer])
+    PR([👷 Provider])
+
+    P1[["1.0<br/>USER<br/>MANAGEMENT"]]
+    P2[["2.0<br/>SERVICE<br/>DISCOVERY"]]
+    P3[["3.0<br/>BOOKING<br/>MANAGEMENT"]]
+    P4[["4.0<br/>REVIEW<br/>SYSTEM"]]
+    P5[["5.0<br/>PROVIDER<br/>MANAGEMENT"]]
+
+    D1[(D1: Users<br/>Database)]
+    D2[(D2: Services<br/>Database)]
+    D3[(D3: Bookings<br/>Database)]
+    D4[(D4: Reviews<br/>Database)]
+
+    CU -->|"Registration Data<br/>Login Credentials"| P1
+    P1 -->|"User Profile<br/>Auth Token"| CU
+    P1 <-->|"User Data"| D1
+
+    CU -->|"Search Query"| P2
+    P2 -->|"Service List<br/>Provider Details"| CU
+    P2 <-->|"Service Data"| D2
+
+    CU -->|"Booking Request"| P3
+    P3 -->|"Booking Confirmation<br/>Status Updates"| CU
+    P3 <-->|"Booking Data"| D3
+
+    CU -->|"Review Data"| P4
+    P4 -->|"Review Confirmation"| CU
+    P4 <-->|"Review Data"| D4
+
+    PR -->|"Service Listings<br/>KYC Documents"| P5
+    P5 -->|"Verification Status<br/>Booking Notifications"| PR
+    P5 <-->|"Provider Data"| D1
+
+    P3 <-->|"Provider Availability"| P5
+    P4 -->|"Update Ratings"| P5
+
+    style P1 fill:#4F46E5,stroke:#4338CA,color:#fff
+    style P2 fill:#10B981,stroke:#059669,color:#fff
+    style P3 fill:#F59E0B,stroke:#D97706,color:#fff
+    style P4 fill:#8B5CF6,stroke:#7C3AED,color:#fff
+    style P5 fill:#EF4444,stroke:#DC2626,color:#fff
+    style D1 fill:#E0E7FF,stroke:#4F46E5
+    style D2 fill:#D1FAE5,stroke:#10B981
+    style D3 fill:#FEF3C7,stroke:#F59E0B
+    style D4 fill:#EDE9FE,stroke:#8B5CF6
