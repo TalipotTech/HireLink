@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from 'react-query'
-import { bookingsAPI } from '../services/api'
+import { bookingsAPI, paymentsAPI } from '../services/api'
 import { useAuthStore } from '../context/authStore'
 import { format } from 'date-fns'
 import toast from 'react-hot-toast'
@@ -17,7 +17,8 @@ import {
   UserIcon,
   EnvelopeIcon,
   PlayIcon,
-  CheckIcon
+  CheckIcon,
+  CreditCardIcon
 } from '@heroicons/react/24/outline'
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid'
 
@@ -41,6 +42,7 @@ export default function BookingDetail() {
   const [rating, setRating] = useState(5)
   const [reviewText, setReviewText] = useState('')
   const [workSummary, setWorkSummary] = useState('')
+  const [payingInProgress, setPayingInProgress] = useState(false)
 
   const isProvider = user?.userType === 'PROVIDER'
   const isAdmin = user?.userType === 'ADMIN' || user?.userType === 'SUPER_ADMIN'
@@ -99,6 +101,85 @@ export default function BookingDetail() {
     }
   )
 
+  const handlePayNow = async () => {
+    setPayingInProgress(true)
+    try {
+      const res = await paymentsAPI.createOrder(booking.bookingId)
+      const orderData = res.data.data
+
+      // Mock mode: backend returns keyId="mock" when Razorpay keys are placeholders
+      if (orderData.keyId === 'mock') {
+        const confirmed = window.confirm(
+          `[Demo Mode] Confirm mock payment of ₹${(orderData.amount / 100).toFixed(2)} for Booking #${orderData.bookingNumber}?`
+        )
+        if (confirmed) {
+          try {
+            await paymentsAPI.verifyPayment({
+              razorpayOrderId: orderData.orderId,
+              razorpayPaymentId: 'mock_pay_' + Date.now(),
+              razorpaySignature: 'mock_signature',
+            })
+            toast.success('Payment successful! (Demo Mode)')
+            queryClient.invalidateQueries(['booking', id])
+          } catch (err) {
+            toast.error(err.response?.data?.message || 'Payment verification failed')
+          }
+        } else {
+          toast.error('Payment cancelled')
+        }
+        setPayingInProgress(false)
+        return
+      }
+
+      // Real Razorpay checkout flow
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || orderData.keyId,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'HireLink',
+        description: `Payment for Booking #${orderData.bookingNumber}`,
+        order_id: orderData.orderId,
+        prefill: {
+          name: orderData.customerName || '',
+          email: orderData.customerEmail || '',
+          contact: orderData.customerPhone || '',
+        },
+        theme: { color: '#2563eb' },
+        handler: async function (response) {
+          try {
+            await paymentsAPI.verifyPayment({
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+            })
+            toast.success('Payment successful!')
+            queryClient.invalidateQueries(['booking', id])
+          } catch (err) {
+            toast.error(err.response?.data?.message || 'Payment verification failed')
+          } finally {
+            setPayingInProgress(false)
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            setPayingInProgress(false)
+            toast.error('Payment cancelled')
+          },
+        },
+      }
+
+      const rzp = new window.Razorpay(options)
+      rzp.on('payment.failed', function (response) {
+        setPayingInProgress(false)
+        toast.error(response.error?.description || 'Payment failed')
+      })
+      rzp.open()
+    } catch (err) {
+      setPayingInProgress(false)
+      toast.error(err.response?.data?.message || 'Failed to initiate payment')
+    }
+  }
+
   const booking = data?.data?.data
 
   if (isLoading) {
@@ -123,6 +204,7 @@ export default function BookingDetail() {
 
   const canCancel = ['PENDING', 'ACCEPTED', 'CONFIRMED'].includes(booking.bookingStatus)
   const canReview = booking.bookingStatus === 'COMPLETED' && !booking.userRating && isCustomer
+  const canPay = isCustomer && ['ACCEPTED', 'CONFIRMED'].includes(booking.bookingStatus) && booking.paymentStatus !== 'PAID'
   
   // Provider actions based on current status
   const canAccept = isProvider && booking.bookingStatus === 'PENDING'
@@ -352,6 +434,18 @@ export default function BookingDetail() {
                     <span>{booking.finalAmount || booking.estimatedAmount}</span>
                   </div>
                 </div>
+                <div className="border-t pt-3 flex justify-between items-center">
+                  <span className="text-gray-500">Payment</span>
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                    booking.paymentStatus === 'PAID'
+                      ? 'bg-green-100 text-green-700'
+                      : booking.paymentStatus === 'REFUNDED'
+                      ? 'bg-orange-100 text-orange-700'
+                      : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    {booking.paymentStatus || 'UNPAID'}
+                  </span>
+                </div>
               </div>
 
               {/* Actions */}
@@ -408,6 +502,18 @@ export default function BookingDetail() {
                   </button>
                 )}
                 
+                {/* Payment Action */}
+                {canPay && (
+                  <button
+                    onClick={handlePayNow}
+                    disabled={payingInProgress}
+                    className="w-full btn bg-primary-600 text-white hover:bg-primary-700 flex items-center justify-center gap-2"
+                  >
+                    <CreditCardIcon className="h-5 w-5" />
+                    {payingInProgress ? 'Processing...' : 'Pay Now'}
+                  </button>
+                )}
+
                 {/* Customer Actions */}
                 {canReview && (
                   <button

@@ -31,3 +31,7 @@ mysql_data/
 
 # Uploads
 uploads/
+
+# Credentials
+rzp-key.csv
+*.credentials

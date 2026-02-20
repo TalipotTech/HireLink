@@ -81,6 +81,7 @@ public class BookingDTO {
         private BigDecimal taxAmount;
         private BigDecimal finalAmount;
         private String bookingStatus;
+        private String paymentStatus;
         private String cancelledBy;
         private String cancellationReason;
         private LocalDateTime cancelledAt;

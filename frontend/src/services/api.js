@@ -126,6 +126,13 @@ export const searchAPI = {
   bookings: (keyword, params) => api.get('/bookings/search', { params: { keyword, ...params } }),
 }
 
+// Payments API
+export const paymentsAPI = {
+  createOrder: (bookingId) => api.post('/payments/create-order', { bookingId }),
+  verifyPayment: (data) => api.post('/payments/verify', data),
+  getByBooking: (bookingId) => api.get(`/payments/booking/${bookingId}`),
+}
+
 // User API
 export const userAPI = {
   getProfile: () => api.get('/users/me'),

@@ -530,6 +530,7 @@ public class BookingService {
                 .taxAmount(booking.getTaxAmount())
                 .finalAmount(booking.getFinalAmount())
                 .bookingStatus(booking.getBookingStatus() != null ? booking.getBookingStatus().name() : "PENDING")
+                .paymentStatus(booking.getPaymentStatus() != null ? booking.getPaymentStatus().name() : "UNPAID")
                 .cancelledBy(booking.getCancelledBy() != null ? booking.getCancelledBy().name() : null)
                 .cancellationReason(booking.getCancellationReason())
                 .cancelledAt(booking.getCancelledAt())

@@ -127,6 +127,11 @@ public class Booking {
     private BookingStatus bookingStatus = BookingStatus.PENDING;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status")
+    @Builder.Default
+    private PaymentStatus paymentStatus = PaymentStatus.UNPAID;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "cancelled_by")
     private CancelledBy cancelledBy;
 
@@ -185,5 +190,9 @@ public class Booking {
 
     public enum CancelledBy {
         USER, PROVIDER, ADMIN, SYSTEM
+    }
+
+    public enum PaymentStatus {
+        UNPAID, PAID, REFUNDED
     }
 }
