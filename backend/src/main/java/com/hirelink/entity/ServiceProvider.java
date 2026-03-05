@@ -30,7 +30,7 @@ public class ServiceProvider {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "primary_category_id")
+    @JoinColumn(name = "primary_category_id", columnDefinition = "bigint unsigned")
     @ToString.Exclude
     private ServiceCategory primaryCategory;
 
