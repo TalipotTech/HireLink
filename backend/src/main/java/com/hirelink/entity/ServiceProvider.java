@@ -29,6 +29,11 @@ public class ServiceProvider {
     @ToString.Exclude
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "primary_category_id")
+    @ToString.Exclude
+    private ServiceCategory primaryCategory;
+
     @Column(name = "business_name", length = 200)
     private String businessName;
 

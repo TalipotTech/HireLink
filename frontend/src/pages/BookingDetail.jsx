@@ -110,7 +110,7 @@ export default function BookingDetail() {
       // Mock mode: backend returns keyId="mock" when Razorpay keys are placeholders
       if (orderData.keyId === 'mock') {
         const confirmed = window.confirm(
-          `[Demo Mode] Confirm mock payment of ₹${(orderData.amount / 100).toFixed(2)} for Booking #${orderData.bookingNumber}?`
+          `[Demo Mode] Confirm booking charge of ₹${(orderData.amount / 100).toFixed(2)} for Booking #${orderData.bookingNumber}?`
         )
         if (confirmed) {
           try {
@@ -394,46 +394,23 @@ export default function BookingDetail() {
               
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Service Charge</span>
+                  <span className="text-gray-500">Service Price</span>
                   <div className="flex items-center">
-                    <CurrencyRupeeIcon className="h-4 w-4" />
-                    <span>{booking.estimatedAmount}</span>
-                  </div>
-                </div>
-                {booking.materialCost > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Materials</span>
-                    <div className="flex items-center">
-                      <CurrencyRupeeIcon className="h-4 w-4" />
-                      <span>{booking.materialCost}</span>
-                    </div>
-                  </div>
-                )}
-                {booking.travelCharge > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Travel</span>
-                    <div className="flex items-center">
-                      <CurrencyRupeeIcon className="h-4 w-4" />
-                      <span>{booking.travelCharge}</span>
-                    </div>
-                  </div>
-                )}
-                {booking.discountAmount > 0 && (
-                  <div className="flex justify-between text-green-600">
-                    <span>Discount</span>
-                    <div className="flex items-center">
-                      -<CurrencyRupeeIcon className="h-4 w-4" />
-                      <span>{booking.discountAmount}</span>
-                    </div>
-                  </div>
-                )}
-                <div className="border-t pt-3 flex justify-between font-semibold">
-                  <span>Total</span>
-                  <div className="flex items-center text-primary-600">
                     <CurrencyRupeeIcon className="h-4 w-4" />
                     <span>{booking.finalAmount || booking.estimatedAmount}</span>
                   </div>
                 </div>
+                <p className="text-xs text-gray-400 -mt-1">Paid directly to the provider</p>
+
+                <div className="border-t pt-3 flex justify-between font-semibold">
+                  <span>Booking Charge</span>
+                  <div className="flex items-center text-primary-600">
+                    <CurrencyRupeeIcon className="h-4 w-4" />
+                    <span>8</span>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-400 -mt-1">Platform fee per booking</p>
+
                 <div className="border-t pt-3 flex justify-between items-center">
                   <span className="text-gray-500">Payment</span>
                   <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${

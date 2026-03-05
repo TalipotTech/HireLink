@@ -32,6 +32,7 @@ public class PaymentDTO {
         private String customerName;
         private String customerEmail;
         private String customerPhone;
+        private BigDecimal bookingCharge;
     }
 
     @Data

@@ -7,8 +7,10 @@ import AuthLayout from './components/layout/AuthLayout'
 
 // Pages
 import Home from './pages/Home'
-import Login from './pages/auth/Login'
-import Register from './pages/auth/Register'
+import CustomerLogin from './pages/auth/CustomerLogin'
+import CustomerRegister from './pages/auth/CustomerRegister'
+import ProviderLogin from './pages/auth/ProviderLogin'
+import ProviderRegister from './pages/auth/ProviderRegister'
 import Categories from './pages/Categories'
 import CategoryServices from './pages/CategoryServices'
 import ServiceDetail from './pages/ServiceDetail'
@@ -20,12 +22,11 @@ import BookService from './pages/BookService'
 import SearchResults from './pages/SearchResults'
 import NotFound from './pages/NotFound'
 
-// Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuthStore()
   
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />
+    return <Navigate to="/customer/login" replace />
   }
   
   return children
@@ -34,11 +35,21 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   return (
     <Routes>
-      {/* Auth Routes */}
+      {/* Customer Auth Routes */}
       <Route element={<AuthLayout />}>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/customer/login" element={<CustomerLogin />} />
+        <Route path="/customer/register" element={<CustomerRegister />} />
       </Route>
+
+      {/* Provider Auth Routes */}
+      <Route element={<AuthLayout variant="provider" />}>
+        <Route path="/provider/login" element={<ProviderLogin />} />
+        <Route path="/provider/register" element={<ProviderRegister />} />
+      </Route>
+
+      {/* Legacy redirects */}
+      <Route path="/login" element={<Navigate to="/customer/login" replace />} />
+      <Route path="/register" element={<Navigate to="/customer/register" replace />} />
 
       {/* Main Routes */}
       <Route element={<MainLayout />}>

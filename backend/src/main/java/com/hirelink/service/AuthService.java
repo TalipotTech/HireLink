@@ -9,6 +9,7 @@ import com.hirelink.exception.BadRequestException;
 import com.hirelink.exception.ResourceNotFoundException;
 import com.hirelink.exception.UnauthorizedException;
 import com.hirelink.repository.OtpRepository;
+import com.hirelink.repository.ServiceCategoryRepository;
 import com.hirelink.repository.ServiceProviderRepository;
 import com.hirelink.repository.UserRepository;
 import com.hirelink.security.CustomUserDetails;
@@ -32,6 +33,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final ServiceProviderRepository providerRepository;
+    private final ServiceCategoryRepository categoryRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -76,13 +78,30 @@ public class AuthService {
 
         user = userRepository.save(user);
 
-        // If provider, create provider profile
+        // If provider, create provider profile with category and location
         if (userType == User.UserType.PROVIDER) {
-            ServiceProvider provider = ServiceProvider.builder()
+            ServiceProvider.ServiceProviderBuilder providerBuilder = ServiceProvider.builder()
                     .user(user)
-                    .businessName(request.getName() + "'s Services")
-                    .build();
-            providerRepository.save(provider);
+                    .businessName(request.getName() + "'s Services");
+
+            if (request.getCategoryId() != null) {
+                categoryRepository.findById(request.getCategoryId())
+                        .ifPresent(providerBuilder::primaryCategory);
+            }
+            if (request.getBaseAddress() != null) {
+                providerBuilder.baseAddress(request.getBaseAddress());
+            }
+            if (request.getBasePincode() != null) {
+                providerBuilder.basePincode(request.getBasePincode());
+            }
+            if (request.getBaseLatitude() != null) {
+                providerBuilder.baseLatitude(request.getBaseLatitude());
+            }
+            if (request.getBaseLongitude() != null) {
+                providerBuilder.baseLongitude(request.getBaseLongitude());
+            }
+
+            providerRepository.save(providerBuilder.build());
         }
 
         // Generate tokens

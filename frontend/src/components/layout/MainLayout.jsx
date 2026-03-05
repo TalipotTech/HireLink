@@ -122,10 +122,10 @@ export default function MainLayout() {
                 </div>
               ) : (
                 <>
-                  <Link to="/login" className="btn-secondary">
+                  <Link to="/customer/login" className="btn-secondary">
                     Login
                   </Link>
-                  <Link to="/register" className="btn-primary">
+                  <Link to="/customer/register" className="btn-primary">
                     Sign Up
                   </Link>
                 </>
@@ -225,14 +225,14 @@ export default function MainLayout() {
               ) : (
                 <div className="space-y-2 pt-4 border-t">
                   <Link 
-                    to="/login" 
+                    to="/customer/login" 
                     className="block w-full btn-secondary text-center"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Login
                   </Link>
                   <Link 
-                    to="/register" 
+                    to="/customer/register" 
                     className="block w-full btn-primary text-center"
                     onClick={() => setMobileMenuOpen(false)}
                   >

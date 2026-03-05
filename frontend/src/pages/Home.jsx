@@ -412,7 +412,7 @@ export default function Home() {
           <p className="text-accent-100 mb-8 text-lg">
             Join thousands of satisfied customers who trust HireLink for their home service needs.
           </p>
-          <Link to="/register" className="btn bg-white text-accent-600 hover:bg-accent-50 px-8 py-3 text-lg shadow-xl">
+          <Link to="/customer/register" className="btn bg-white text-accent-600 hover:bg-accent-50 px-8 py-3 text-lg shadow-xl">
             Sign Up Now - It's Free
           </Link>
         </div>

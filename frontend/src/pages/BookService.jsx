@@ -382,16 +382,28 @@ export default function BookService() {
               </div>
 
               {/* Price */}
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600">Estimated Price</span>
-                <div className="flex items-center text-primary-600">
-                  <CurrencyRupeeIcon className="h-5 w-5" />
-                  <span className="text-2xl font-bold">{service.basePrice}</span>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600">Service Price</span>
+                  <div className="flex items-center text-gray-700">
+                    <CurrencyRupeeIcon className="h-5 w-5" />
+                    <span className="text-xl font-bold">{service.basePrice}</span>
+                  </div>
                 </div>
+                <p className="text-xs text-gray-400">
+                  Paid directly to the provider
+                </p>
+                <div className="border-t pt-3 flex items-center justify-between">
+                  <span className="text-gray-600 font-medium">Booking Charge</span>
+                  <div className="flex items-center text-primary-600">
+                    <CurrencyRupeeIcon className="h-5 w-5" />
+                    <span className="text-2xl font-bold">8</span>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-400">
+                  Platform fee collected at confirmation
+                </p>
               </div>
-              <p className="text-xs text-gray-500 mt-2">
-                Final price may vary based on service requirements
-              </p>
             </div>
           </div>
         </div>

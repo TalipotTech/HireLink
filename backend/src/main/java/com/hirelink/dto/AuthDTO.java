@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 public class AuthDTO {
 
     @Data
@@ -29,6 +31,15 @@ public class AuthDTO {
         private String password;
 
         private String userType; // CUSTOMER or PROVIDER
+
+        // Provider-specific fields (optional, only used when userType=PROVIDER)
+        private Long categoryId;
+        private String baseAddress;
+        private String basePincode;
+        private BigDecimal baseLatitude;
+        private BigDecimal baseLongitude;
+        private String serviceCity;
+        private String serviceState;
     }
 
     /**

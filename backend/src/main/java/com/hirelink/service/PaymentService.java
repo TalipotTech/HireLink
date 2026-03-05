@@ -34,16 +34,19 @@ public class PaymentService {
     private final String razorpayKeyId;
     private final String razorpayKeySecret;
     private final boolean mockMode;
+    private final BigDecimal bookingCharge;
 
     public PaymentService(
             PaymentRepository paymentRepository,
             BookingRepository bookingRepository,
             @Value("${razorpay.key-id}") String razorpayKeyId,
-            @Value("${razorpay.key-secret}") String razorpayKeySecret) throws RazorpayException {
+            @Value("${razorpay.key-secret}") String razorpayKeySecret,
+            @Value("${hirelink.booking-charge:8}") BigDecimal bookingCharge) throws RazorpayException {
         this.paymentRepository = paymentRepository;
         this.bookingRepository = bookingRepository;
         this.razorpayKeyId = razorpayKeyId;
         this.razorpayKeySecret = razorpayKeySecret;
+        this.bookingCharge = bookingCharge;
         this.mockMode = razorpayKeyId.contains("xxxxx") || razorpayKeySecret.contains("xxxxx");
 
         if (mockMode) {
@@ -73,13 +76,7 @@ public class PaymentService {
             throw new BadRequestException("This booking has already been paid");
         }
 
-        BigDecimal amount = booking.getFinalAmount() != null
-                ? booking.getFinalAmount()
-                : booking.getEstimatedAmount();
-
-        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BadRequestException("Invalid booking amount");
-        }
+        BigDecimal amount = bookingCharge;
 
         long amountInPaise = amount.multiply(BigDecimal.valueOf(100)).longValue();
 
@@ -118,6 +115,7 @@ public class PaymentService {
                     .customerName(booking.getUser().getName())
                     .customerEmail(booking.getUser().getEmail())
                     .customerPhone(booking.getUser().getPhone())
+                    .bookingCharge(bookingCharge)
                     .build();
 
         } catch (RazorpayException e) {
@@ -155,6 +153,7 @@ public class PaymentService {
                 .customerName(booking.getUser().getName())
                 .customerEmail(booking.getUser().getEmail())
                 .customerPhone(booking.getUser().getPhone())
+                .bookingCharge(bookingCharge)
                 .build();
     }
 
