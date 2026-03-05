@@ -276,33 +276,36 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-16 lg:py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="section-title">Why Choose HireLink?</h2>
-            <p className="section-subtitle">We ensure quality service every time</p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <div 
-                key={index} 
-                className={`text-center p-6 animate-slideUp stagger-${index + 1}`}
-                style={{ animationFillMode: 'both' }}
-              >
-                <div className={`w-16 h-16 mx-auto ${feature.color} rounded-2xl flex items-center justify-center mb-4`}>
-                  <feature.icon className="h-8 w-8" />
+      {/* Features Section - only for logged out users */}
+      {!isAuthenticated && (
+        <section className="py-16 lg:py-24 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="section-title">Why Choose HireLink?</h2>
+              <p className="section-subtitle">We ensure quality service every time</p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {features.map((feature, index) => (
+                <div 
+                  key={index} 
+                  className={`text-center p-6 animate-slideUp stagger-${index + 1}`}
+                  style={{ animationFillMode: 'both' }}
+                >
+                  <div className={`w-16 h-16 mx-auto ${feature.color} rounded-2xl flex items-center justify-center mb-4`}>
+                    <feature.icon className="h-8 w-8" />
+                  </div>
+                  <h3 className="font-semibold text-gray-900 mb-2 text-lg">{feature.title}</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed">{feature.description}</p>
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-2 text-lg">{feature.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{feature.description}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* Location Banner - Quick access hint */}
+      {/* Location Banner - customers only */}
+      {isAuthenticated && isCustomer && (
       <section className="py-6 bg-gradient-to-r from-emerald-500 to-emerald-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -326,9 +329,10 @@ export default function Home() {
           </div>
         </div>
       </section>
+      )}
 
-      {/* Featured Providers */}
-      {providers.length > 0 && (
+      {/* Featured Providers - customers only */}
+      {isAuthenticated && isCustomer && providers.length > 0 && (
         <section className="py-16 lg:py-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
@@ -372,51 +376,55 @@ export default function Home() {
         </section>
       )}
 
-      {/* How It Works */}
-      <section className="py-16 lg:py-24 bg-gradient-to-br from-primary-50 to-primary-100/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="section-title">How It Works</h2>
-            <p className="section-subtitle">Book a service in 3 easy steps</p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
-            {[
-              { step: '1', title: 'Choose a Service', desc: 'Browse our categories and select the service you need' },
-              { step: '2', title: 'Book a Time', desc: 'Pick a convenient date and time for the service' },
-              { step: '3', title: 'Get It Done', desc: 'Our verified professional arrives and completes the job' },
-            ].map((item, index) => (
-              <div key={index} className="text-center relative">
-                <div className="w-16 h-16 mx-auto bg-gradient-to-br from-primary-500 to-primary-700 text-white rounded-2xl flex items-center justify-center text-2xl font-bold mb-6 shadow-lg shadow-primary-500/30">
-                  {item.step}
+      {/* How It Works - only for logged out users */}
+      {!isAuthenticated && (
+        <section className="py-16 lg:py-24 bg-gradient-to-br from-primary-50 to-primary-100/50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="section-title">How It Works</h2>
+              <p className="section-subtitle">Book a service in 3 easy steps</p>
+            </div>
+            
+            <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
+              {[
+                { step: '1', title: 'Choose a Service', desc: 'Browse our categories and select the service you need' },
+                { step: '2', title: 'Book a Time', desc: 'Pick a convenient date and time for the service' },
+                { step: '3', title: 'Get It Done', desc: 'Our verified professional arrives and completes the job' },
+              ].map((item, index) => (
+                <div key={index} className="text-center relative">
+                  <div className="w-16 h-16 mx-auto bg-gradient-to-br from-primary-500 to-primary-700 text-white rounded-2xl flex items-center justify-center text-2xl font-bold mb-6 shadow-lg shadow-primary-500/30">
+                    {item.step}
+                  </div>
+                  <h3 className="font-semibold text-gray-900 mb-2 text-lg">{item.title}</h3>
+                  <p className="text-gray-500">{item.desc}</p>
+                  
+                  {index < 2 && (
+                    <div className="hidden md:block absolute top-8 left-[60%] w-[80%] border-t-2 border-dashed border-primary-300"></div>
+                  )}
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-2 text-lg">{item.title}</h3>
-                <p className="text-gray-500">{item.desc}</p>
-                
-                {index < 2 && (
-                  <div className="hidden md:block absolute top-8 left-[60%] w-[80%] border-t-2 border-dashed border-primary-300"></div>
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* CTA Section */}
-      <section className="py-16 lg:py-20 bg-gradient-to-r from-accent-500 to-accent-600 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-30" style={{backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.4) 1px, transparent 0)', backgroundSize: '30px 30px'}}></div>
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
-            Ready to Get Started?
-          </h2>
-          <p className="text-accent-100 mb-8 text-lg">
-            Join thousands of satisfied customers who trust HireLink for their home service needs.
-          </p>
-          <Link to="/customer/register" className="btn bg-white text-accent-600 hover:bg-accent-50 px-8 py-3 text-lg shadow-xl">
-            Sign Up Now - It's Free
-          </Link>
-        </div>
-      </section>
+      {/* CTA Section - only for logged out users */}
+      {!isAuthenticated && (
+        <section className="py-16 lg:py-20 bg-gradient-to-r from-accent-500 to-accent-600 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-30" style={{backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.4) 1px, transparent 0)', backgroundSize: '30px 30px'}}></div>
+          <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+              Ready to Get Started?
+            </h2>
+            <p className="text-accent-100 mb-8 text-lg">
+              Join thousands of satisfied customers who trust HireLink for their home service needs.
+            </p>
+            <Link to="/customer/register" className="btn bg-white text-accent-600 hover:bg-accent-50 px-8 py-3 text-lg shadow-xl">
+              Sign Up Now - It's Free
+            </Link>
+          </div>
+        </section>
+      )}
     </div>
   )
 }
