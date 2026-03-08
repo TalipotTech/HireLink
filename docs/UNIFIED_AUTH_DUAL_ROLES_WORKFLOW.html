@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HireLink - Unified Authentication &amp; Dual-Role Workflow</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --primary: #4f46e5;
+    --primary-light: #eef2ff;
+    --primary-dark: #3730a3;
+    --emerald: #059669;
+    --emerald-light: #ecfdf5;
+    --amber: #d97706;
+    --amber-light: #fffbeb;
+    --red: #dc2626;
+    --red-light: #fef2f2;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --radius: 8px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--gray-800);
+    line-height: 1.7;
+    background: #fff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .page-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 32px;
+  }
+
+  /* Cover / Header */
+  .doc-header {
+    text-align: center;
+    padding: 48px 24px 40px;
+    margin-bottom: 48px;
+    background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+    border-radius: 16px;
+    color: #fff;
+  }
+  .doc-header .institution {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.8;
+    margin-bottom: 8px;
+  }
+  .doc-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  .doc-header .subtitle {
+    font-size: 15px;
+    font-weight: 400;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto 20px;
+  }
+  .doc-header .meta {
+    display: inline-flex;
+    gap: 20px;
+    font-size: 12px;
+    opacity: 0.75;
+  }
+  .doc-header .meta span { display: flex; align-items: center; gap: 4px; }
+
+  /* Table of Contents */
+  .toc {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-bottom: 40px;
+  }
+  .toc h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 12px;
+  }
+  .toc ol {
+    list-style: none;
+    counter-reset: toc-counter;
+    padding: 0;
+    columns: 2;
+    column-gap: 24px;
+  }
+  .toc li {
+    counter-increment: toc-counter;
+    padding: 4px 0;
+  }
+  .toc li a {
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .toc li a:hover { color: var(--primary-dark); text-decoration: underline; }
+  .toc li a::before {
+    content: counter(toc-counter) ". ";
+    color: var(--gray-500);
+    font-weight: 400;
+  }
+
+  /* Sections */
+  .section {
+    margin-bottom: 44px;
+    page-break-inside: avoid;
+  }
+  .section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gray-900);
+    border-bottom: 3px solid var(--primary);
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+  }
+  .section h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin: 24px 0 12px;
+  }
+  .section h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin: 16px 0 8px;
+  }
+
+  p { margin-bottom: 12px; font-size: 14.5px; }
+
+  ul, ol { margin: 0 0 16px 20px; font-size: 14.5px; }
+  li { margin-bottom: 4px; }
+
+  strong { font-weight: 600; }
+
+  code {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    background: var(--gray-100);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--primary-dark);
+  }
+
+  pre {
+    background: var(--gray-900);
+    color: #e5e7eb;
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 12px 0 16px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+    font-size: 13px;
+  }
+  pre .comment { color: #6b7280; }
+  pre .keyword { color: #c084fc; }
+  pre .string { color: #86efac; }
+  pre .type { color: #67e8f9; }
+  pre .annotation { color: #fbbf24; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 20px;
+    font-size: 13.5px;
+  }
+  thead th {
+    background: var(--gray-100);
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 2px solid var(--gray-300);
+    color: var(--gray-700);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  tbody td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--gray-200);
+    vertical-align: top;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--gray-50); }
+
+  /* Callout boxes */
+  .callout {
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  .callout-info {
+    background: var(--primary-light);
+    border-left: 4px solid var(--primary);
+  }
+  .callout-warn {
+    background: var(--amber-light);
+    border-left: 4px solid var(--amber);
+  }
+  .callout-success {
+    background: var(--emerald-light);
+    border-left: 4px solid var(--emerald);
+  }
+  .callout-danger {
+    background: var(--red-light);
+    border-left: 4px solid var(--red);
+  }
+  .callout strong { display: block; margin-bottom: 4px; }
+
+  /* Diagram boxes */
+  .diagram {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin: 16px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--gray-700);
+  }
+
+  /* Badge */
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    vertical-align: middle;
+  }
+  .badge-new { background: var(--emerald-light); color: var(--emerald); }
+  .badge-mod { background: var(--amber-light); color: var(--amber); }
+  .badge-del { background: var(--red-light); color: var(--red); }
+
+  blockquote {
+    border-left: 3px solid var(--gray-300);
+    padding: 8px 16px;
+    margin: 12px 0;
+    color: var(--gray-600);
+    font-style: italic;
+    font-size: 14px;
+    background: var(--gray-50);
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--gray-200);
+    margin: 32px 0;
+  }
+
+  /* Footer */
+  .doc-footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--gray-500);
+    padding-top: 24px;
+    border-top: 1px solid var(--gray-200);
+    margin-top: 48px;
+  }
+
+  /* Print styles */
+  @media print {
+    body { background: #fff; font-size: 12px; }
+    .page-wrapper { max-width: 100%; padding: 20px; }
+    .doc-header { padding: 32px 16px; margin-bottom: 32px; }
+    .section { page-break-inside: avoid; }
+    pre { font-size: 11px; }
+    table { font-size: 12px; }
+    a { color: var(--primary); text-decoration: none; }
+    .toc ol { columns: 2; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+<!-- Header -->
+<div class="doc-header">
+  <div class="institution">ENSATE &mdash; Academic Year 2025-2026</div>
+  <h1>HireLink</h1>
+  <div class="subtitle">Unified Authentication &amp; Dual-Role Workflow Documentation</div>
+  <div class="meta">
+    <span>Branch: <strong>feature/unified-auth-dual-roles</strong></span>
+    <span>Date: March 2026</span>
+  </div>
+</div>
+
+<!-- Table of Contents -->
+<div class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#motivation">Motivation</a></li>
+    <li><a href="#architecture">Architecture Changes</a></li>
+    <li><a href="#database">Database Changes</a></li>
+    <li><a href="#auth-workflow">Authentication Workflow</a></li>
+    <li><a href="#booking-workflow">Booking Workflow</a></li>
+    <li><a href="#privacy">Contact Privacy Policy</a></li>
+    <li><a href="#frontend">Frontend UI Changes</a></li>
+    <li><a href="#api">API Reference</a></li>
+    <li><a href="#backend">Backend Service Changes</a></li>
+    <li><a href="#migration">Migration Guide</a></li>
+  </ol>
+</div>
+
+<!-- Section 1: Motivation -->
+<div class="section" id="motivation">
+  <h2>1. Motivation</h2>
+  <p>In the previous system, Customers and Providers had completely separate registration and login flows. This caused friction when the same person wanted to act as both:</p>
+  <ul>
+    <li><strong>Two phone numbers required</strong> &mdash; a user had to register separately as Customer and Provider with different credentials.</li>
+    <li><strong>Confusing UX</strong> &mdash; two login pages, two register pages, and no way to link accounts.</li>
+    <li><strong>Data duplication</strong> &mdash; the same person existed as two unrelated user records.</li>
+  </ul>
+  <p>The unified system solves this by:</p>
+  <ul>
+    <li>A single registration and login flow for all users.</li>
+    <li>Supporting multiple roles per account via a <code>user_roles</code> join table.</li>
+    <li>A &ldquo;Become a Provider&rdquo; upgrade path for existing customers.</li>
+    <li>OTP-verified registration for phone number ownership.</li>
+  </ul>
+</div>
+
+<!-- Section 2: Architecture Changes -->
+<div class="section" id="architecture">
+  <h2>2. Architecture Changes</h2>
+
+  <h3>Role Model: From Enum to Join Table</h3>
+  <p><strong>Before:</strong> Each user had a single <code>user_type</code> enum column (<code>CUSTOMER</code>, <code>PROVIDER</code>, <code>ADMIN</code>) determining their role.</p>
+  <p><strong>After:</strong> A new <code>user_roles</code> table allows multiple roles per user. The <code>user_type</code> column is retained for backward compatibility but is no longer the sole source of truth for authorization.</p>
+
+  <div class="diagram">users (1) &mdash;&mdash;&mdash;&mdash; (*) user_roles</div>
+
+  <h3>Auth Flow: Unified Endpoints</h3>
+  <p><strong>Before:</strong> Separate endpoints and UI pages per role.</p>
+  <table>
+    <thead><tr><th>Old Route</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>/customer/login</code></td><td>Customer login page</td></tr>
+      <tr><td><code>/provider/login</code></td><td>Provider login page</td></tr>
+      <tr><td><code>/customer/register</code></td><td>Customer registration</td></tr>
+      <tr><td><code>/provider/register</code></td><td>Provider registration</td></tr>
+    </tbody>
+  </table>
+
+  <p><strong>After:</strong> Single set of routes.</p>
+  <table>
+    <thead><tr><th>New Route</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>/login</code></td><td>Unified login (all users)</td></tr>
+      <tr><td><code>/register</code></td><td>OTP-verified registration</td></tr>
+      <tr><td><code>/become-provider</code></td><td>Upgrade to Provider role</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-info">
+    <strong>Backward Compatibility</strong>
+    Old routes automatically redirect to their new equivalents. No existing bookmarks or links will break.
+  </div>
+</div>
+
+<!-- Section 3: Database Changes -->
+<div class="section" id="database">
+  <h2>3. Database Changes</h2>
+
+  <h3>New Table: <code>user_roles</code></h3>
+  <p>This table enables multi-role assignment per user.</p>
+
+  <pre><code><span class="keyword">CREATE TABLE IF NOT EXISTS</span> user_roles (
+    id         <span class="type">BIGINT UNSIGNED</span> AUTO_INCREMENT PRIMARY KEY,
+    user_id    <span class="type">BIGINT UNSIGNED</span> NOT NULL,
+    role       <span class="type">VARCHAR(20)</span>     NOT NULL,
+    created_at <span class="type">TIMESTAMP</span>       DEFAULT CURRENT_TIMESTAMP,
+    <span class="keyword">FOREIGN KEY</span> (user_id) <span class="keyword">REFERENCES</span> users(user_id) <span class="keyword">ON DELETE CASCADE</span>,
+    <span class="keyword">UNIQUE KEY</span> unique_user_role (user_id, role)
+);</code></pre>
+
+  <h4>Column Details</h4>
+  <table>
+    <thead><tr><th>Column</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>BIGINT UNSIGNED</td><td>Auto-increment primary key</td></tr>
+      <tr><td><code>user_id</code></td><td>BIGINT UNSIGNED</td><td>Foreign key to <code>users.user_id</code></td></tr>
+      <tr><td><code>role</code></td><td>VARCHAR(20)</td><td>Role name: <code>CUSTOMER</code>, <code>PROVIDER</code>, or <code>ADMIN</code></td></tr>
+      <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>When the role was assigned</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Constraints</h4>
+  <ul>
+    <li><code>UNIQUE KEY unique_user_role (user_id, role)</code> &mdash; prevents duplicate role entries.</li>
+    <li><code>FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE</code> &mdash; cascading delete when user is removed.</li>
+  </ul>
+
+  <div class="callout callout-warn">
+    <strong>Important: Column Type Match</strong>
+    The <code>id</code> and <code>user_id</code> columns must be <code>BIGINT UNSIGNED</code> to match the <code>users.user_id</code> type. A signed/unsigned mismatch will cause a foreign key constraint error.
+  </div>
+
+  <h3>Migration Script</h3>
+  <p>Located at <code>database/migration_user_roles.sql</code>. Must be run <strong>once</strong> to migrate existing data.</p>
+
+  <pre><code><span class="comment">-- Step 1: Create the user_roles table</span>
+<span class="keyword">CREATE TABLE IF NOT EXISTS</span> user_roles ( ... );
+
+<span class="comment">-- Step 2: Populate from existing user_type data</span>
+<span class="keyword">INSERT INTO</span> user_roles (user_id, role)
+<span class="keyword">SELECT</span> user_id, user_type <span class="keyword">FROM</span> users
+<span class="keyword">WHERE</span> deleted_at <span class="keyword">IS NULL</span>
+<span class="keyword">ON DUPLICATE KEY UPDATE</span> role = <span class="keyword">VALUES</span>(role);
+
+<span class="comment">-- Step 3: Existing PROVIDER users also get CUSTOMER role</span>
+<span class="keyword">INSERT INTO</span> user_roles (user_id, role)
+<span class="keyword">SELECT</span> user_id, <span class="string">'CUSTOMER'</span> <span class="keyword">FROM</span> users
+<span class="keyword">WHERE</span> user_type = <span class="string">'PROVIDER'</span> <span class="keyword">AND</span> deleted_at <span class="keyword">IS NULL</span>
+<span class="keyword">ON DUPLICATE KEY UPDATE</span> role = <span class="keyword">VALUES</span>(role);</code></pre>
+
+  <h3>Schema Diagram (After Migration)</h3>
+  <div class="diagram">&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;       &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;        users         &#9474;       &#9474;       user_roles         &#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;       &#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474; user_id  (PK, UINT)  &#9474;&#9472;&#9472;&#9488;  &#9474; id       (PK, UINT)        &#9474;
+&#9474; name                 &#9474;  &#9474;  &#9474; user_id  (FK, UINT)       &#9474;
+&#9474; phone                &#9474;  &#9492;&#9472;&gt;&#9474; role     (VARCHAR)         &#9474;
+&#9474; email                &#9474;     &#9474; created_at (TIMESTAMP)   &#9474;
+&#9474; user_type  (enum)    &#9474;     &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+&#9474; password_hash        &#9474;
+&#9474; ...                  &#9474;     &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;                      &#9474;&#9472;&#9472;&#9472;&#9472;&gt;&#9474;   service_providers      &#9474;
+&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;     &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;</div>
+
+  <h3>Existing Tables &mdash; No Schema Change</h3>
+  <p>The following tables are <strong>not</strong> altered. The <code>users.user_type</code> column remains but now serves as a &ldquo;primary role&rdquo; indicator while <code>user_roles</code> is the authoritative source:</p>
+  <ul>
+    <li><code>users</code> &mdash; no column changes</li>
+    <li><code>service_providers</code> &mdash; no column changes</li>
+    <li><code>bookings</code> &mdash; no column changes</li>
+    <li><code>otp_verifications</code> &mdash; no column changes</li>
+  </ul>
+</div>
+
+<!-- Section 4: Authentication Workflow -->
+<div class="section" id="auth-workflow">
+  <h2>4. Authentication Workflow</h2>
+
+  <h3>4.1 Registration (New Users)</h3>
+  <p>All new users register as <strong>Customer</strong> by default. The registration is a 3-step OTP-verified flow.</p>
+
+  <div class="diagram">&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;     &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;     &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;  Step 1: Info   &#9474;&#9472;&#9472;&#9472;&#9472;&gt;&#9474;  Step 2: OTP    &#9474;&#9472;&#9472;&#9472;&#9472;&gt;&#9474;  Step 3: Pwd    &#9474;
+&#9474;  Name + Phone   &#9474;     &#9474;  Verify Phone   &#9474;     &#9474;  Password + Email&#9474;
+&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;     &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;     &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+        &#9474;                       &#9474;                       &#9474;
+   POST /send-otp          OTP entered             POST /register
+     (phone)               locally              (name, phone, otp,
+                                                 password, email?)
+                                                       &#9474;
+                                                       &#9660;
+                                              User created as CUSTOMER
+                                              user_roles: [CUSTOMER]
+                                              Phone marked verified
+                                              JWT tokens returned</div>
+
+  <h4>API Calls</h4>
+  <ol>
+    <li><code>POST /api/auth/send-otp</code> with <code>{ phone: "9876543210" }</code> &mdash; sends 6-digit OTP via SMS.</li>
+    <li>User enters OTP in the UI (validated client-side before proceeding).</li>
+    <li><code>POST /api/auth/register</code> with <code>{ name, phone, otp, password, email? }</code> &mdash; verifies OTP server-side, creates account.</li>
+  </ol>
+
+  <h3>4.2 Login (Existing Users)</h3>
+  <p>A single login page supports multiple authentication methods:</p>
+  <table>
+    <thead><tr><th>Method</th><th>How It Works</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Password</strong></td><td>Phone/Email + Password &rarr; <code>POST /api/auth/login</code></td></tr>
+      <tr><td><strong>Phone OTP</strong></td><td>Phone &rarr; Send OTP &rarr; Verify &rarr; <code>POST /api/auth/verify-otp</code></td></tr>
+      <tr><td><strong>Email OTP</strong></td><td>Email &rarr; Send OTP &rarr; Verify &rarr; <code>POST /api/auth/verify-otp</code></td></tr>
+      <tr><td><strong>Google OAuth</strong></td><td>Google Sign-In &rarr; <code>POST /api/auth/google</code></td></tr>
+    </tbody>
+  </table>
+  <p>No <code>userType</code> parameter is sent during login. The system determines the user&rsquo;s roles from the <code>user_roles</code> table and returns all of them in the response.</p>
+
+  <h3>4.3 Become a Provider (Role Upgrade)</h3>
+  <p>Authenticated customers can upgrade to also hold the Provider role via <code>/become-provider</code>.</p>
+
+  <div class="diagram">Customer account &mdash;&mdash;&gt; POST /api/users/become-provider &mdash;&mdash;&gt; Customer + Provider account</div>
+
+  <h4>Request Body</h4>
+  <pre><code>{
+  <span class="string">"categoryId"</span>: 1,
+  <span class="string">"baseAddress"</span>: <span class="string">"123 Main St"</span>,
+  <span class="string">"basePincode"</span>: <span class="string">"560001"</span>,
+  <span class="string">"baseLatitude"</span>: 12.9716,
+  <span class="string">"baseLongitude"</span>: 77.5946,
+  <span class="string">"serviceCity"</span>: <span class="string">"Bangalore"</span>,
+  <span class="string">"serviceState"</span>: <span class="string">"Karnataka"</span>
+}</code></pre>
+
+  <h4>Server-Side Steps</h4>
+  <ol>
+    <li>Validates user doesn&rsquo;t already have the PROVIDER role.</li>
+    <li>Creates a <code>service_providers</code> record linked to the user.</li>
+    <li>Inserts a new <code>user_roles</code> row with <code>role = 'PROVIDER'</code>.</li>
+    <li>Updates <code>users.user_type</code> to <code>PROVIDER</code>.</li>
+    <li>Returns fresh JWT tokens with updated roles.</li>
+  </ol>
+
+  <h3>4.4 Auth Response Structure</h3>
+  <p>All authentication endpoints return:</p>
+  <pre><code>{
+  <span class="string">"accessToken"</span>: <span class="string">"eyJhbG..."</span>,
+  <span class="string">"refreshToken"</span>: <span class="string">"eyJhbG..."</span>,
+  <span class="string">"tokenType"</span>: <span class="string">"Bearer"</span>,
+  <span class="string">"expiresIn"</span>: 86400,
+  <span class="string">"user"</span>: {
+    <span class="string">"userId"</span>: 1,
+    <span class="string">"name"</span>: <span class="string">"John Doe"</span>,
+    <span class="string">"phone"</span>: <span class="string">"9876543210"</span>,
+    <span class="string">"email"</span>: <span class="string">"john@email.com"</span>,
+    <span class="string">"userType"</span>: <span class="string">"CUSTOMER"</span>,
+    <span class="string">"roles"</span>: [<span class="string">"CUSTOMER"</span>, <span class="string">"PROVIDER"</span>],
+    <span class="string">"hasProviderProfile"</span>: <span class="keyword">true</span>,
+    <span class="string">"accountStatus"</span>: <span class="string">"ACTIVE"</span>,
+    <span class="string">"isPhoneVerified"</span>: <span class="keyword">true</span>,
+    <span class="string">"isEmailVerified"</span>: <span class="keyword">false</span>,
+    <span class="string">"authProvider"</span>: <span class="string">"LOCAL"</span>,
+    <span class="string">"hasPassword"</span>: <span class="keyword">true</span>
+  }
+}</code></pre>
+  <p><strong>Key fields:</strong></p>
+  <ul>
+    <li><code>roles</code> &mdash; array of all roles the user holds (replaces reliance on <code>userType</code> alone).</li>
+    <li><code>hasProviderProfile</code> &mdash; boolean indicating whether a <code>service_providers</code> record exists.</li>
+  </ul>
+
+  <h3>4.5 Legacy User Compatibility</h3>
+  <p>For users created before the <code>user_roles</code> table existed, the backend method <code>ensureUserHasRoles()</code> runs on every login:</p>
+  <ol>
+    <li>If the user has no entries in <code>user_roles</code>, it creates them based on <code>users.user_type</code>.</li>
+    <li>If <code>user_type = PROVIDER</code>, both <code>PROVIDER</code> and <code>CUSTOMER</code> roles are created (all providers can also act as customers).</li>
+  </ol>
+</div>
+
+<!-- Section 5: Booking Workflow -->
+<div class="section" id="booking-workflow">
+  <h2>5. Booking Workflow</h2>
+
+  <h3>5.1 Status Flow</h3>
+  <p>The booking lifecycle follows a strict state machine:</p>
+
+  <div class="diagram">PENDING &mdash;&gt; ACCEPTED &mdash;&gt; (Customer Pays) &mdash;&gt; CONFIRMED &mdash;&gt; IN_PROGRESS &mdash;&gt; COMPLETED
+  &#9474;          &#9474;                                           &#9474;
+  &#9474;          &#9474;                                           &#9660;
+  &#9660;          &#9660;                                      (Provider marks)
+CANCELLED  CANCELLED</div>
+
+  <table>
+    <thead><tr><th>Step</th><th>Actor</th><th>Action</th><th>Status Change</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Customer</td><td>Creates booking</td><td>&rarr; <code>PENDING</code></td></tr>
+      <tr><td>2</td><td>Provider</td><td>Accepts the booking</td><td>&rarr; <code>ACCEPTED</code></td></tr>
+      <tr><td>3</td><td>Customer</td><td>Makes payment (Razorpay)</td><td>&rarr; <code>CONFIRMED</code> (auto)</td></tr>
+      <tr><td>4</td><td>Provider</td><td>Starts the service</td><td>&rarr; <code>IN_PROGRESS</code></td></tr>
+      <tr><td>5</td><td>Provider</td><td>Completes the service</td><td>&rarr; <code>COMPLETED</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-success">
+    <strong>Auto-confirmation on payment</strong>
+    When payment status changes to <code>PAID</code>, if the booking is <code>ACCEPTED</code>, it is automatically upgraded to <code>CONFIRMED</code>. This eliminates a manual confirmation step.
+  </div>
+
+  <h3>5.2 Dual-Role Booking Access</h3>
+  <p>For users who hold both Customer and Provider roles, the backend provides special access methods:</p>
+  <ul>
+    <li><code>getBookingByIdForDualRole</code> / <code>getBookingByNumberForDualRole</code> &mdash; grants access if the user is <strong>either</strong> the customer <strong>or</strong> the provider of the booking.</li>
+    <li>This prevents &ldquo;Booking not found&rdquo; errors when a dual-role user tries to view their own bookings from either perspective.</li>
+  </ul>
+
+  <h3>5.3 Booking List Filtering</h3>
+  <p>On the <code>/bookings</code> page, the <code>activeRole</code> determines which bookings are fetched:</p>
+  <table>
+    <thead><tr><th>Active Role</th><th>API Parameter</th><th>Returns</th></tr></thead>
+    <tbody>
+      <tr><td><code>CUSTOMER</code></td><td><code>role=CUSTOMER</code></td><td>Bookings where user is the customer</td></tr>
+      <tr><td><code>PROVIDER</code></td><td><code>role=PROVIDER</code></td><td>Bookings where user is the service provider</td></tr>
+    </tbody>
+  </table>
+  <p>Each booking card displays the <strong>other party&rsquo;s name</strong> for context:</p>
+  <ul>
+    <li>Customer view &rarr; shows Provider name</li>
+    <li>Provider view &rarr; shows Customer name</li>
+  </ul>
+</div>
+
+<!-- Section 6: Contact Privacy Policy -->
+<div class="section" id="privacy">
+  <h2>6. Contact Privacy Policy</h2>
+  <p>Contact details (phone numbers, emails) are <strong>hidden</strong> until payment is completed to enforce platform-centric communication.</p>
+
+  <h3>Backend Enforcement</h3>
+  <p>In <code>BookingService.mapToBookingResponse()</code>:</p>
+  <pre><code><span class="keyword">if</span> (booking.paymentStatus != PAID) {
+    provider.phone  = <span class="keyword">null</span>;
+    customer.phone  = <span class="keyword">null</span>;
+    customer.email  = <span class="keyword">null</span>;
+}</code></pre>
+
+  <h3>Frontend Enforcement</h3>
+  <p>In <code>BookingDetail.jsx</code>, contact sections display a message instead of actual details:</p>
+  <blockquote>&ldquo;Contact details will be shared once payment is completed.&rdquo;</blockquote>
+  <p>Once <code>booking.paymentStatus === 'PAID'</code>, the actual phone numbers and emails are rendered.</p>
+</div>
+
+<!-- Section 7: Frontend UI Changes -->
+<div class="section" id="frontend">
+  <h2>7. Frontend UI Changes</h2>
+
+  <h3>7.1 Removed Pages (References Only)</h3>
+  <p>The following pages are <strong>kept in the codebase</strong> but all routes and imports pointing to them are removed:</p>
+  <table>
+    <thead><tr><th>Page</th><th>File</th></tr></thead>
+    <tbody>
+      <tr><td>Customer Login</td><td><code>pages/auth/CustomerLogin.jsx</code></td></tr>
+      <tr><td>Provider Login</td><td><code>pages/auth/ProviderLogin.jsx</code></td></tr>
+      <tr><td>Customer Register</td><td><code>pages/auth/CustomerRegister.jsx</code></td></tr>
+      <tr><td>Provider Register</td><td><code>pages/auth/ProviderRegister.jsx</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>7.2 New/Updated Pages</h3>
+  <table>
+    <thead><tr><th>Page</th><th>File</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>Unified Login</td><td><code>pages/auth/Login.jsx</code></td><td>Single login page with all auth methods</td></tr>
+      <tr><td>Unified Register</td><td><code>pages/auth/Register.jsx</code></td><td>3-step OTP-verified registration</td></tr>
+      <tr><td>Become Provider</td><td><code>pages/BecomeProvider.jsx</code></td><td>Provider profile creation form</td></tr>
+    </tbody>
+  </table>
+
+  <h3>7.3 RoleSwitcher Component</h3>
+  <p><code>components/RoleSwitcher.jsx</code> &mdash; Context-aware role display for dual-role users.</p>
+  <table>
+    <thead><tr><th>Location</th><th>Single-Role User</th><th>Dual-Role User</th></tr></thead>
+    <tbody>
+      <tr><td><code>/bookings</code> pages</td><td>Not rendered</td><td>Customer/Provider toggle buttons</td></tr>
+      <tr><td>All other pages</td><td>Not rendered</td><td>&ldquo;Also a Provider&rdquo; badge (compact)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>7.4 Navigation Active Styling</h3>
+  <p><code>MainLayout.jsx</code> uses React Router&rsquo;s <code>NavLink</code> component to highlight the currently active navigation item with distinct styling (bold text, accent underline).</p>
+
+  <h3>7.5 State Management (Zustand)</h3>
+  <p>The <code>authStore.js</code> manages:</p>
+  <table>
+    <thead><tr><th>State Field</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>user</code></td><td>Object</td><td>User profile with <code>roles</code> array</td></tr>
+      <tr><td><code>activeRole</code></td><td>String</td><td>Currently active role view (<code>CUSTOMER</code> / <code>PROVIDER</code>)</td></tr>
+      <tr><td><code>isAuthenticated</code></td><td>Boolean</td><td>Login status</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Key actions:</strong></p>
+  <ul>
+    <li><code>switchRole(role)</code> &mdash; toggles the active role for UI context.</li>
+    <li><code>becomeProvider(data)</code> &mdash; calls API and updates local state with new roles.</li>
+    <li><code>onRehydrateStorage</code> &mdash; corrects stale <code>activeRole</code> on app reload.</li>
+  </ul>
+</div>
+
+<!-- Section 8: API Reference -->
+<div class="section" id="api">
+  <h2>8. API Reference</h2>
+
+  <h3>Authentication Endpoints</h3>
+  <table>
+    <thead><tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>POST</td><td><code>/api/auth/send-otp</code></td><td>No</td><td>Send OTP to phone or email</td></tr>
+      <tr><td>POST</td><td><code>/api/auth/register</code></td><td>No</td><td>OTP-verified user registration</td></tr>
+      <tr><td>POST</td><td><code>/api/auth/login</code></td><td>No</td><td>Password-based login</td></tr>
+      <tr><td>POST</td><td><code>/api/auth/verify-otp</code></td><td>No</td><td>OTP-based login</td></tr>
+      <tr><td>POST</td><td><code>/api/auth/google</code></td><td>No</td><td>Google OAuth login</td></tr>
+      <tr><td>POST</td><td><code>/api/auth/refresh</code></td><td>No</td><td>Refresh JWT tokens</td></tr>
+      <tr><td>POST</td><td><code>/api/auth/set-password</code></td><td>Yes</td><td>Set password for OTP users</td></tr>
+      <tr><td>POST</td><td><code>/api/auth/change-password</code></td><td>Yes</td><td>Change existing password</td></tr>
+    </tbody>
+  </table>
+
+  <h3>User Endpoints</h3>
+  <table>
+    <thead><tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>GET</td><td><code>/api/users/me</code></td><td>Yes</td><td>Get current user profile with roles</td></tr>
+      <tr><td>PUT</td><td><code>/api/users/profile</code></td><td>Yes</td><td>Update user profile</td></tr>
+      <tr><td>POST</td><td><code>/api/users/become-provider</code></td><td>Yes</td><td>Upgrade account to Provider role</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Request/Response Schemas</h3>
+  <h4>POST <code>/api/auth/register</code></h4>
+  <pre><code><span class="comment">// Request</span>
+{
+  <span class="string">"name"</span>: <span class="string">"John Doe"</span>,
+  <span class="string">"phone"</span>: <span class="string">"9876543210"</span>,
+  <span class="string">"otp"</span>: <span class="string">"123456"</span>,
+  <span class="string">"password"</span>: <span class="string">"securePassword123"</span>,
+  <span class="string">"email"</span>: <span class="string">"john@email.com"</span>        <span class="comment">// optional</span>
+}
+
+<span class="comment">// Response &rarr; AuthResponse (see Section 4.4)</span></code></pre>
+
+  <h4>POST <code>/api/users/become-provider</code></h4>
+  <pre><code><span class="comment">// Request</span>
+{
+  <span class="string">"categoryId"</span>: 1,
+  <span class="string">"baseAddress"</span>: <span class="string">"123 Main St, Koramangala"</span>,
+  <span class="string">"basePincode"</span>: <span class="string">"560034"</span>,
+  <span class="string">"baseLatitude"</span>: 12.9352,
+  <span class="string">"baseLongitude"</span>: 77.6245,
+  <span class="string">"serviceCity"</span>: <span class="string">"Bangalore"</span>,
+  <span class="string">"serviceState"</span>: <span class="string">"Karnataka"</span>
+}
+
+<span class="comment">// Response &rarr; AuthResponse with updated roles</span></code></pre>
+</div>
+
+<!-- Section 9: Backend Service Changes -->
+<div class="section" id="backend">
+  <h2>9. Backend Service Changes</h2>
+
+  <h3>9.1 New Entity: <code>UserRole</code></h3>
+  <p>JPA entity mapped to <code>user_roles</code> table with <code>@ManyToOne</code> relationship to <code>User</code>.</p>
+  <p><strong>File:</strong> <code>backend/src/main/java/com/hirelink/entity/UserRole.java</code></p>
+
+  <h3>9.2 Updated Entity: <code>User</code></h3>
+  <p>Added <code>@OneToMany</code> association:</p>
+  <pre><code><span class="annotation">@OneToMany</span>(mappedBy = <span class="string">"user"</span>, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+<span class="keyword">private</span> List&lt;UserRole&gt; roles;</code></pre>
+
+  <h3>9.3 New Repository: <code>UserRoleRepository</code></h3>
+  <p><strong>File:</strong> <code>backend/src/main/java/com/hirelink/repository/UserRoleRepository.java</code></p>
+  <p>Key methods:</p>
+  <ul>
+    <li><code>findByUserUserId(Long userId)</code> &mdash; fetch all roles for a user.</li>
+    <li><code>existsByUserUserIdAndRole(Long userId, String role)</code> &mdash; check if user has a specific role.</li>
+  </ul>
+
+  <h3>9.4 Updated Service: <code>AuthService</code></h3>
+  <table>
+    <thead><tr><th>Method</th><th>Change</th></tr></thead>
+    <tbody>
+      <tr><td><code>register()</code></td><td>Now requires OTP verification, always creates CUSTOMER</td></tr>
+      <tr><td><code>login()</code></td><td>Removed <code>userType</code> parameter, calls <code>ensureUserHasRoles</code></td></tr>
+      <tr><td><code>verifyOtpAndLogin()</code></td><td>Removed <code>userType</code>, always creates CUSTOMER if new</td></tr>
+      <tr><td><code>googleLogin()</code></td><td>Removed <code>userType</code>, always creates CUSTOMER if new</td></tr>
+      <tr><td><code>becomeProvider()</code></td><td><span class="badge badge-new">New</span> Creates provider profile and assigns role</td></tr>
+      <tr><td><code>ensureUserHasRoles()</code></td><td><span class="badge badge-new">New</span> Backward-compat role population for legacy users</td></tr>
+      <tr><td><code>mapToUserDTO()</code></td><td>Returns <code>roles</code> list and <code>hasProviderProfile</code> flag</td></tr>
+    </tbody>
+  </table>
+
+  <h3>9.5 Updated Service: <code>BookingService</code></h3>
+  <table>
+    <thead><tr><th>Method</th><th>Change</th></tr></thead>
+    <tbody>
+      <tr><td><code>getBookingByIdForDualRole()</code></td><td><span class="badge badge-new">New</span> Dual-role access validation</td></tr>
+      <tr><td><code>getBookingByNumberForDualRole()</code></td><td><span class="badge badge-new">New</span> Dual-role access validation</td></tr>
+      <tr><td><code>mapToBookingResponse()</code></td><td><span class="badge badge-mod">Modified</span> Strips contact info when payment != PAID</td></tr>
+    </tbody>
+  </table>
+
+  <h3>9.6 Updated Service: <code>PaymentService</code></h3>
+  <table>
+    <thead><tr><th>Method</th><th>Change</th></tr></thead>
+    <tbody>
+      <tr><td><code>verifyPayment()</code></td><td><span class="badge badge-mod">Modified</span> Auto-sets booking to <code>CONFIRMED</code> when payment = PAID and status = ACCEPTED</td></tr>
+    </tbody>
+  </table>
+
+  <h3>9.7 Updated Security: <code>CustomUserDetails</code></h3>
+  <p><code>getAuthorities()</code> now returns all roles from <code>user_roles</code> instead of just the single <code>user_type</code>:</p>
+  <pre><code><span class="annotation">@Override</span>
+<span class="keyword">public</span> Collection&lt;? <span class="keyword">extends</span> GrantedAuthority&gt; <span class="type">getAuthorities</span>() {
+    <span class="keyword">if</span> (user.getRoles() != <span class="keyword">null</span> &amp;&amp; !user.getRoles().isEmpty()) {
+        <span class="keyword">return</span> user.getRoles().stream()
+            .map(role -> <span class="keyword">new</span> SimpleGrantedAuthority(<span class="string">"ROLE_"</span> + role.getRole()))
+            .collect(Collectors.toList());
+    }
+    <span class="keyword">return</span> List.of(<span class="keyword">new</span> SimpleGrantedAuthority(<span class="string">"ROLE_"</span> + user.getUserType().name()));
+}</code></pre>
+</div>
+
+<!-- Section 10: Migration Guide -->
+<div class="section" id="migration">
+  <h2>10. Migration Guide</h2>
+
+  <h3>Prerequisites</h3>
+  <ul>
+    <li>MySQL 8.0 running with the <code>hirelink_db</code> database.</li>
+    <li>Backend application stopped.</li>
+  </ul>
+
+  <h3>Step-by-Step</h3>
+
+  <h4>Step 1: Run the migration script</h4>
+  <pre><code>mysql -u hirelink -p hirelink_db &lt; database/migration_user_roles.sql</code></pre>
+  <p>This creates the <code>user_roles</code> table and populates it from existing <code>users.user_type</code> data. Existing providers automatically receive both <code>CUSTOMER</code> and <code>PROVIDER</code> roles.</p>
+
+  <h4>Step 2: Start the backend</h4>
+  <p>The Hibernate schema validation will recognize the new <code>user_roles</code> table. The <code>UserRole</code> entity uses <code>columnDefinition = "bigint unsigned"</code> to match the existing <code>users.user_id</code> type.</p>
+
+  <h4>Step 3: Verify the migration</h4>
+  <pre><code><span class="comment">-- Check that all active users have at least one role</span>
+<span class="keyword">SELECT</span> u.user_id, u.name, u.user_type, GROUP_CONCAT(ur.role) <span class="keyword">AS</span> roles
+<span class="keyword">FROM</span> users u
+<span class="keyword">LEFT JOIN</span> user_roles ur <span class="keyword">ON</span> u.user_id = ur.user_id
+<span class="keyword">WHERE</span> u.deleted_at <span class="keyword">IS NULL</span>
+<span class="keyword">GROUP BY</span> u.user_id;
+
+<span class="comment">-- Check that all providers have both roles</span>
+<span class="keyword">SELECT</span> u.user_id, u.name, COUNT(ur.role) <span class="keyword">AS</span> role_count
+<span class="keyword">FROM</span> users u
+<span class="keyword">JOIN</span> user_roles ur <span class="keyword">ON</span> u.user_id = ur.user_id
+<span class="keyword">WHERE</span> u.user_type = <span class="string">'PROVIDER'</span>
+<span class="keyword">GROUP BY</span> u.user_id
+<span class="keyword">HAVING</span> role_count &lt; 2;
+<span class="comment">-- Should return 0 rows</span></code></pre>
+
+  <h4>Step 4: Deploy the frontend</h4>
+  <p>The new frontend routes (<code>/login</code>, <code>/register</code>, <code>/become-provider</code>) are active. Old routes (<code>/customer/login</code>, <code>/provider/login</code>, etc.) automatically redirect.</p>
+
+  <h3>Rollback</h3>
+  <p>If needed, the migration can be reversed:</p>
+  <pre><code><span class="keyword">DROP TABLE IF EXISTS</span> user_roles;</code></pre>
+  <p>The backend will fall back to <code>users.user_type</code> for role determination via the existing fallback logic in <code>CustomUserDetails.getAuthorities()</code>.</p>
+</div>
+
+<hr>
+
+<!-- Appendix -->
+<div class="section" id="appendix">
+  <h2>Appendix: File Change Summary</h2>
+
+  <h3>New Files</h3>
+  <table>
+    <thead><tr><th>File</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>database/migration_user_roles.sql</code></td><td>SQL migration script</td></tr>
+      <tr><td><code>backend/.../entity/UserRole.java</code></td><td>JPA entity for <code>user_roles</code></td></tr>
+      <tr><td><code>backend/.../repository/UserRoleRepository.java</code></td><td>Data access for user roles</td></tr>
+      <tr><td><code>frontend/src/pages/BecomeProvider.jsx</code></td><td>Provider upgrade page</td></tr>
+      <tr><td><code>frontend/src/components/RoleSwitcher.jsx</code></td><td>Role toggle / badge component</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Modified Files</h3>
+  <table>
+    <thead><tr><th>File</th><th>Key Changes</th></tr></thead>
+    <tbody>
+      <tr><td><code>backend/.../entity/User.java</code></td><td>Added <code>@OneToMany roles</code> association</td></tr>
+      <tr><td><code>backend/.../dto/AuthDTO.java</code></td><td>Updated DTOs: <code>RegisterRequest</code> (OTP), <code>BecomeProviderRequest</code>, <code>UserDTO</code> (roles)</td></tr>
+      <tr><td><code>backend/.../service/AuthService.java</code></td><td>Unified register, <code>becomeProvider()</code>, <code>ensureUserHasRoles()</code></td></tr>
+      <tr><td><code>backend/.../service/BookingService.java</code></td><td>Dual-role access, contact stripping</td></tr>
+      <tr><td><code>backend/.../service/PaymentService.java</code></td><td>Auto-confirm on payment</td></tr>
+      <tr><td><code>backend/.../controller/AuthController.java</code></td><td>Updated <code>/register</code> endpoint</td></tr>
+      <tr><td><code>backend/.../controller/UserController.java</code></td><td>Added <code>/become-provider</code> endpoint</td></tr>
+      <tr><td><code>backend/.../controller/BookingController.java</code></td><td>Dual-role booking access</td></tr>
+      <tr><td><code>backend/.../security/CustomUserDetails.java</code></td><td>Multi-role authorities</td></tr>
+      <tr><td><code>frontend/src/App.jsx</code></td><td>Unified routes, redirects</td></tr>
+      <tr><td><code>frontend/src/pages/auth/Login.jsx</code></td><td>Single unified login page</td></tr>
+      <tr><td><code>frontend/src/pages/auth/Register.jsx</code></td><td>3-step OTP registration</td></tr>
+      <tr><td><code>frontend/src/pages/Home.jsx</code></td><td>Per-booking role-aware display</td></tr>
+      <tr><td><code>frontend/src/pages/Bookings.jsx</code></td><td>Role switching, relationship-based display</td></tr>
+      <tr><td><code>frontend/src/pages/BookingDetail.jsx</code></td><td>Contact privacy, workflow buttons</td></tr>
+      <tr><td><code>frontend/src/pages/ServiceDetail.jsx</code></td><td>Updated role checks</td></tr>
+      <tr><td><code>frontend/src/services/api.js</code></td><td>Added <code>becomeProvider</code>, unified redirect</td></tr>
+      <tr><td><code>frontend/src/context/authStore.js</code></td><td><code>activeRole</code>, <code>switchRole</code>, <code>becomeProvider</code></td></tr>
+      <tr><td><code>frontend/src/components/layout/MainLayout.jsx</code></td><td>RoleSwitcher, NavLink active styling</td></tr>
+      <tr><td><code>frontend/src/components/layout/AuthLayout.jsx</code></td><td>Removed variant prop</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Retained (Unused) Files</h3>
+  <table>
+    <thead><tr><th>File</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td><code>frontend/src/pages/auth/CustomerLogin.jsx</code></td><td>Kept, routes removed</td></tr>
+      <tr><td><code>frontend/src/pages/auth/ProviderLogin.jsx</code></td><td>Kept, routes removed</td></tr>
+      <tr><td><code>frontend/src/pages/auth/CustomerRegister.jsx</code></td><td>Kept, routes removed</td></tr>
+      <tr><td><code>frontend/src/pages/auth/ProviderRegister.jsx</code></td><td>Kept, routes removed</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Footer -->
+<div class="doc-footer">
+  <p>HireLink &mdash; Unified Authentication &amp; Dual-Role Workflow &mdash; ENSATE Academic Project 2026</p>
+  <p style="margin-top: 4px;">To save as PDF: Open this file in a browser and use <strong>Ctrl+P</strong> (or Cmd+P) &rarr; Save as PDF</p>
+</div>
+
+</div>
+</body>
+</html>
