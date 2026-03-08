@@ -113,6 +113,10 @@ public class User {
     @ToString.Exclude
     private ServiceProvider serviceProvider;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ToString.Exclude
+    private List<UserRole> roles;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
     private List<UserAddress> addresses;

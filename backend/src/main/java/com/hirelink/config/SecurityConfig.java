@@ -59,7 +59,7 @@ public class SecurityConfig {
                 ).permitAll()
                 // Admin endpoints
                 .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
-                // Provider endpoints
+                // Provider dashboard endpoints (users with PROVIDER role)
                 .requestMatchers("/api/provider/**").hasAnyRole("PROVIDER", "ADMIN", "SUPER_ADMIN")
                 // All other requests require authentication
                 .anyRequest().authenticated()

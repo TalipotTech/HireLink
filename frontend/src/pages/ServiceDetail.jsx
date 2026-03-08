@@ -25,7 +25,7 @@ export default function ServiceDetail() {
   const service = data?.data?.data
 
   // Only customers can book services
-  const canBook = !isAuthenticated || user?.userType === 'CUSTOMER'
+  const canBook = !isAuthenticated || user?.roles?.includes('CUSTOMER') || user?.userType === 'CUSTOMER'
 
   const handleBookNow = () => {
     if (!isAuthenticated) {
@@ -215,7 +215,7 @@ export default function ServiceDetail() {
               ) : (
                 <div className="text-center p-4 bg-gray-50 rounded-xl">
                   <p className="text-gray-600 text-sm">
-                    {user?.userType === 'PROVIDER' ? 'Service providers cannot book services' : 'Only customers can book services'}
+                    {!user?.roles?.includes('CUSTOMER') ? 'Only customers can book services' : 'You need to log in to book services'}
                   </p>
                 </div>
               )}

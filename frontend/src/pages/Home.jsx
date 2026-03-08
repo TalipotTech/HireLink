@@ -80,15 +80,15 @@ export default function Home() {
   const { data: recentBookingsData } = useQuery(
     'recentBookings', 
     () => bookingsAPI.getRecent(3),
-    { enabled: isAuthenticated && (user?.userType === 'CUSTOMER' || user?.userType === 'PROVIDER') }
+    { enabled: isAuthenticated }
   )
   
   const categories = categoriesData?.data?.data?.slice(0, 8) || []
   const providers = featuredProviders?.data?.data?.slice(0, 4) || []
   const recentBookings = recentBookingsData?.data?.data || []
   
-  const isProvider = user?.userType === 'PROVIDER'
-  const isCustomer = user?.userType === 'CUSTOMER'
+  const isProvider = user?.roles?.includes('PROVIDER') || user?.userType === 'PROVIDER'
+  const isCustomer = user?.roles?.includes('CUSTOMER') || user?.userType === 'CUSTOMER'
 
   const handleHeroSearch = (e) => {
     e.preventDefault()
@@ -162,32 +162,30 @@ export default function Home() {
       </section>
 
       {/* Recent Bookings Section - for logged in users (below hero) */}
-      {isAuthenticated && (isCustomer || isProvider) && recentBookings.length > 0 && (
+      {isAuthenticated && recentBookings.length > 0 && (
         <section className="py-8 bg-gray-50 border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 ${isProvider ? 'bg-emerald-100' : 'bg-primary-100'} rounded-xl flex items-center justify-center`}>
-                  <CalendarDaysIcon className={`h-5 w-5 ${isProvider ? 'text-emerald-600' : 'text-primary-600'}`} />
+                <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
+                  <CalendarDaysIcon className="h-5 w-5 text-primary-600" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    {isProvider ? 'Recent Service Requests' : 'Your Recent Bookings'}
-                  </h2>
-                  <p className="text-sm text-gray-500">
-                    {isProvider ? 'Pending requests need your attention' : 'Track your service bookings'}
-                  </p>
+                  <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
+                  <p className="text-sm text-gray-500">Your latest bookings and service requests</p>
                 </div>
               </div>
               <Link 
                 to="/bookings" 
-                className={`text-sm font-medium ${isProvider ? 'text-emerald-600 hover:text-emerald-700' : 'text-primary-600 hover:text-primary-700'} flex items-center gap-1 hover:gap-2 transition-all`}
+                className="text-sm font-medium text-primary-600 hover:text-primary-700 flex items-center gap-1 hover:gap-2 transition-all"
               >
                 View all <ChevronRightIcon className="h-4 w-4" />
               </Link>
             </div>
             <div className="grid md:grid-cols-3 gap-4">
-              {recentBookings.map((booking, index) => (
+              {recentBookings.map((booking, index) => {
+                const iAmCustomer = booking.customer?.userId === user?.userId
+                return (
                 <Link
                   key={booking.bookingId}
                   to={`/bookings/${booking.bookingId}`}
@@ -198,7 +196,7 @@ export default function Home() {
                         ? 'border-l-purple-400' 
                         : booking.bookingStatus === 'COMPLETED'
                           ? 'border-l-green-400'
-                          : isProvider ? 'border-l-emerald-400' : 'border-l-primary-400'
+                          : !iAmCustomer ? 'border-l-emerald-400' : 'border-l-primary-400'
                   } animate-slideUp`}
                   style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'both' }}
                 >
@@ -218,18 +216,19 @@ export default function Home() {
                       <span>{booking.scheduledTime}</span>
                     </div>
                   </div>
-                  {isProvider ? (
+                  {iAmCustomer ? (
+                    <div className="text-sm text-gray-600 pt-2 border-t">
+                      <span className="font-medium">{booking.provider?.businessName || booking.provider?.providerName}</span>
+                    </div>
+                  ) : (
                     <div className="flex items-center gap-2 text-sm text-gray-600 pt-2 border-t">
                       <UserIcon className="h-4 w-4" />
                       <span>Customer: <span className="font-medium">{booking.customer?.name}</span></span>
                     </div>
-                  ) : (
-                    <div className="text-sm text-gray-600 pt-2 border-t">
-                      <span className="font-medium">{booking.provider?.businessName || booking.provider?.providerName}</span>
-                    </div>
                   )}
                 </Link>
-              ))}
+                )
+              })}
             </div>
           </div>
         </section>
@@ -419,7 +418,7 @@ export default function Home() {
             <p className="text-accent-100 mb-8 text-lg">
               Join thousands of satisfied customers who trust HireLink for their home service needs.
             </p>
-            <Link to="/customer/register" className="btn bg-white text-accent-600 hover:bg-accent-50 px-8 py-3 text-lg shadow-xl">
+            <Link to="/register" className="btn bg-white text-accent-600 hover:bg-accent-50 px-8 py-3 text-lg shadow-xl">
               Sign Up Now - It's Free
             </Link>
           </div>

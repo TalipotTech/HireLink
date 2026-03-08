@@ -44,9 +44,7 @@ export default function BookingDetail() {
   const [workSummary, setWorkSummary] = useState('')
   const [payingInProgress, setPayingInProgress] = useState(false)
 
-  const isProvider = user?.userType === 'PROVIDER'
-  const isAdmin = user?.userType === 'ADMIN' || user?.userType === 'SUPER_ADMIN'
-  const isCustomer = user?.userType === 'CUSTOMER'
+  const isAdmin = user?.roles?.includes('ADMIN') || user?.roles?.includes('SUPER_ADMIN') || user?.userType === 'ADMIN' || user?.userType === 'SUPER_ADMIN'
 
   const { data, isLoading } = useQuery(
     ['booking', id],
@@ -202,16 +200,19 @@ export default function BookingDetail() {
     )
   }
 
-  const canCancel = ['PENDING', 'ACCEPTED', 'CONFIRMED'].includes(booking.bookingStatus)
-  const canReview = booking.bookingStatus === 'COMPLETED' && !booking.userRating && isCustomer
-  const canPay = isCustomer && ['ACCEPTED', 'CONFIRMED'].includes(booking.bookingStatus) && booking.paymentStatus !== 'PAID'
+  // Determine role based on the user's actual relationship to THIS booking
+  const isBookingCustomer = booking.customer?.userId === user?.userId
+  const isBookingProvider = !isBookingCustomer && !isAdmin
+
+  const canCancel = ['PENDING', 'ACCEPTED'].includes(booking.bookingStatus) && booking.paymentStatus !== 'PAID'
+  const canReview = booking.bookingStatus === 'COMPLETED' && !booking.userRating && isBookingCustomer
+  const canPay = isBookingCustomer && ['ACCEPTED', 'CONFIRMED'].includes(booking.bookingStatus) && booking.paymentStatus !== 'PAID'
   
-  // Provider actions based on current status
-  const canAccept = isProvider && booking.bookingStatus === 'PENDING'
-  const canReject = isProvider && booking.bookingStatus === 'PENDING'
-  const canConfirm = isProvider && booking.bookingStatus === 'ACCEPTED'
-  const canStart = isProvider && booking.bookingStatus === 'CONFIRMED'
-  const canComplete = isProvider && booking.bookingStatus === 'IN_PROGRESS'
+  // Provider actions: accept → customer pays (auto-confirms) → provider starts → completes
+  const canAccept = isBookingProvider && booking.bookingStatus === 'PENDING'
+  const canReject = isBookingProvider && booking.bookingStatus === 'PENDING'
+  const canStart = isBookingProvider && booking.bookingStatus === 'CONFIRMED' && booking.paymentStatus === 'PAID'
+  const canComplete = isBookingProvider && booking.bookingStatus === 'IN_PROGRESS'
 
   return (
     <div className="animate-fadeIn">
@@ -285,8 +286,8 @@ export default function BookingDetail() {
               </div>
             </div>
 
-            {/* Show Provider Details for Customers, Customer Details for Providers */}
-            {isProvider ? (
+            {/* Show the other party's details: provider sees customer, customer sees provider */}
+            {isBookingProvider ? (
               // Provider sees Customer Details
               <div className="card p-6 border-2 border-emerald-200 bg-emerald-50/50">
                 <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -303,20 +304,26 @@ export default function BookingDetail() {
                     </h3>
                   </div>
                 </div>
-                <div className="mt-4 space-y-2">
-                  {booking.customer?.phone && (
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <PhoneIcon className="h-4 w-4" />
-                      <a href={`tel:${booking.customer.phone}`} className="hover:text-emerald-600">{booking.customer.phone}</a>
-                    </div>
-                  )}
-                  {booking.customer?.email && (
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <EnvelopeIcon className="h-4 w-4" />
-                      <a href={`mailto:${booking.customer.email}`} className="hover:text-emerald-600">{booking.customer.email}</a>
-                    </div>
-                  )}
-                </div>
+                {booking.paymentStatus === 'PAID' ? (
+                  <div className="mt-4 space-y-2">
+                    {booking.customer?.phone && (
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <PhoneIcon className="h-4 w-4" />
+                        <a href={`tel:${booking.customer.phone}`} className="hover:text-emerald-600">{booking.customer.phone}</a>
+                      </div>
+                    )}
+                    {booking.customer?.email && (
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <EnvelopeIcon className="h-4 w-4" />
+                        <a href={`mailto:${booking.customer.email}`} className="hover:text-emerald-600">{booking.customer.email}</a>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="mt-4 text-sm text-gray-500 bg-gray-50 rounded-lg px-3 py-2">
+                    Contact details will be shared once the customer completes payment.
+                  </p>
+                )}
               </div>
             ) : (
               // Customer/Admin sees Provider Details
@@ -337,11 +344,17 @@ export default function BookingDetail() {
                     </div>
                   </div>
                 </Link>
-                {booking.provider?.phone && (
-                  <div className="mt-4 flex items-center gap-2 text-gray-600">
-                    <PhoneIcon className="h-4 w-4" />
-                    <span>{booking.provider.phone}</span>
-                  </div>
+                {booking.paymentStatus === 'PAID' ? (
+                  booking.provider?.phone && (
+                    <div className="mt-4 flex items-center gap-2 text-gray-600">
+                      <PhoneIcon className="h-4 w-4" />
+                      <span>{booking.provider.phone}</span>
+                    </div>
+                  )
+                ) : (
+                  <p className="mt-4 text-sm text-gray-500 bg-gray-50 rounded-lg px-3 py-2">
+                    Provider contact details will be available after payment.
+                  </p>
                 )}
               </div>
             )}
@@ -402,15 +415,6 @@ export default function BookingDetail() {
                 </div>
                 <p className="text-xs text-gray-400 -mt-1">Paid directly to the provider</p>
 
-                <div className="border-t pt-3 flex justify-between font-semibold">
-                  <span>Booking Charge</span>
-                  <div className="flex items-center text-primary-600">
-                    <CurrencyRupeeIcon className="h-4 w-4" />
-                    <span>8</span>
-                  </div>
-                </div>
-                <p className="text-xs text-gray-400 -mt-1">Platform fee per booking</p>
-
                 <div className="border-t pt-3 flex justify-between items-center">
                   <span className="text-gray-500">Payment</span>
                   <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
@@ -448,15 +452,10 @@ export default function BookingDetail() {
                     Reject Request
                   </button>
                 )}
-                {canConfirm && (
-                  <button
-                    onClick={() => statusUpdateMutation.mutate({ status: 'CONFIRMED' })}
-                    disabled={statusUpdateMutation.isLoading}
-                    className="w-full btn bg-blue-600 text-white hover:bg-blue-700 flex items-center justify-center gap-2"
-                  >
-                    <CheckCircleIcon className="h-5 w-5" />
-                    Confirm Booking
-                  </button>
+                {isBookingProvider && booking.bookingStatus === 'ACCEPTED' && booking.paymentStatus !== 'PAID' && (
+                  <p className="text-sm text-center text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
+                    Waiting for customer to complete payment. You can start the service once payment is done.
+                  </p>
                 )}
                 {canStart && (
                   <button

@@ -1,7 +1,8 @@
-import { Outlet, Link, useNavigate } from 'react-router-dom'
+import { Outlet, Link, NavLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuthStore } from '../../context/authStore'
 import NearbyProvidersPanel from '../NearbyProvidersPanel'
+import RoleSwitcher from '../RoleSwitcher'
 import { 
   Bars3Icon, 
   XMarkIcon, 
@@ -52,16 +53,16 @@ export default function MainLayout() {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-1">
-              <Link to="/" className="px-4 py-2 rounded-lg text-gray-600 hover:text-primary-600 hover:bg-primary-50 font-medium transition-all">
+              <NavLink to="/" end className={({ isActive }) => `px-4 py-2 rounded-lg font-medium transition-all ${isActive ? 'text-primary-700 bg-primary-50' : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'}`}>
                 Home
-              </Link>
-              <Link to="/categories" className="px-4 py-2 rounded-lg text-gray-600 hover:text-primary-600 hover:bg-primary-50 font-medium transition-all">
+              </NavLink>
+              <NavLink to="/categories" className={({ isActive }) => `px-4 py-2 rounded-lg font-medium transition-all ${isActive ? 'text-primary-700 bg-primary-50' : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'}`}>
                 Services
-              </Link>
+              </NavLink>
               {isAuthenticated && (
-                <Link to="/bookings" className="px-4 py-2 rounded-lg text-gray-600 hover:text-primary-600 hover:bg-primary-50 font-medium transition-all">
+                <NavLink to="/bookings" className={({ isActive }) => `px-4 py-2 rounded-lg font-medium transition-all ${isActive ? 'text-primary-700 bg-primary-50' : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'}`}>
                   My Bookings
-                </Link>
+                </NavLink>
               )}
             </div>
 
@@ -103,15 +104,16 @@ export default function MainLayout() {
               </div>
               {isAuthenticated ? (
                 <div className="flex items-center space-x-3">
-                  <Link 
+                  <RoleSwitcher />
+                  <NavLink 
                     to="/profile" 
-                    className="flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-all"
+                    className={({ isActive }) => `flex items-center space-x-2 px-3 py-2 rounded-lg transition-all ${isActive ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-100'}`}
                   >
                     <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
                       <UserCircleIcon className="h-5 w-5 text-primary-600" />
                     </div>
                     <span className="font-medium">{user?.name?.split(' ')[0]}</span>
-                  </Link>
+                  </NavLink>
                   <button 
                     onClick={handleLogout}
                     className="p-2 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50 transition-all"
@@ -122,10 +124,10 @@ export default function MainLayout() {
                 </div>
               ) : (
                 <>
-                  <Link to="/customer/login" className="btn-secondary">
+                  <Link to="/login" className="btn-secondary">
                     Login
                   </Link>
-                  <Link to="/customer/register" className="btn-primary">
+                  <Link to="/register" className="btn-primary">
                     Sign Up
                   </Link>
                 </>
@@ -178,40 +180,40 @@ export default function MainLayout() {
                 </div>
               </form>
               
-              <Link 
-                to="/" 
-                className="flex items-center space-x-3 p-3 rounded-xl hover:bg-gray-50 transition-all"
+              <NavLink 
+                to="/" end
+                className={({ isActive }) => `flex items-center space-x-3 p-3 rounded-xl transition-all ${isActive ? 'bg-primary-50 text-primary-700' : 'hover:bg-gray-50'}`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <HomeIcon className="h-5 w-5 text-gray-500" />
+                <HomeIcon className="h-5 w-5" />
                 <span className="font-medium">Home</span>
-              </Link>
-              <Link 
-                to="/categories" 
-                className="flex items-center space-x-3 p-3 rounded-xl hover:bg-gray-50 transition-all"
+              </NavLink>
+              <NavLink 
+                to="/categories"
+                className={({ isActive }) => `flex items-center space-x-3 p-3 rounded-xl transition-all ${isActive ? 'bg-primary-50 text-primary-700' : 'hover:bg-gray-50'}`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <Squares2X2Icon className="h-5 w-5 text-gray-500" />
+                <Squares2X2Icon className="h-5 w-5" />
                 <span className="font-medium">Services</span>
-              </Link>
+              </NavLink>
               {isAuthenticated ? (
                 <>
-                  <Link 
-                    to="/bookings" 
-                    className="flex items-center space-x-3 p-3 rounded-xl hover:bg-gray-50 transition-all"
+                  <NavLink 
+                    to="/bookings"
+                    className={({ isActive }) => `flex items-center space-x-3 p-3 rounded-xl transition-all ${isActive ? 'bg-primary-50 text-primary-700' : 'hover:bg-gray-50'}`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <CalendarDaysIcon className="h-5 w-5 text-gray-500" />
+                    <CalendarDaysIcon className="h-5 w-5" />
                     <span className="font-medium">My Bookings</span>
-                  </Link>
-                  <Link 
-                    to="/profile" 
-                    className="flex items-center space-x-3 p-3 rounded-xl hover:bg-gray-50 transition-all"
+                  </NavLink>
+                  <NavLink 
+                    to="/profile"
+                    className={({ isActive }) => `flex items-center space-x-3 p-3 rounded-xl transition-all ${isActive ? 'bg-primary-50 text-primary-700' : 'hover:bg-gray-50'}`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <UserCircleIcon className="h-5 w-5 text-gray-500" />
+                    <UserCircleIcon className="h-5 w-5" />
                     <span className="font-medium">Profile</span>
-                  </Link>
+                  </NavLink>
                   <div className="pt-2 border-t">
                     <button 
                       onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
@@ -225,14 +227,14 @@ export default function MainLayout() {
               ) : (
                 <div className="space-y-2 pt-4 border-t">
                   <Link 
-                    to="/customer/login" 
+                    to="/login" 
                     className="block w-full btn-secondary text-center"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Login
                   </Link>
                   <Link 
-                    to="/customer/register" 
+                    to="/register" 
                     className="block w-full btn-primary text-center"
                     onClick={() => setMobileMenuOpen(false)}
                   >

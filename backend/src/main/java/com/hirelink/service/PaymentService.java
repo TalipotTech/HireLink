@@ -187,6 +187,9 @@ public class PaymentService {
 
         Booking booking = payment.getBooking();
         booking.setPaymentStatus(Booking.PaymentStatus.PAID);
+        if (booking.getBookingStatus() == Booking.BookingStatus.ACCEPTED) {
+            booking.setBookingStatus(Booking.BookingStatus.CONFIRMED);
+        }
         bookingRepository.save(booking);
 
         log.info("Payment verified for booking {}: paymentId={}", booking.getBookingNumber(), request.getRazorpayPaymentId());

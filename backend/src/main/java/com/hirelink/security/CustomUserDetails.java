@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Getter
@@ -18,6 +19,11 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+            return user.getRoles().stream()
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRole()))
+                    .collect(Collectors.toList());
+        }
         return List.of(new SimpleGrantedAuthority("ROLE_" + user.getUserType().name()));
     }
 

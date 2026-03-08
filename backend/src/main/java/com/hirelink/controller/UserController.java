@@ -4,10 +4,14 @@ import com.hirelink.dto.ApiResponse;
 import com.hirelink.dto.AuthDTO;
 import com.hirelink.entity.User;
 import com.hirelink.entity.UserAddress;
+import com.hirelink.entity.UserRole;
 import com.hirelink.exception.ResourceNotFoundException;
+import com.hirelink.repository.ServiceProviderRepository;
+import com.hirelink.repository.UserRoleRepository;
 import com.hirelink.repository.UserAddressRepository;
 import com.hirelink.repository.UserRepository;
 import com.hirelink.security.CustomUserDetails;
+import com.hirelink.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -32,6 +36,9 @@ public class UserController {
 
     private final UserRepository userRepository;
     private final UserAddressRepository addressRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final ServiceProviderRepository providerRepository;
+    private final AuthService authService;
 
     @GetMapping("/me")
     @Operation(summary = "Get current user profile")
@@ -40,19 +47,17 @@ public class UserController {
         User user = userRepository.findById(userDetails.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        AuthDTO.UserDTO dto = AuthDTO.UserDTO.builder()
-                .userId(user.getUserId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .phone(user.getPhone())
-                .profileImageUrl(user.getProfileImageUrl())
-                .userType(user.getUserType().name())
-                .accountStatus(user.getAccountStatus().name())
-                .isEmailVerified(user.getIsEmailVerified())
-                .isPhoneVerified(user.getIsPhoneVerified())
-                .build();
-
+        AuthDTO.UserDTO dto = buildUserDTO(user);
         return ResponseEntity.ok(ApiResponse.success(dto));
+    }
+
+    @PostMapping("/become-provider")
+    @Operation(summary = "Upgrade current user to also be a service provider")
+    public ResponseEntity<ApiResponse<AuthDTO.AuthResponse>> becomeProvider(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody AuthDTO.BecomeProviderRequest request) {
+        AuthDTO.AuthResponse response = authService.becomeProvider(userDetails.getUserId(), request);
+        return ResponseEntity.ok(ApiResponse.success("You are now a provider!", response));
     }
 
     @PutMapping("/me")
@@ -82,18 +87,7 @@ public class UserController {
 
         user = userRepository.save(user);
 
-        AuthDTO.UserDTO dto = AuthDTO.UserDTO.builder()
-                .userId(user.getUserId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .phone(user.getPhone())
-                .profileImageUrl(user.getProfileImageUrl())
-                .userType(user.getUserType().name())
-                .accountStatus(user.getAccountStatus().name())
-                .isEmailVerified(user.getIsEmailVerified())
-                .isPhoneVerified(user.getIsPhoneVerified())
-                .build();
-
+        AuthDTO.UserDTO dto = buildUserDTO(user);
         return ResponseEntity.ok(ApiResponse.success("Profile updated", dto));
     }
 
@@ -212,6 +206,31 @@ public class UserController {
         address.setIsActive(false);
         addressRepository.save(address);
         return ResponseEntity.ok(ApiResponse.success("Address deleted"));
+    }
+
+    private AuthDTO.UserDTO buildUserDTO(User user) {
+        List<String> roleNames = userRoleRepository.findByUserUserId(user.getUserId())
+                .stream().map(UserRole::getRole).collect(Collectors.toList());
+        if (roleNames.isEmpty()) {
+            roleNames = List.of(user.getUserType().name());
+        }
+        boolean hasProviderProfile = providerRepository.findByUserUserId(user.getUserId()).isPresent();
+
+        return AuthDTO.UserDTO.builder()
+                .userId(user.getUserId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .profileImageUrl(user.getProfileImageUrl())
+                .userType(user.getUserType().name())
+                .roles(roleNames)
+                .hasProviderProfile(hasProviderProfile)
+                .accountStatus(user.getAccountStatus().name())
+                .isEmailVerified(user.getIsEmailVerified())
+                .isPhoneVerified(user.getIsPhoneVerified())
+                .authProvider(user.getAuthProvider() != null ? user.getAuthProvider().name() : "LOCAL")
+                .hasPassword(user.getPasswordHash() != null && !user.getPasswordHash().isEmpty())
+                .build();
     }
 
     private AddressDTO mapToAddressDTO(UserAddress address) {

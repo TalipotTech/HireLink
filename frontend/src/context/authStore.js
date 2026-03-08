@@ -11,13 +11,8 @@ export const useAuthStore = create(
       isAuthenticated: false,
       isLoading: false,
       error: null,
+      activeRole: 'CUSTOMER',
 
-      /**
-       * Login with phone/email and password
-       * @param {string|null} phone - Phone number (optional)
-       * @param {string|null} email - Email (optional)
-       * @param {string} password - Password
-       */
       login: async (phone, email, password) => {
         set({ isLoading: true, error: null })
         try {
@@ -28,12 +23,15 @@ export const useAuthStore = create(
           localStorage.setItem('accessToken', accessToken)
           localStorage.setItem('refreshToken', refreshToken)
 
+          const defaultRole = user.roles?.includes('PROVIDER') ? 'PROVIDER' : 'CUSTOMER'
+
           set({
             user,
             accessToken,
             refreshToken,
             isAuthenticated: true,
             isLoading: false,
+            activeRole: defaultRole,
           })
 
           return { success: true }
@@ -59,6 +57,7 @@ export const useAuthStore = create(
             refreshToken,
             isAuthenticated: true,
             isLoading: false,
+            activeRole: 'CUSTOMER',
           })
 
           return { success: true }
@@ -77,6 +76,7 @@ export const useAuthStore = create(
           accessToken: null,
           refreshToken: null,
           isAuthenticated: false,
+          activeRole: 'CUSTOMER',
         })
       },
 
@@ -88,15 +88,17 @@ export const useAuthStore = create(
         set({ error: null })
       },
 
+      switchRole: (role) => {
+        const { user } = get()
+        if (user?.roles?.includes(role)) {
+          set({ activeRole: role })
+        }
+      },
+
       // ============================================
       // OTP Authentication
       // ============================================
 
-      /**
-       * Send OTP to phone or email
-       * @param {string|null} phone - Phone number (for SMS OTP)
-       * @param {string|null} email - Email address (for Email OTP)
-       */
       sendOtp: async (phone, email) => {
         set({ isLoading: true, error: null })
         try {
@@ -111,26 +113,20 @@ export const useAuthStore = create(
         }
       },
 
-      /**
-       * Verify OTP and login
-       * @param {string|null} phone - Phone number used for OTP
-       * @param {string|null} email - Email used for OTP
-       * @param {string} otp - The 6-digit OTP code
-       * @param {string|null} name - Optional name for new users
-       * @param {string|null} userType - Optional user type (CUSTOMER/PROVIDER)
-       */
-      verifyOtp: async (phone, email, otp, name = null, userType = null) => {
+      verifyOtp: async (phone, email, otp, name = null) => {
         set({ isLoading: true, error: null })
         try {
-          const data = phone 
-            ? { phone, otp, name, userType } 
-            : { email, otp, name, userType }
-          
+          const data = phone
+            ? { phone, otp, name }
+            : { email, otp, name }
+
           const response = await authAPI.verifyOtp(data)
           const { accessToken, refreshToken, user } = response.data.data
 
           localStorage.setItem('accessToken', accessToken)
           localStorage.setItem('refreshToken', refreshToken)
+
+          const defaultRole = user.roles?.includes('PROVIDER') ? 'PROVIDER' : 'CUSTOMER'
 
           set({
             user,
@@ -138,6 +134,7 @@ export const useAuthStore = create(
             refreshToken,
             isAuthenticated: true,
             isLoading: false,
+            activeRole: defaultRole,
           })
 
           return { success: true }
@@ -152,10 +149,6 @@ export const useAuthStore = create(
       // Google OAuth Authentication
       // ============================================
 
-      /**
-       * Login with Google OAuth
-       * @param {object} googleData - Google user data from OAuth response
-       */
       googleLogin: async (googleData) => {
         set({ isLoading: true, error: null })
         try {
@@ -165,12 +158,15 @@ export const useAuthStore = create(
           localStorage.setItem('accessToken', accessToken)
           localStorage.setItem('refreshToken', refreshToken)
 
+          const defaultRole = user.roles?.includes('PROVIDER') ? 'PROVIDER' : 'CUSTOMER'
+
           set({
             user,
             accessToken,
             refreshToken,
             isAuthenticated: true,
             isLoading: false,
+            activeRole: defaultRole,
           })
 
           return { success: true }
@@ -182,23 +178,48 @@ export const useAuthStore = create(
       },
 
       // ============================================
+      // Become Provider
+      // ============================================
+
+      becomeProvider: async (providerData) => {
+        set({ isLoading: true, error: null })
+        try {
+          const response = await authAPI.becomeProvider(providerData)
+          const { accessToken, refreshToken, user } = response.data.data
+
+          localStorage.setItem('accessToken', accessToken)
+          localStorage.setItem('refreshToken', refreshToken)
+
+          set({
+            user,
+            accessToken,
+            refreshToken,
+            isAuthenticated: true,
+            isLoading: false,
+            activeRole: 'PROVIDER',
+          })
+
+          return { success: true }
+        } catch (error) {
+          const message = error.response?.data?.message || 'Failed to become a provider'
+          set({ error: message, isLoading: false })
+          return { success: false, error: message }
+        }
+      },
+
+      // ============================================
       // Password Management
       // ============================================
 
-      /**
-       * Set password for verified users
-       * @param {string} password - New password
-       */
       setPassword: async (password) => {
         set({ isLoading: true, error: null })
         try {
           await authAPI.setPassword({ password })
-          // Update user to reflect they now have a password
           const currentUser = get().user
           if (currentUser) {
-            set({ 
+            set({
               user: { ...currentUser, hasPassword: true },
-              isLoading: false 
+              isLoading: false
             })
           } else {
             set({ isLoading: false })
@@ -218,7 +239,16 @@ export const useAuthStore = create(
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
+        activeRole: state.activeRole,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (!state) return
+        const { user, activeRole } = state
+        if (user?.roles && !user.roles.includes(activeRole)) {
+          const correctedRole = user.roles.includes('PROVIDER') ? 'PROVIDER' : 'CUSTOMER'
+          useAuthStore.setState({ activeRole: correctedRole })
+        }
+      },
     }
   )
 )

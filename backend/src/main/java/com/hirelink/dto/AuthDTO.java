@@ -7,9 +7,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class AuthDTO {
 
+    /**
+     * OTP-verified registration request.
+     * User must first call /send-otp, then submit this with the OTP code.
+     */
     @Data
     @Builder
     @NoArgsConstructor
@@ -23,19 +28,35 @@ public class AuthDTO {
         @Pattern(regexp = "^[+]?[0-9]{10,15}$", message = "Invalid phone number format")
         private String phone;
 
+        @NotBlank(message = "OTP is required")
+        private String otp;
+
         @Email(message = "Invalid email format")
         private String email;
 
         @NotBlank(message = "Password is required")
         @Size(min = 8, message = "Password must be at least 8 characters")
         private String password;
+    }
 
-        private String userType; // CUSTOMER or PROVIDER
-
-        // Provider-specific fields (optional, only used when userType=PROVIDER)
+    /**
+     * Request to upgrade a CUSTOMER account to also have PROVIDER role.
+     */
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BecomeProviderRequest {
+        @NotNull(message = "Category ID is required")
         private Long categoryId;
+
+        @NotBlank(message = "Base address is required")
         private String baseAddress;
+
+        @NotBlank(message = "Pincode is required")
+        @Pattern(regexp = "^[0-9]{6}$", message = "Invalid 6-digit pincode")
         private String basePincode;
+
         private BigDecimal baseLatitude;
         private BigDecimal baseLongitude;
         private String serviceCity;
@@ -103,11 +124,13 @@ public class AuthDTO {
         private String phone;
         private String profileImageUrl;
         private String userType;
+        private List<String> roles;
+        private Boolean hasProviderProfile;
         private String accountStatus;
         private Boolean isEmailVerified;
         private Boolean isPhoneVerified;
         private String authProvider;
-        private Boolean hasPassword;  // True if user has set a password
+        private Boolean hasPassword;
     }
 
     /**
@@ -156,9 +179,7 @@ public class AuthDTO {
         @NotBlank(message = "OTP is required")
         private String otp;
         
-        // Optional: for new users
         private String name;
-        private String userType;  // CUSTOMER or PROVIDER
     }
 
     // ============================================
@@ -182,7 +203,6 @@ public class AuthDTO {
         
         private String name;
         private String imageUrl;
-        private String userType;  // CUSTOMER or PROVIDER (for new users)
     }
 
     /**

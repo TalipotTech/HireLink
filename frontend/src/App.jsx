@@ -5,12 +5,13 @@ import { useAuthStore } from './context/authStore'
 import MainLayout from './components/layout/MainLayout'
 import AuthLayout from './components/layout/AuthLayout'
 
+// Auth Pages
+import Login from './pages/auth/Login'
+import Register from './pages/auth/Register'
+
 // Pages
 import Home from './pages/Home'
-import CustomerLogin from './pages/auth/CustomerLogin'
-import CustomerRegister from './pages/auth/CustomerRegister'
-import ProviderLogin from './pages/auth/ProviderLogin'
-import ProviderRegister from './pages/auth/ProviderRegister'
+import BecomeProvider from './pages/BecomeProvider'
 import Categories from './pages/Categories'
 import CategoryServices from './pages/CategoryServices'
 import ServiceDetail from './pages/ServiceDetail'
@@ -24,32 +25,28 @@ import NotFound from './pages/NotFound'
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuthStore()
-  
+
   if (!isAuthenticated) {
-    return <Navigate to="/customer/login" replace />
+    return <Navigate to="/login" replace />
   }
-  
+
   return children
 }
 
 function App() {
   return (
     <Routes>
-      {/* Customer Auth Routes */}
+      {/* Auth Routes */}
       <Route element={<AuthLayout />}>
-        <Route path="/customer/login" element={<CustomerLogin />} />
-        <Route path="/customer/register" element={<CustomerRegister />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Route>
 
-      {/* Provider Auth Routes */}
-      <Route element={<AuthLayout variant="provider" />}>
-        <Route path="/provider/login" element={<ProviderLogin />} />
-        <Route path="/provider/register" element={<ProviderRegister />} />
-      </Route>
-
-      {/* Legacy redirects */}
-      <Route path="/login" element={<Navigate to="/customer/login" replace />} />
-      <Route path="/register" element={<Navigate to="/customer/register" replace />} />
+      {/* Backward-compatible redirects for old auth routes */}
+      <Route path="/customer/login" element={<Navigate to="/login" replace />} />
+      <Route path="/customer/register" element={<Navigate to="/register" replace />} />
+      <Route path="/provider/login" element={<Navigate to="/login" replace />} />
+      <Route path="/provider/register" element={<Navigate to="/register" replace />} />
 
       {/* Main Routes */}
       <Route element={<MainLayout />}>
@@ -59,8 +56,13 @@ function App() {
         <Route path="/categories/:slug" element={<CategoryServices />} />
         <Route path="/services/:id" element={<ServiceDetail />} />
         <Route path="/providers/:id" element={<ProviderProfile />} />
-        
+
         {/* Protected Routes */}
+        <Route path="/become-provider" element={
+          <ProtectedRoute>
+            <BecomeProvider />
+          </ProtectedRoute>
+        } />
         <Route path="/book/:serviceId" element={
           <ProtectedRoute>
             <BookService />

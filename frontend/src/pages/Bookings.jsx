@@ -39,24 +39,30 @@ export default function Bookings() {
   const [statusFilter, setStatusFilter] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearching, setIsSearching] = useState(false)
-  const { user } = useAuthStore()
+  const { user, activeRole } = useAuthStore()
   
-  const isProvider = user?.userType === 'PROVIDER'
-  const isAdmin = user?.userType === 'ADMIN' || user?.userType === 'SUPER_ADMIN'
-  const isCustomer = user?.userType === 'CUSTOMER'
+  const viewRole = activeRole || 'CUSTOMER'
+  const isProvider = viewRole === 'PROVIDER'
+  const isAdmin = user?.roles?.includes('ADMIN') || user?.roles?.includes('SUPER_ADMIN') || user?.userType === 'ADMIN' || user?.userType === 'SUPER_ADMIN'
+  const isCustomer = viewRole === 'CUSTOMER'
 
-  // Regular bookings query
+  // Regular bookings query -- reset on role switch
   const { data, isLoading } = useQuery(
-    ['myBookings', statusFilter],
-    () => bookingsAPI.getMyBookings({ status: statusFilter, page: 0, size: 20 }),
-    { enabled: !isSearching }
+    ['myBookings', statusFilter, viewRole],
+    () => bookingsAPI.getMyBookings({
+      status: statusFilter || undefined,
+      role: viewRole,
+      page: 0,
+      size: 20,
+    }),
+    { enabled: !isSearching, keepPreviousData: false, staleTime: 0 }
   )
 
   // Search query
   const { data: searchData, isLoading: searchLoading } = useQuery(
-    ['searchBookings', searchQuery],
-    () => bookingsAPI.search(searchQuery, { page: 0, size: 20 }),
-    { enabled: isSearching && searchQuery.length > 0 }
+    ['searchBookings', searchQuery, viewRole],
+    () => bookingsAPI.search(searchQuery, { role: viewRole, page: 0, size: 20 }),
+    { enabled: isSearching && searchQuery.length > 0, keepPreviousData: false, staleTime: 0 }
   )
 
   const handleSearch = (e) => {
@@ -183,7 +189,10 @@ export default function Bookings() {
         {/* Bookings List */}
         {!loading && bookings.length > 0 && (
           <div className="space-y-4">
-            {bookings.map((booking, index) => (
+            {bookings.map((booking, index) => {
+              const iAmCustomer = booking.customer?.userId === user?.userId
+              const iAmProvider = !iAmCustomer && !isAdmin
+              return (
               <Link
                 key={booking.bookingId}
                 to={`/bookings/${booking.bookingId}`}
@@ -192,7 +201,7 @@ export default function Bookings() {
               >
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="flex items-start gap-4">
-                    <div className={`w-12 h-12 bg-gradient-to-br ${isProvider ? 'from-emerald-400 to-emerald-600' : 'from-primary-400 to-primary-600'} rounded-xl flex items-center justify-center text-white font-semibold flex-shrink-0`}>
+                    <div className={`w-12 h-12 bg-gradient-to-br ${iAmProvider ? 'from-emerald-400 to-emerald-600' : 'from-primary-400 to-primary-600'} rounded-xl flex items-center justify-center text-white font-semibold flex-shrink-0`}>
                       {booking.service?.categoryName?.charAt(0) || 'S'}
                     </div>
                     <div>
@@ -203,16 +212,8 @@ export default function Bookings() {
                         </span>
                       </div>
                       
-                      {/* Show different info based on user type */}
-                      {isProvider ? (
-                        // Provider sees customer info
-                        <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
-                          <UserIcon className="h-4 w-4" />
-                          <span>Customer: <span className="font-medium text-gray-700">{booking.customer?.name}</span></span>
-                          {booking.customer?.phone && <span>• {booking.customer.phone}</span>}
-                        </div>
-                      ) : isAdmin ? (
-                        // Admin sees both customer and provider info
+                      {/* Show the other party's info based on actual booking relationship */}
+                      {isAdmin ? (
                         <div className="space-y-1 mt-1">
                           <div className="flex items-center gap-2 text-sm text-gray-500">
                             <UserIcon className="h-4 w-4" />
@@ -223,8 +224,12 @@ export default function Bookings() {
                             <span>Provider: <span className="font-medium text-gray-700">{booking.provider?.businessName || booking.provider?.providerName}</span></span>
                           </div>
                         </div>
+                      ) : iAmProvider ? (
+                        <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
+                          <UserIcon className="h-4 w-4" />
+                          <span>Customer: <span className="font-medium text-gray-700">{booking.customer?.name}</span></span>
+                        </div>
                       ) : (
-                        // Customer sees provider info
                         <p className="text-sm text-gray-500 mt-1">
                           {booking.provider?.businessName || booking.provider?.providerName}
                         </p>
@@ -244,7 +249,7 @@ export default function Bookings() {
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <div className={`flex items-center ${isProvider ? 'text-emerald-600' : 'text-primary-600'}`}>
+                      <div className={`flex items-center ${iAmProvider ? 'text-emerald-600' : 'text-primary-600'}`}>
                         <CurrencyRupeeIcon className="h-4 w-4" />
                         <span className="font-bold">{booking.finalAmount || booking.estimatedAmount}</span>
                       </div>
@@ -254,7 +259,8 @@ export default function Bookings() {
                   </div>
                 </div>
               </Link>
-            ))}
+              )
+            })}
           </div>
         )}
 

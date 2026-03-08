@@ -21,7 +21,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    @Operation(summary = "Register a new user")
+    @Operation(summary = "Register a new user (OTP-verified)")
     public ResponseEntity<ApiResponse<AuthDTO.AuthResponse>> register(
             @Valid @RequestBody AuthDTO.RegisterRequest request) {
         AuthDTO.AuthResponse response = authService.register(request);
@@ -70,13 +70,11 @@ public class AuthController {
     @Operation(summary = "Send OTP to phone or email")
     public ResponseEntity<ApiResponse<String>> sendOtp(
             @RequestBody AuthDTO.SendOtpRequest request) {
-        
+
         if (request.getPhone() != null && !request.getPhone().isEmpty()) {
-            // Send SMS OTP
             authService.sendPhoneOtp(request.getPhone());
             return ResponseEntity.ok(ApiResponse.success("OTP sent to phone", "Check your phone for the verification code"));
         } else if (request.getEmail() != null && !request.getEmail().isEmpty()) {
-            // Send Email OTP
             authService.sendEmailOtp(request.getEmail());
             return ResponseEntity.ok(ApiResponse.success("OTP sent to email", "Check your email for the verification code"));
         } else {

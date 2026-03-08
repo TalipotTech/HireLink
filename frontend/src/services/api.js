@@ -47,7 +47,7 @@ api.interceptors.response.use(
       } catch (refreshError) {
         localStorage.removeItem('accessToken')
         localStorage.removeItem('refreshToken')
-        window.location.href = '/customer/login'
+        window.location.href = '/login'
       }
     }
 
@@ -57,19 +57,18 @@ api.interceptors.response.use(
 
 // Auth API
 export const authAPI = {
-  // Password-based auth (phone/email + password)
-  register: (data) => api.post('/auth/register', data),
-  login: (data) => api.post('/auth/login', data),           // { phone/email, password }
+  register: (data) => api.post('/auth/register', data),     // { name, phone, otp, password, email? }
+  login: (data) => api.post('/auth/login', data),            // { phone/email, password }
   refresh: (refreshToken) => api.post('/auth/refresh', { refreshToken }),
   changePassword: (data) => api.post('/auth/change-password', data),
-  setPassword: (data) => api.post('/auth/set-password', data),  // { password } - for verified users
-  
-  // OTP-based authentication
+  setPassword: (data) => api.post('/auth/set-password', data),
+
   sendOtp: (data) => api.post('/auth/send-otp', data),      // { phone } or { email }
-  verifyOtp: (data) => api.post('/auth/verify-otp', data),  // { phone/email, otp, name?, userType? }
-  
-  // Google OAuth
-  googleLogin: (data) => api.post('/auth/google', data),
+  verifyOtp: (data) => api.post('/auth/verify-otp', data),   // { phone/email, otp, name? }
+
+  googleLogin: (data) => api.post('/auth/google', data),     // { googleId, email, name?, imageUrl? }
+
+  becomeProvider: (data) => api.post('/users/become-provider', data),
 }
 
 // Categories API

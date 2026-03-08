@@ -273,6 +273,35 @@ public class BookingService {
     }
 
     /**
+     * Get booking by ID for a user who holds both CUSTOMER and PROVIDER roles.
+     * Grants access if the user is either the customer or the provider of the booking.
+     */
+    @Transactional(readOnly = true)
+    public BookingDTO.BookingResponse getBookingByIdForDualRole(Long bookingId, Long userId) {
+        Booking booking = bookingRepository.findByIdWithDetails(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
+        validateDualRoleAccess(booking, userId);
+        return mapToBookingResponse(booking);
+    }
+
+    @Transactional(readOnly = true)
+    public BookingDTO.BookingResponse getBookingByNumberForDualRole(String bookingNumber, Long userId) {
+        Booking booking = bookingRepository.findByBookingNumber(bookingNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found: " + bookingNumber));
+        validateDualRoleAccess(booking, userId);
+        return mapToBookingResponse(booking);
+    }
+
+    private void validateDualRoleAccess(Booking booking, Long userId) {
+        boolean isCustomer = booking.getUser().getUserId().equals(userId);
+        boolean isProvider = booking.getProvider() != null
+                && booking.getProvider().getUser().getUserId().equals(userId);
+        if (!isCustomer && !isProvider) {
+            throw new BadRequestException("You don't have access to this booking");
+        }
+    }
+
+    /**
      * Validate that the user has access to view/modify the booking
      */
     private void validateBookingAccess(Booking booking, Long userId, User.UserType userType) {
@@ -462,6 +491,7 @@ public class BookingService {
         Service service = booking.getService();
         ServiceProvider provider = booking.getProvider();
         User user = booking.getUser();
+        boolean contactVisible = booking.getPaymentStatus() == Booking.PaymentStatus.PAID;
 
         // Build service summary with null safety
         BookingDTO.ServiceSummary serviceSummary = null;
@@ -478,7 +508,7 @@ public class BookingService {
                     .build();
         }
 
-        // Build provider info with null safety
+        // Build provider info -- hide phone until payment is completed
         BookingDTO.ProviderInfo providerInfo = null;
         if (provider != null) {
             User providerUser = provider.getUser();
@@ -486,21 +516,21 @@ public class BookingService {
                     .providerId(provider.getProviderId())
                     .businessName(provider.getBusinessName())
                     .providerName(providerUser != null ? providerUser.getName() : "Unknown")
-                    .phone(providerUser != null ? providerUser.getPhone() : null)
+                    .phone(contactVisible && providerUser != null ? providerUser.getPhone() : null)
                     .profileImageUrl(providerUser != null ? providerUser.getProfileImageUrl() : null)
                     .averageRating(provider.getAverageRating())
                     .completedBookings(provider.getCompletedBookings())
                     .build();
         }
 
-        // Build customer info with null safety
+        // Build customer info -- hide phone/email until payment is completed
         BookingDTO.CustomerInfo customerInfo = null;
         if (user != null) {
             customerInfo = BookingDTO.CustomerInfo.builder()
                     .userId(user.getUserId())
                     .name(user.getName())
-                    .phone(user.getPhone())
-                    .email(user.getEmail())
+                    .phone(contactVisible ? user.getPhone() : null)
+                    .email(contactVisible ? user.getEmail() : null)
                     .profileImageUrl(user.getProfileImageUrl())
                     .build();
         }
