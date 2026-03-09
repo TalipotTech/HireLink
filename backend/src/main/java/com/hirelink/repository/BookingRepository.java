@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -113,6 +114,45 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
            "LOWER(b.provider.businessName) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<Booking> searchAllBookings(@Param("keyword") String keyword, Pageable pageable);
     
+    // ========== Admin dashboard queries ==========
+
+    long countByBookingStatus(BookingStatus status);
+
+    @Query("SELECT COALESCE(SUM(b.finalAmount), 0) FROM Booking b WHERE b.bookingStatus = 'COMPLETED'")
+    BigDecimal sumCompletedRevenue();
+
+    @Query("SELECT COALESCE(SUM(b.finalAmount), 0) FROM Booking b " +
+           "WHERE b.bookingStatus = 'COMPLETED' " +
+           "AND MONTH(b.createdAt) = MONTH(CURRENT_DATE) " +
+           "AND YEAR(b.createdAt) = YEAR(CURRENT_DATE)")
+    BigDecimal sumRevenueThisMonth();
+
+    @Query("SELECT FUNCTION('DATE_FORMAT', b.createdAt, '%Y-%m') AS month, COUNT(b) " +
+           "FROM Booking b " +
+           "WHERE b.createdAt >= :since " +
+           "GROUP BY FUNCTION('DATE_FORMAT', b.createdAt, '%Y-%m') " +
+           "ORDER BY month")
+    List<Object[]> countBookingsByMonth(@Param("since") LocalDateTime since);
+
+    long countByUserUserId(Long userId);
+
+    // ========== Admin report queries ==========
+
+    @Query("SELECT b.service.serviceName, COUNT(b), COALESCE(SUM(b.finalAmount), 0) " +
+           "FROM Booking b " +
+           "WHERE b.bookingStatus = 'COMPLETED' " +
+           "AND b.createdAt BETWEEN :fromDate AND :toDate " +
+           "GROUP BY b.service.serviceName " +
+           "ORDER BY SUM(b.finalAmount) DESC")
+    List<Object[]> revenueByService(@Param("fromDate") LocalDateTime fromDate, @Param("toDate") LocalDateTime toDate);
+
+    @Query("SELECT b.provider.providerId, b.provider.businessName, COUNT(b), COALESCE(SUM(b.finalAmount), 0), b.provider.averageRating " +
+           "FROM Booking b " +
+           "WHERE b.bookingStatus = 'COMPLETED' " +
+           "GROUP BY b.provider.providerId, b.provider.businessName, b.provider.averageRating " +
+           "ORDER BY COUNT(b) DESC")
+    List<Object[]> topProviders();
+
     // ========== Location-based queries ==========
     
     // Find bookings within a geographic bounding box

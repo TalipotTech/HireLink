@@ -4,6 +4,7 @@ import { useAuthStore } from './context/authStore'
 // Layouts
 import MainLayout from './components/layout/MainLayout'
 import AuthLayout from './components/layout/AuthLayout'
+import AdminLayout from './layouts/AdminLayout'
 
 // Auth Pages
 import Login from './pages/auth/Login'
@@ -22,6 +23,15 @@ import Profile from './pages/Profile'
 import BookService from './pages/BookService'
 import SearchResults from './pages/SearchResults'
 import NotFound from './pages/NotFound'
+
+// Admin Pages
+import AdminRoute from './components/AdminRoute'
+import AdminDashboard from './pages/admin/Dashboard'
+import UserManagement from './pages/admin/UserManagement'
+import BookingManagement from './pages/admin/BookingManagement'
+import ServiceManagement from './pages/admin/ServiceManagement'
+import ProviderApprovals from './pages/admin/ProviderApprovals'
+import Reports from './pages/admin/Reports'
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuthStore()
@@ -47,6 +57,16 @@ function App() {
       <Route path="/customer/register" element={<Navigate to="/register" replace />} />
       <Route path="/provider/login" element={<Navigate to="/login" replace />} />
       <Route path="/provider/register" element={<Navigate to="/register" replace />} />
+
+      {/* Admin Routes - Protected by AdminRoute guard */}
+      <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+        <Route index element={<AdminDashboard />} />
+        <Route path="users" element={<UserManagement />} />
+        <Route path="bookings" element={<BookingManagement />} />
+        <Route path="services" element={<ServiceManagement />} />
+        <Route path="providers" element={<ProviderApprovals />} />
+        <Route path="reports" element={<Reports />} />
+      </Route>
 
       {/* Main Routes */}
       <Route element={<MainLayout />}>

@@ -39,6 +39,16 @@ public interface ServiceProviderRepository extends JpaRepository<ServiceProvider
     @Query("SELECT sp FROM ServiceProvider sp LEFT JOIN FETCH sp.user LEFT JOIN FETCH sp.services WHERE sp.providerId = :id")
     Optional<ServiceProvider> findByIdWithDetails(@Param("id") Long id);
     
+    // ========== Admin queries ==========
+
+    long countByKycStatus(ServiceProvider.KycStatus kycStatus);
+
+    @Query("SELECT sp FROM ServiceProvider sp LEFT JOIN FETCH sp.user WHERE sp.kycStatus = :status")
+    List<ServiceProvider> findByKycStatus(@Param("status") ServiceProvider.KycStatus status);
+
+    @Query("SELECT sp FROM ServiceProvider sp LEFT JOIN FETCH sp.user ORDER BY sp.createdAt DESC")
+    List<ServiceProvider> findAllWithUser();
+
     // ========== Location-based queries ==========
     
     // Find providers within a geographic bounding box who are available
