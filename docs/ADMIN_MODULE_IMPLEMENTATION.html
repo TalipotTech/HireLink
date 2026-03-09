@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HireLink - Admin Module Implementation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --primary: #4f46e5;
+    --primary-light: #eef2ff;
+    --primary-dark: #3730a3;
+    --emerald: #059669;
+    --emerald-light: #ecfdf5;
+    --amber: #d97706;
+    --amber-light: #fffbeb;
+    --red: #dc2626;
+    --red-light: #fef2f2;
+    --cyan: #0891b2;
+    --cyan-light: #ecfeff;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --radius: 8px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--gray-800);
+    line-height: 1.7;
+    background: #fff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .page-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 32px;
+  }
+
+  /* Cover / Header */
+  .doc-header {
+    text-align: center;
+    padding: 48px 24px 40px;
+    margin-bottom: 48px;
+    background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+    border-radius: 16px;
+    color: #fff;
+  }
+  .doc-header .institution {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.8;
+    margin-bottom: 8px;
+  }
+  .doc-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  .doc-header .subtitle {
+    font-size: 15px;
+    font-weight: 400;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto 20px;
+  }
+  .doc-header .meta {
+    display: inline-flex;
+    gap: 20px;
+    font-size: 13px;
+    opacity: 0.8;
+  }
+
+  /* Table of Contents */
+  .toc {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-bottom: 40px;
+  }
+  .toc h2 {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--gray-500);
+    margin-bottom: 12px;
+  }
+  .toc ol {
+    padding-left: 20px;
+  }
+  .toc li {
+    margin-bottom: 6px;
+    font-size: 14px;
+  }
+  .toc a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .toc a:hover { text-decoration: underline; }
+
+  /* Sections */
+  .section {
+    margin-bottom: 48px;
+    page-break-inside: avoid;
+  }
+  .section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary);
+  }
+  .section h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin: 24px 0 12px;
+  }
+  .section h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin: 16px 0 8px;
+  }
+  .section p, .section li {
+    font-size: 14px;
+    color: var(--gray-700);
+  }
+  .section ul, .section ol {
+    padding-left: 24px;
+    margin: 8px 0 16px;
+  }
+  .section li {
+    margin-bottom: 6px;
+  }
+
+  /* Code blocks */
+  pre {
+    background: var(--gray-900);
+    color: #e5e7eb;
+    padding: 20px;
+    border-radius: var(--radius);
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 12px 0 20px;
+  }
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--gray-100);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--primary-dark);
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 20px;
+    font-size: 13px;
+  }
+  th {
+    background: var(--gray-50);
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 14px;
+    border: 1px solid var(--gray-200);
+    color: var(--gray-700);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  td {
+    padding: 10px 14px;
+    border: 1px solid var(--gray-200);
+    vertical-align: top;
+  }
+  tr:nth-child(even) td {
+    background: var(--gray-50);
+  }
+
+  /* Info/Callout boxes */
+  .callout {
+    padding: 16px 20px;
+    border-radius: var(--radius);
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  .callout-info {
+    background: var(--primary-light);
+    border-left: 4px solid var(--primary);
+    color: var(--primary-dark);
+  }
+  .callout-warn {
+    background: var(--amber-light);
+    border-left: 4px solid var(--amber);
+    color: #92400e;
+  }
+  .callout-success {
+    background: var(--emerald-light);
+    border-left: 4px solid var(--emerald);
+    color: #065f46;
+  }
+
+  /* Architecture diagram */
+  .arch-diagram {
+    background: var(--gray-900);
+    color: #a5b4fc;
+    padding: 24px;
+    border-radius: var(--radius);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-x: auto;
+    white-space: pre;
+    margin: 16px 0 24px;
+  }
+
+  /* Badge */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .badge-method {
+    background: var(--emerald-light);
+    color: var(--emerald);
+  }
+  .badge-get { background: #dbeafe; color: #1d4ed8; }
+  .badge-post { background: var(--emerald-light); color: var(--emerald); }
+  .badge-put { background: var(--amber-light); color: var(--amber); }
+  .badge-patch { background: #fae8ff; color: #a21caf; }
+  .badge-delete { background: var(--red-light); color: var(--red); }
+
+  /* API endpoint rows */
+  .api-method {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .api-path {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--gray-800);
+  }
+
+  /* Flow diagram */
+  .flow {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    white-space: pre;
+    overflow-x: auto;
+    margin: 16px 0 24px;
+    color: var(--gray-700);
+  }
+
+  /* Print */
+  @media print {
+    .page-wrapper { padding: 20px; }
+    .doc-header { border-radius: 0; }
+    .section { page-break-inside: avoid; }
+  }
+
+  /* Feature cards */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0 24px;
+  }
+  .feature-card {
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 20px;
+    background: #fff;
+  }
+  .feature-card h4 {
+    margin: 0 0 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gray-800);
+  }
+  .feature-card ul {
+    padding-left: 18px;
+    margin: 0;
+  }
+  .feature-card li {
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  @media (max-width: 600px) {
+    .feature-grid { grid-template-columns: 1fr; }
+    .page-wrapper { padding: 20px 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- Header -->
+  <div class="doc-header">
+    <div class="institution">ENSATE &mdash; Academic Project</div>
+    <h1>Admin Module Implementation</h1>
+    <div class="subtitle">Complete administrative interface for managing the HireLink platform &mdash; user management, booking oversight, service catalog CRUD, provider KYC verification, and analytics reporting.</div>
+    <div class="meta">
+      <span>Branch: <strong>feature/admin-module</strong></span>
+      <span>Stack: <strong>Spring Boot + React</strong></span>
+    </div>
+  </div>
+
+  <!-- Table of Contents -->
+  <div class="toc">
+    <h2>Table of Contents</h2>
+    <ol>
+      <li><a href="#s1">Architecture Overview</a></li>
+      <li><a href="#s2">Database Changes</a></li>
+      <li><a href="#s3">Authentication &amp; Authorization</a></li>
+      <li><a href="#s4">Backend Implementation</a></li>
+      <li><a href="#s5">Frontend Implementation</a></li>
+      <li><a href="#s6">API Reference</a></li>
+      <li><a href="#s7">Admin Access &amp; Navigation</a></li>
+      <li><a href="#s8">Feature Details</a></li>
+      <li><a href="#s9">File Inventory</a></li>
+    </ol>
+  </div>
+
+  <!-- Section 1 -->
+  <div class="section" id="s1">
+    <h2>1. Architecture Overview</h2>
+    <p>The admin module follows the same architecture as the rest of the HireLink application:</p>
+    <ul>
+      <li><strong>Backend:</strong> Spring Boot 3.x REST controllers secured by Spring Security&rsquo;s role-based access control.</li>
+      <li><strong>Frontend:</strong> React 18 SPA with a dedicated admin layout, Zustand for auth state, and Axios for API calls.</li>
+      <li><strong>Data Flow:</strong> All admin API calls go through <code>/api/admin/**</code>, locked behind <code>ADMIN</code>/<code>SUPER_ADMIN</code> role checks at the Spring Security filter chain level.</li>
+    </ul>
+
+    <div class="arch-diagram">┌─────────────────────────────────────────────────────────────┐
+│  Frontend (React)                                           │
+│                                                             │
+│  ┌──────────────┐  ┌──────────────────────────────────────┐ │
+│  │ AdminRoute   │→ │ AdminLayout (sidebar + &lt;Outlet /&gt;)   │ │
+│  │ (role guard) │  │                                      │ │
+│  └──────────────┘  │  ┌────────────┐  ┌───────────────┐  │ │
+│                     │  │ Dashboard  │  │ UserManagement│  │ │
+│                     │  ├────────────┤  ├───────────────┤  │ │
+│                     │  │ Bookings   │  │ Services      │  │ │
+│                     │  ├────────────┤  ├───────────────┤  │ │
+│                     │  │ Providers  │  │ Reports       │  │ │
+│                     │  └────────────┘  └───────────────┘  │ │
+│                     └──────────────────────────────────────┘ │
+│                              │ Axios (adminApi.js)           │
+└──────────────────────────────┼───────────────────────────────┘
+                               │ JWT Bearer Token
+┌──────────────────────────────┼───────────────────────────────┐
+│  Backend (Spring Boot)       ▼                               │
+│                                                              │
+│  SecurityConfig: /api/admin/** → hasAnyRole(ADMIN,SUPER_ADMIN)│
+│                                                              │
+│  ┌────────────────────┐  ┌────────────────────┐             │
+│  │ AdminDashboard     │  │ AdminUser           │             │
+│  │   Controller       │  │   Controller        │             │
+│  ├────────────────────┤  ├────────────────────┤             │
+│  │ AdminBooking       │  │ AdminService        │             │
+│  │   Controller       │  │   Controller        │             │
+│  ├────────────────────┤  ├────────────────────┤             │
+│  │ AdminProvider      │  │ AdminReport         │             │
+│  │   Controller       │  │   Controller        │             │
+│  └────────┬───────────┘  └────────┬───────────┘             │
+│           │  Services + DTOs      │                          │
+│           └──────────┬────────────┘                          │
+│                      ▼                                       │
+│           Repositories (JPA) → MySQL                         │
+│           AdminAuditLog for audit trail                      │
+└──────────────────────────────────────────────────────────────┘</div>
+  </div>
+
+  <!-- Section 2 -->
+  <div class="section" id="s2">
+    <h2>2. Database Changes</h2>
+
+    <h3>Modified Tables</h3>
+    <table>
+      <tr><th>Table</th><th>Change</th><th>Purpose</th></tr>
+      <tr><td><code>users</code></td><td>Added <code>banned_reason VARCHAR(500)</code></td><td>Stores reason when admin bans a user</td></tr>
+    </table>
+
+    <h3>Existing Tables Used (No Changes)</h3>
+    <table>
+      <tr><th>Table</th><th>Admin Usage</th></tr>
+      <tr><td><code>admin_audit_logs</code></td><td>New JPA entity <code>AdminAuditLog</code> maps to this pre-existing table for audit trail</td></tr>
+      <tr><td><code>users</code> / <code>user_roles</code></td><td>User listing, search, ban/unban, role-based filtering</td></tr>
+      <tr><td><code>bookings</code></td><td>Booking listing, status override, provider assignment</td></tr>
+      <tr><td><code>service_categories</code></td><td>Category CRUD, activation/deactivation</td></tr>
+      <tr><td><code>services</code></td><td>Service CRUD, activation/deactivation</td></tr>
+      <tr><td><code>service_providers</code></td><td>Provider listing, KYC approval/rejection</td></tr>
+    </table>
+
+    <div class="callout callout-info">
+      No new tables were created. The only schema change is the <code>banned_reason</code> column added to <code>users</code> (applied automatically via JPA <code>ddl-auto=update</code>).
+    </div>
+  </div>
+
+  <!-- Section 3 -->
+  <div class="section" id="s3">
+    <h2>3. Authentication &amp; Authorization</h2>
+
+    <h3>Backend Security</h3>
+    <p>All admin endpoints are protected at the Spring Security configuration level:</p>
+    <pre><code>// SecurityConfig.java
+.requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")</code></pre>
+    <p>Every request to <code>/api/admin/**</code> must include a valid JWT token belonging to a user with <code>ROLE_ADMIN</code> or <code>ROLE_SUPER_ADMIN</code> in their granted authorities.</p>
+
+    <h3>Frontend Route Guard</h3>
+    <p>The <code>AdminRoute</code> component wraps the admin layout and checks:</p>
+    <pre><code>const isAdmin = user?.roles?.includes('ADMIN') ||
+                user?.roles?.includes('SUPER_ADMIN') ||
+                user?.userType === 'ADMIN' ||
+                user?.userType === 'SUPER_ADMIN'</code></pre>
+    <ul>
+      <li><strong>Not authenticated</strong> &rarr; redirect to <code>/login</code></li>
+      <li><strong>Authenticated but not admin</strong> &rarr; redirect to <code>/</code></li>
+      <li><strong>Admin</strong> &rarr; render admin layout</li>
+    </ul>
+
+    <h3>Seeded Admin Users</h3>
+    <p>Admin credentials are pre-seeded via <code>database/init.sql</code>:</p>
+    <table>
+      <tr><th>Email</th><th>Password</th><th>Role</th></tr>
+      <tr><td><code>admin@hirelink.in</code></td><td><code>password123</code></td><td>ADMIN</td></tr>
+      <tr><td><code>superadmin@hirelink.in</code></td><td><code>password123</code></td><td>SUPER_ADMIN</td></tr>
+    </table>
+
+    <h3>Security Layers</h3>
+    <table>
+      <tr><th>Layer</th><th>Check</th><th>Failure Action</th></tr>
+      <tr><td>Frontend route</td><td><code>AdminRoute</code> checks <code>user.roles</code> for ADMIN/SUPER_ADMIN</td><td>Redirect to <code>/login</code> or <code>/</code></td></tr>
+      <tr><td>Axios interceptor</td><td>Attaches JWT; handles 401/403</td><td>Clears tokens, redirects to <code>/login</code></td></tr>
+      <tr><td>Spring Security</td><td><code>hasAnyRole("ADMIN", "SUPER_ADMIN")</code> on <code>/api/admin/**</code></td><td>Returns 403 Forbidden</td></tr>
+    </table>
+  </div>
+
+  <!-- Section 4 -->
+  <div class="section" id="s4">
+    <h2>4. Backend Implementation</h2>
+
+    <h3>4.1 Entity: AdminAuditLog</h3>
+    <p>Maps to the existing <code>admin_audit_logs</code> table. Records every admin action for accountability.</p>
+    <table>
+      <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+      <tr><td><code>logId</code></td><td>Long</td><td>Auto-generated primary key</td></tr>
+      <tr><td><code>adminUserId</code></td><td>Long</td><td>ID of the admin who performed the action</td></tr>
+      <tr><td><code>actionType</code></td><td>String</td><td>Category (e.g., <code>BOOKING_STATUS_OVERRIDE</code>, <code>KYC_APPROVED</code>, <code>USER_BANNED</code>)</td></tr>
+      <tr><td><code>actionDescription</code></td><td>String</td><td>Human-readable description</td></tr>
+      <tr><td><code>targetType</code></td><td>String</td><td>Entity type (<code>BOOKING</code>, <code>PROVIDER</code>, <code>USER</code>)</td></tr>
+      <tr><td><code>targetId</code></td><td>Long</td><td>ID of the affected entity</td></tr>
+      <tr><td><code>oldValues</code></td><td>String (JSON)</td><td>Previous state</td></tr>
+      <tr><td><code>newValues</code></td><td>String (JSON)</td><td>New state</td></tr>
+      <tr><td><code>ipAddress</code></td><td>String</td><td>Client IP address</td></tr>
+      <tr><td><code>userAgent</code></td><td>String</td><td>Client user agent</td></tr>
+      <tr><td><code>performedAt</code></td><td>LocalDateTime</td><td>Timestamp (auto-set on persist)</td></tr>
+    </table>
+
+    <h3>4.2 DTOs</h3>
+    <p>All admin endpoints return flat DTOs to avoid circular JSON serialization issues caused by bidirectional JPA relationships (e.g., <code>ServiceProvider</code> &harr; <code>User</code> &harr; <code>Booking</code> &harr; <code>Service</code>).</p>
+    <table>
+      <tr><th>DTO Class</th><th>Inner Classes</th></tr>
+      <tr><td><code>DashboardDTO</code></td><td><code>DashboardStats</code>, <code>BookingsByStatus</code>, <code>MonthlyBookingCount</code></td></tr>
+      <tr><td><code>AdminUserDTO</code></td><td><code>UserListItem</code>, <code>UserDetail</code>, <code>UpdateUserRequest</code>, <code>BanUserRequest</code></td></tr>
+      <tr><td><code>AdminBookingDTO</code></td><td><code>AdminBookingListItem</code>, <code>OverrideStatusRequest</code>, <code>AssignProviderRequest</code></td></tr>
+      <tr><td><code>AdminServiceDTO</code></td><td><code>CategoryItem</code>, <code>ServiceItem</code>, <code>CreateCategoryRequest</code>, <code>CreateServiceRequest</code></td></tr>
+      <tr><td><code>AdminProviderDTO</code></td><td><code>ProviderItem</code></td></tr>
+      <tr><td><code>ReportDTO</code></td><td><code>RevenueReport</code>, <code>ServiceRevenue</code>, <code>TopProvider</code></td></tr>
+    </table>
+
+    <h3>4.3 Services</h3>
+    <table>
+      <tr><th>Service</th><th>Key Methods</th></tr>
+      <tr><td><code>AdminDashboardService</code></td><td><code>getDashboardStats()</code> &mdash; aggregates booking counts, user counts, revenue, KYC pending count, and monthly trends</td></tr>
+      <tr><td><code>AdminUserService</code></td><td><code>getAllUsers()</code>, <code>getUsersByType()</code>, <code>searchUsers()</code>, <code>getUserDetail()</code>, <code>updateUser()</code>, <code>banUser()</code>, <code>unbanUser()</code></td></tr>
+      <tr><td><code>AdminBookingService</code></td><td><code>getAllBookings()</code>, <code>getBookingsByStatus()</code>, <code>searchBookings()</code>, <code>overrideStatus()</code>, <code>assignProvider()</code>, <code>getAuditTrail()</code></td></tr>
+      <tr><td><code>AdminProviderService</code></td><td><code>getPendingProviders()</code>, <code>getAllProviders()</code>, <code>approveProvider()</code>, <code>rejectProvider()</code></td></tr>
+    </table>
+
+    <h3>4.4 Repository Queries Added</h3>
+
+    <h4>BookingRepository &mdash; Dashboard Stats &amp; Reporting</h4>
+    <ul>
+      <li><code>countByBookingStatus(status)</code> &mdash; count bookings by status</li>
+      <li><code>sumCompletedRevenue()</code> &mdash; total revenue from completed bookings</li>
+      <li><code>sumRevenueThisMonth()</code> &mdash; revenue for current month</li>
+      <li><code>countBookingsByMonth(since)</code> &mdash; monthly booking trend</li>
+      <li><code>revenueByService(from, to)</code> &mdash; revenue breakdown by service</li>
+      <li><code>topProviders()</code> &mdash; top providers by completed booking count</li>
+    </ul>
+
+    <h4>UserRepository &mdash; User Management</h4>
+    <ul>
+      <li><code>countByUserType(type)</code> &mdash; count users by type</li>
+      <li><code>findByUserType(type)</code> &mdash; list users by type</li>
+      <li><code>searchUsers(keyword)</code> &mdash; search by name, email, or phone</li>
+    </ul>
+
+    <h4>ServiceProviderRepository &mdash; Provider Management</h4>
+    <ul>
+      <li><code>countByKycStatus(status)</code> &mdash; count providers by KYC status</li>
+      <li><code>findByKycStatus(status)</code> &mdash; list providers by KYC status (with user JOIN FETCH)</li>
+      <li><code>findAllWithUser()</code> &mdash; all providers with eagerly loaded user data</li>
+    </ul>
+  </div>
+
+  <!-- Section 5 -->
+  <div class="section" id="s5">
+    <h2>5. Frontend Implementation</h2>
+
+    <h3>5.1 Admin Axios Instance (<code>adminApi.js</code>)</h3>
+    <p>A dedicated Axios instance configured with:</p>
+    <ul>
+      <li><strong>Base URL:</strong> <code>${VITE_API_URL}/admin</code> (defaults to <code>/api/admin</code>)</li>
+      <li><strong>Request interceptor:</strong> Attaches <code>Authorization: Bearer &lt;token&gt;</code> from localStorage</li>
+      <li><strong>Response interceptor:</strong> On 401/403, clears tokens and redirects to <code>/login</code></li>
+    </ul>
+
+    <h3>5.2 Admin Layout (<code>AdminLayout.jsx</code>)</h3>
+    <p>A fixed-position sidebar layout with:</p>
+    <ul>
+      <li>Dark sidebar (<code>bg-gray-900</code>) with navigation links</li>
+      <li>Main content area with <code>&lt;Outlet /&gt;</code> for nested routes</li>
+      <li>User info and logout button at the bottom</li>
+      <li>&ldquo;Back to Site&rdquo; link to return to the main application</li>
+    </ul>
+
+    <h4>Navigation Items</h4>
+    <table>
+      <tr><th>Route</th><th>Label</th><th>Icon</th></tr>
+      <tr><td><code>/admin</code></td><td>Dashboard</td><td>ChartBarIcon</td></tr>
+      <tr><td><code>/admin/users</code></td><td>Users</td><td>UsersIcon</td></tr>
+      <tr><td><code>/admin/bookings</code></td><td>Bookings</td><td>CalendarDaysIcon</td></tr>
+      <tr><td><code>/admin/services</code></td><td>Services</td><td>WrenchScrewdriverIcon</td></tr>
+      <tr><td><code>/admin/providers</code></td><td>Provider Approvals</td><td>ShieldCheckIcon</td></tr>
+      <tr><td><code>/admin/reports</code></td><td>Reports</td><td>DocumentChartBarIcon</td></tr>
+    </table>
+
+    <h3>5.3 Route Registration (<code>App.jsx</code>)</h3>
+    <pre><code>&lt;Route path="/admin" element={&lt;AdminRoute&gt;&lt;AdminLayout /&gt;&lt;/AdminRoute&gt;}&gt;
+  &lt;Route index element={&lt;AdminDashboard /&gt;} /&gt;
+  &lt;Route path="users" element={&lt;UserManagement /&gt;} /&gt;
+  &lt;Route path="bookings" element={&lt;BookingManagement /&gt;} /&gt;
+  &lt;Route path="services" element={&lt;ServiceManagement /&gt;} /&gt;
+  &lt;Route path="providers" element={&lt;ProviderApprovals /&gt;} /&gt;
+  &lt;Route path="reports" element={&lt;Reports /&gt;} /&gt;
+&lt;/Route&gt;</code></pre>
+
+    <h3>5.4 Admin Panel Link in Header</h3>
+    <p>The main site header (<code>MainLayout.jsx</code>) conditionally shows an &ldquo;Admin Panel&rdquo; link:</p>
+    <ul>
+      <li><strong>Desktop:</strong> Amber-styled nav link with gear icon, appears after &ldquo;My Bookings&rdquo;</li>
+      <li><strong>Mobile:</strong> Same link in the collapsible mobile menu</li>
+      <li><strong>Visibility:</strong> Only when the logged-in user has <code>ADMIN</code> or <code>SUPER_ADMIN</code> role</li>
+    </ul>
+  </div>
+
+  <!-- Section 6 -->
+  <div class="section" id="s6">
+    <h2>6. API Reference</h2>
+
+    <h3>Dashboard</h3>
+    <table>
+      <tr><th style="width:70px">Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="badge badge-get api-method">GET</span></td><td class="api-path">/api/admin/dashboard/stats</td><td>Dashboard statistics</td></tr>
+    </table>
+
+    <h3>User Management</h3>
+    <table>
+      <tr><th style="width:70px">Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="badge badge-get api-method">GET</span></td><td class="api-path">/api/admin/users</td><td>List users (query: <code>role</code>, <code>search</code>)</td></tr>
+      <tr><td><span class="badge badge-get api-method">GET</span></td><td class="api-path">/api/admin/users/{id}</td><td>Get user details</td></tr>
+      <tr><td><span class="badge badge-put api-method">PUT</span></td><td class="api-path">/api/admin/users/{id}</td><td>Update user profile</td></tr>
+      <tr><td><span class="badge badge-post api-method">POST</span></td><td class="api-path">/api/admin/users/{id}/ban</td><td>Ban user (body: <code>{ reason }</code>)</td></tr>
+      <tr><td><span class="badge badge-post api-method">POST</span></td><td class="api-path">/api/admin/users/{id}/unban</td><td>Unban user</td></tr>
+    </table>
+
+    <h3>Booking Management</h3>
+    <table>
+      <tr><th style="width:70px">Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="badge badge-get api-method">GET</span></td><td class="api-path">/api/admin/bookings</td><td>List bookings (query: <code>page</code>, <code>size</code>, <code>status</code>, <code>search</code>)</td></tr>
+      <tr><td><span class="badge badge-patch api-method">PATCH</span></td><td class="api-path">/api/admin/bookings/{id}/status</td><td>Override booking status (body: <code>{ status, adminNote }</code>)</td></tr>
+      <tr><td><span class="badge badge-patch api-method">PATCH</span></td><td class="api-path">/api/admin/bookings/{id}/assign</td><td>Assign provider (body: <code>{ providerId }</code>)</td></tr>
+      <tr><td><span class="badge badge-get api-method">GET</span></td><td class="api-path">/api/admin/bookings/{id}/audit</td><td>Get audit trail for a booking</td></tr>
+    </table>
+
+    <h3>Service &amp; Category Management</h3>
+    <table>
+      <tr><th style="width:70px">Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="badge badge-get api-method">GET</span></td><td class="api-path">/api/admin/services/categories</td><td>List all categories</td></tr>
+      <tr><td><span class="badge badge-post api-method">POST</span></td><td class="api-path">/api/admin/services/categories</td><td>Create category</td></tr>
+      <tr><td><span class="badge badge-put api-method">PUT</span></td><td class="api-path">/api/admin/services/categories/{id}</td><td>Update category</td></tr>
+      <tr><td><span class="badge badge-put api-method">PUT</span></td><td class="api-path">/api/admin/services/categories/{id}/toggle-active</td><td>Toggle category active status</td></tr>
+      <tr><td><span class="badge badge-get api-method">GET</span></td><td class="api-path">/api/admin/services</td><td>List all services</td></tr>
+      <tr><td><span class="badge badge-post api-method">POST</span></td><td class="api-path">/api/admin/services</td><td>Create service</td></tr>
+      <tr><td><span class="badge badge-put api-method">PUT</span></td><td class="api-path">/api/admin/services/{id}</td><td>Update service</td></tr>
+      <tr><td><span class="badge badge-put api-method">PUT</span></td><td class="api-path">/api/admin/services/{id}/toggle-active</td><td>Toggle service active status</td></tr>
+      <tr><td><span class="badge badge-delete api-method">DELETE</span></td><td class="api-path">/api/admin/services/{id}</td><td>Soft-delete (deactivate) service</td></tr>
+    </table>
+
+    <h3>Provider Management</h3>
+    <table>
+      <tr><th style="width:70px">Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="badge badge-get api-method">GET</span></td><td class="api-path">/api/admin/providers</td><td>List all providers</td></tr>
+      <tr><td><span class="badge badge-get api-method">GET</span></td><td class="api-path">/api/admin/providers/pending</td><td>List providers with pending KYC</td></tr>
+      <tr><td><span class="badge badge-post api-method">POST</span></td><td class="api-path">/api/admin/providers/{id}/approve</td><td>Approve provider KYC</td></tr>
+      <tr><td><span class="badge badge-post api-method">POST</span></td><td class="api-path">/api/admin/providers/{id}/reject</td><td>Reject provider KYC (body: <code>{ reason }</code>)</td></tr>
+    </table>
+
+    <h3>Reports</h3>
+    <table>
+      <tr><th style="width:70px">Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="badge badge-get api-method">GET</span></td><td class="api-path">/api/admin/reports/revenue</td><td>Revenue report (query: <code>from</code>, <code>to</code>)</td></tr>
+      <tr><td><span class="badge badge-get api-method">GET</span></td><td class="api-path">/api/admin/reports/top-providers</td><td>Top providers by completed bookings</td></tr>
+    </table>
+  </div>
+
+  <!-- Section 7 -->
+  <div class="section" id="s7">
+    <h2>7. Admin Access &amp; Navigation</h2>
+
+    <h3>How to Access the Admin Panel</h3>
+    <ol>
+      <li><strong>Login</strong> at <code>/login</code> using admin credentials (e.g., <code>admin@hirelink.in</code> / <code>password123</code>).</li>
+      <li>An <strong>&ldquo;Admin Panel&rdquo;</strong> link appears in the header navigation (amber-colored with gear icon).</li>
+      <li>Click it or navigate directly to <code>/admin</code>.</li>
+    </ol>
+
+    <h3>Admin Navigation Flow</h3>
+    <div class="flow">/login &rarr; authenticate with ADMIN credentials
+  │
+  ▼
+Main Site Header shows "Admin Panel" link (amber)
+  │
+  ▼
+/admin &rarr; AdminRoute guard checks role &rarr; AdminLayout renders
+  │
+  ├── /admin          &rarr; Dashboard (stats, revenue, trends)
+  ├── /admin/users    &rarr; User Management (list, search, ban/unban)
+  ├── /admin/bookings &rarr; Booking Management (list, status override, audit)
+  ├── /admin/services &rarr; Service &amp; Category Management (CRUD, toggle)
+  ├── /admin/providers&rarr; Provider Approvals (KYC approve/reject)
+  └── /admin/reports  &rarr; Reports &amp; Analytics (revenue, top providers)</div>
+  </div>
+
+  <!-- Section 8 -->
+  <div class="section" id="s8">
+    <h2>8. Feature Details</h2>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h4>8.1 Dashboard</h4>
+        <ul>
+          <li><strong>Stat Cards:</strong> Total/pending/completed/cancelled bookings, customer count, provider count, service count, category count</li>
+          <li><strong>Revenue Cards:</strong> Total revenue (all-time), revenue this month</li>
+          <li><strong>Pending KYC Alert:</strong> Shown when providers are awaiting verification</li>
+          <li><strong>Bookings by Status:</strong> Breakdown of booking counts per status</li>
+          <li><strong>Monthly Trend:</strong> Booking volume for the last 6 months</li>
+        </ul>
+      </div>
+      <div class="feature-card">
+        <h4>8.2 User Management</h4>
+        <ul>
+          <li><strong>List &amp; Search:</strong> View all users, filter by role, search by name/email/phone</li>
+          <li><strong>Ban/Unban:</strong> Ban sets <code>accountStatus=BANNED</code> with <code>bannedReason</code>; unban restores <code>ACTIVE</code></li>
+          <li><strong>Safeguard:</strong> Admin/Super Admin users cannot be banned through the UI</li>
+          <li><strong>Audit Trail:</strong> All ban/unban actions are logged</li>
+        </ul>
+      </div>
+      <div class="feature-card">
+        <h4>8.3 Booking Management</h4>
+        <ul>
+          <li><strong>List &amp; Filter:</strong> Paginated listing with status and keyword search filters</li>
+          <li><strong>Status Override:</strong> Admin can force-change status with an admin note</li>
+          <li><strong>Provider Assignment:</strong> Admin can assign/reassign a provider to a booking</li>
+          <li><strong>Audit Trail:</strong> View the full history of admin actions on any booking</li>
+        </ul>
+      </div>
+      <div class="feature-card">
+        <h4>8.4 Service &amp; Category Management</h4>
+        <ul>
+          <li><strong>Categories:</strong> Create, edit, toggle active/inactive, featured flag, price range, display order</li>
+          <li><strong>Services:</strong> Create, edit, toggle active/inactive, soft-delete, category &amp; provider assignment</li>
+          <li><strong>Provider Dropdown:</strong> Only KYC-verified providers appear when creating a service</li>
+        </ul>
+      </div>
+      <div class="feature-card">
+        <h4>8.5 Provider Verification (KYC)</h4>
+        <ul>
+          <li><strong>Filter Tabs:</strong> All / Pending / Verified / Rejected / Not Submitted</li>
+          <li><strong>Provider Cards:</strong> Business name, owner info, KYC status, experience, rating, bookings</li>
+          <li><strong>Approve:</strong> Sets <code>kycStatus=VERIFIED</code> with timestamp</li>
+          <li><strong>Reject:</strong> Sets <code>kycStatus=REJECTED</code> with reason</li>
+          <li><strong>Re-approve:</strong> Rejected providers can be approved again</li>
+        </ul>
+      </div>
+      <div class="feature-card">
+        <h4>8.6 Reports &amp; Analytics</h4>
+        <ul>
+          <li><strong>Revenue Report:</strong> Configurable date range, total revenue, avg booking value, per-service breakdown</li>
+          <li><strong>Top Providers:</strong> Ranked by completed bookings with earnings and rating</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 9 -->
+  <div class="section" id="s9">
+    <h2>9. File Inventory</h2>
+
+    <h3>New Backend Files (17 files)</h3>
+    <table>
+      <tr><th>Category</th><th>File</th><th>Purpose</th></tr>
+      <tr><td>Entity</td><td><code>entity/AdminAuditLog.java</code></td><td>Audit log entity mapping to <code>admin_audit_logs</code></td></tr>
+      <tr><td>Repository</td><td><code>repository/AdminAuditLogRepository.java</code></td><td>Audit log queries</td></tr>
+      <tr><td>DTO</td><td><code>dto/DashboardDTO.java</code></td><td>Dashboard statistics DTOs</td></tr>
+      <tr><td>DTO</td><td><code>dto/AdminUserDTO.java</code></td><td>User management DTOs</td></tr>
+      <tr><td>DTO</td><td><code>dto/AdminBookingDTO.java</code></td><td>Booking management DTOs</td></tr>
+      <tr><td>DTO</td><td><code>dto/AdminServiceDTO.java</code></td><td>Service/category management DTOs</td></tr>
+      <tr><td>DTO</td><td><code>dto/AdminProviderDTO.java</code></td><td>Provider management DTOs</td></tr>
+      <tr><td>DTO</td><td><code>dto/ReportDTO.java</code></td><td>Report/analytics DTOs</td></tr>
+      <tr><td>Service</td><td><code>service/AdminDashboardService.java</code></td><td>Dashboard data aggregation</td></tr>
+      <tr><td>Service</td><td><code>service/AdminUserService.java</code></td><td>User CRUD and ban/unban logic</td></tr>
+      <tr><td>Service</td><td><code>service/AdminBookingService.java</code></td><td>Booking management and audit</td></tr>
+      <tr><td>Service</td><td><code>service/AdminProviderService.java</code></td><td>KYC approval/rejection</td></tr>
+      <tr><td>Controller</td><td><code>controller/AdminDashboardController.java</code></td><td>Dashboard API endpoints</td></tr>
+      <tr><td>Controller</td><td><code>controller/AdminUserController.java</code></td><td>User management API endpoints</td></tr>
+      <tr><td>Controller</td><td><code>controller/AdminBookingController.java</code></td><td>Booking management API endpoints</td></tr>
+      <tr><td>Controller</td><td><code>controller/AdminServiceController.java</code></td><td>Service/category CRUD API endpoints</td></tr>
+      <tr><td>Controller</td><td><code>controller/AdminProviderController.java</code></td><td>Provider KYC API endpoints</td></tr>
+      <tr><td>Controller</td><td><code>controller/AdminReportController.java</code></td><td>Reports API endpoints</td></tr>
+    </table>
+
+    <h3>New Frontend Files (9 files)</h3>
+    <table>
+      <tr><th>Category</th><th>File</th><th>Purpose</th></tr>
+      <tr><td>Guard</td><td><code>components/AdminRoute.jsx</code></td><td>Role-based route protection</td></tr>
+      <tr><td>Layout</td><td><code>layouts/AdminLayout.jsx</code></td><td>Sidebar layout with navigation</td></tr>
+      <tr><td>API</td><td><code>services/adminApi.js</code></td><td>Axios instance for admin endpoints</td></tr>
+      <tr><td>Page</td><td><code>pages/admin/Dashboard.jsx</code></td><td>Dashboard with stats and trends</td></tr>
+      <tr><td>Page</td><td><code>pages/admin/UserManagement.jsx</code></td><td>User listing, search, ban/unban</td></tr>
+      <tr><td>Page</td><td><code>pages/admin/BookingManagement.jsx</code></td><td>Booking listing, status override, audit</td></tr>
+      <tr><td>Page</td><td><code>pages/admin/ServiceManagement.jsx</code></td><td>Category/service CRUD with modals</td></tr>
+      <tr><td>Page</td><td><code>pages/admin/ProviderApprovals.jsx</code></td><td>KYC approval workflow</td></tr>
+      <tr><td>Page</td><td><code>pages/admin/Reports.jsx</code></td><td>Revenue reports and top providers</td></tr>
+    </table>
+
+    <h3>Modified Files (8 files)</h3>
+    <table>
+      <tr><th>File</th><th>Change</th></tr>
+      <tr><td><code>entity/User.java</code></td><td>Added <code>bannedReason</code> field</td></tr>
+      <tr><td><code>repository/BookingRepository.java</code></td><td>Added admin dashboard and report queries</td></tr>
+      <tr><td><code>repository/UserRepository.java</code></td><td>Added <code>countByUserType</code>, <code>findByUserType</code>, <code>searchUsers</code></td></tr>
+      <tr><td><code>repository/ServiceProviderRepository.java</code></td><td>Added <code>countByKycStatus</code>, <code>findByKycStatus</code>, <code>findAllWithUser</code></td></tr>
+      <tr><td><code>frontend/src/App.jsx</code></td><td>Added admin route block with <code>AdminRoute</code> guard and <code>AdminLayout</code></td></tr>
+      <tr><td><code>frontend/src/components/layout/MainLayout.jsx</code></td><td>Added &ldquo;Admin Panel&rdquo; link (desktop + mobile) for admin users</td></tr>
+      <tr><td><code>frontend/src/components/RoleSwitcher.jsx</code></td><td>Added &ldquo;Become a Provider&rdquo; link for customer-only users</td></tr>
+      <tr><td><code>frontend/src/pages/Profile.jsx</code></td><td>Added &ldquo;Become a Provider&rdquo; CTA card for customer-only users</td></tr>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>

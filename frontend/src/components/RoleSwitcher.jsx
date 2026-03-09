@@ -1,15 +1,31 @@
+import { Link, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../context/authStore'
-import { useLocation } from 'react-router-dom'
 import {
   UserIcon,
   WrenchScrewdriverIcon,
+  SparklesIcon,
 } from '@heroicons/react/24/outline'
 
 export default function RoleSwitcher() {
   const { user, activeRole, switchRole } = useAuthStore()
   const location = useLocation()
 
-  const hasMultipleRoles = user?.roles?.includes('CUSTOMER') && user?.roles?.includes('PROVIDER')
+  const hasCustomer = user?.roles?.includes('CUSTOMER')
+  const hasProvider = user?.roles?.includes('PROVIDER')
+  const hasMultipleRoles = hasCustomer && hasProvider
+  const isCustomerOnly = hasCustomer && !hasProvider
+
+  if (isCustomerOnly) {
+    return (
+      <Link
+        to="/become-provider"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 border border-emerald-200 hover:from-emerald-100 hover:to-teal-100 hover:border-emerald-300 transition-all"
+      >
+        <SparklesIcon className="h-3.5 w-3.5" />
+        Become a Provider
+      </Link>
+    )
+  }
 
   if (!hasMultipleRoles) {
     return null

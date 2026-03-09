@@ -11,7 +11,9 @@ import {
   Squares2X2Icon,
   CalendarDaysIcon,
   ArrowRightOnRectangleIcon,
-  MagnifyingGlassIcon
+  MagnifyingGlassIcon,
+  Cog6ToothIcon,
+  SparklesIcon
 } from '@heroicons/react/24/outline'
 
 export default function MainLayout() {
@@ -20,6 +22,18 @@ export default function MainLayout() {
   const [searchQuery, setSearchQuery] = useState('')
   const { isAuthenticated, user, logout } = useAuthStore()
   const navigate = useNavigate()
+
+  const isAdmin = isAuthenticated && (
+    user?.roles?.includes('ADMIN') ||
+    user?.roles?.includes('SUPER_ADMIN') ||
+    user?.userType === 'ADMIN' ||
+    user?.userType === 'SUPER_ADMIN'
+  )
+
+  const isCustomerOnly = isAuthenticated &&
+    user?.roles?.includes('CUSTOMER') &&
+    !user?.roles?.includes('PROVIDER') &&
+    !user?.hasProviderProfile
 
   const handleLogout = () => {
     logout()
@@ -62,6 +76,12 @@ export default function MainLayout() {
               {isAuthenticated && (
                 <NavLink to="/bookings" className={({ isActive }) => `px-4 py-2 rounded-lg font-medium transition-all ${isActive ? 'text-primary-700 bg-primary-50' : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'}`}>
                   My Bookings
+                </NavLink>
+              )}
+              {isAdmin && (
+                <NavLink to="/admin" className={({ isActive }) => `px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-1.5 ${isActive ? 'text-amber-700 bg-amber-50' : 'text-amber-600 hover:text-amber-700 hover:bg-amber-50'}`}>
+                  <Cog6ToothIcon className="h-4 w-4" />
+                  Admin Panel
                 </NavLink>
               )}
             </div>
@@ -206,6 +226,26 @@ export default function MainLayout() {
                     <CalendarDaysIcon className="h-5 w-5" />
                     <span className="font-medium">My Bookings</span>
                   </NavLink>
+                  {isAdmin && (
+                    <NavLink 
+                      to="/admin"
+                      className={({ isActive }) => `flex items-center space-x-3 p-3 rounded-xl transition-all ${isActive ? 'bg-amber-50 text-amber-700' : 'text-amber-600 hover:bg-amber-50'}`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Cog6ToothIcon className="h-5 w-5" />
+                      <span className="font-medium">Admin Panel</span>
+                    </NavLink>
+                  )}
+                  {isCustomerOnly && (
+                    <NavLink 
+                      to="/become-provider"
+                      className={({ isActive }) => `flex items-center space-x-3 p-3 rounded-xl transition-all ${isActive ? 'bg-emerald-50 text-emerald-700' : 'text-emerald-600 hover:bg-emerald-50'}`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <SparklesIcon className="h-5 w-5" />
+                      <span className="font-medium">Become a Provider</span>
+                    </NavLink>
+                  )}
                   <NavLink 
                     to="/profile"
                     className={({ isActive }) => `flex items-center space-x-3 p-3 rounded-xl transition-all ${isActive ? 'bg-primary-50 text-primary-700' : 'hover:bg-gray-50'}`}

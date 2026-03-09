@@ -16,8 +16,11 @@ import {
   ShieldCheckIcon,
   CheckCircleIcon,
   EyeIcon,
-  EyeSlashIcon
+  EyeSlashIcon,
+  WrenchScrewdriverIcon,
+  ArrowRightIcon
 } from '@heroicons/react/24/outline'
+import { Link } from 'react-router-dom'
 import LocationPicker from '../components/LocationPicker'
 
 export default function Profile() {
@@ -578,6 +581,32 @@ export default function Profile() {
             </div>
           </div>
         </div>
+
+        {/* Become a Provider CTA - only for customers who aren't providers yet */}
+        {user?.roles?.includes('CUSTOMER') && !user?.roles?.includes('PROVIDER') && !user?.hasProviderProfile && (
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 p-6 text-white shadow-lg">
+            <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
+            <div className="absolute bottom-0 left-0 -mb-6 -ml-6 w-24 h-24 bg-white/10 rounded-full blur-xl" />
+            <div className="relative flex items-start gap-4">
+              <div className="shrink-0 w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                <WrenchScrewdriverIcon className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-lg font-bold mb-1">Become a Service Provider</h3>
+                <p className="text-emerald-100 text-sm leading-relaxed mb-4">
+                  Start earning by offering your skills on HireLink. Set up your provider profile, list your services, and connect with customers in your area.
+                </p>
+                <Link
+                  to="/become-provider"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-emerald-700 rounded-lg text-sm font-semibold hover:bg-emerald-50 transition-colors shadow-sm"
+                >
+                  Get Started
+                  <ArrowRightIcon className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
