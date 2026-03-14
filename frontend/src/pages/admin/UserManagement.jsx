@@ -9,11 +9,13 @@ const roleBadgeClass = (role) => {
   }
 }
 
-const statusBadgeClass = (status) => {
+const statusBadgeClass = (status, isDeleted) => {
+  if (isDeleted) return 'bg-gray-200 text-gray-500 line-through'
   switch (status) {
     case 'ACTIVE': return 'bg-green-100 text-green-700'
     case 'BANNED': return 'bg-red-100 text-red-700'
     case 'SUSPENDED': return 'bg-orange-100 text-orange-700'
+    case 'INACTIVE': return 'bg-gray-100 text-gray-500'
     default: return 'bg-gray-100 text-gray-700'
   }
 }
@@ -68,6 +70,26 @@ const UserManagement = () => {
     }
   }
 
+  const handleDelete = async (id, name) => {
+    if (!confirm(`Are you sure you want to delete "${name}"? This action will deactivate the account.`)) return
+    try {
+      await adminApi.delete(`/users/${id}`)
+      fetchUsers()
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to delete user')
+    }
+  }
+
+  const handleRestore = async (id) => {
+    if (!confirm('Restore this user account?')) return
+    try {
+      await adminApi.post(`/users/${id}/restore`)
+      fetchUsers()
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to restore user')
+    }
+  }
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold text-gray-800 mb-6">User Management</h1>
@@ -113,9 +135,12 @@ const UserManagement = () => {
             </thead>
             <tbody>
               {users.map(u => (
-                <tr key={u.userId} className="border-b border-gray-50 hover:bg-gray-50">
+                <tr key={u.userId} className={`border-b border-gray-50 hover:bg-gray-50 ${u.isDeleted ? 'opacity-60' : ''}`}>
                   <td className="px-4 py-3 text-gray-600">{u.userId}</td>
-                  <td className="px-4 py-3 font-medium text-gray-800">{u.name}</td>
+                  <td className="px-4 py-3 font-medium text-gray-800">
+                    {u.name}
+                    {u.isDeleted && <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-200 text-gray-500 uppercase">Deleted</span>}
+                  </td>
                   <td className="px-4 py-3 text-gray-600">{u.email || '-'}</td>
                   <td className="px-4 py-3 text-gray-600">{u.phone || '-'}</td>
                   <td className="px-4 py-3">
@@ -124,8 +149,8 @@ const UserManagement = () => {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${statusBadgeClass(u.accountStatus)}`}>
-                      {u.accountStatus}
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${statusBadgeClass(u.accountStatus, u.isDeleted)}`}>
+                      {u.isDeleted ? 'DELETED' : u.accountStatus}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-gray-600">
@@ -134,15 +159,28 @@ const UserManagement = () => {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex gap-2">
-                      {u.accountStatus === 'BANNED' ? (
-                        <button onClick={() => handleUnban(u.userId)} className="px-3 py-1.5 bg-green-500 text-white text-xs rounded-lg hover:bg-green-600 transition-colors">
-                          Unban
+                      {u.isDeleted ? (
+                        <button onClick={() => handleRestore(u.userId)} className="px-3 py-1.5 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-colors">
+                          Restore
                         </button>
-                      ) : u.userType !== 'ADMIN' && u.userType !== 'SUPER_ADMIN' ? (
-                        <button onClick={() => handleBan(u.userId)} className="px-3 py-1.5 bg-red-500 text-white text-xs rounded-lg hover:bg-red-600 transition-colors">
-                          Ban
-                        </button>
-                      ) : null}
+                      ) : (
+                        <>
+                          {u.accountStatus === 'BANNED' ? (
+                            <button onClick={() => handleUnban(u.userId)} className="px-3 py-1.5 bg-green-500 text-white text-xs rounded-lg hover:bg-green-600 transition-colors">
+                              Unban
+                            </button>
+                          ) : u.userType !== 'ADMIN' && u.userType !== 'SUPER_ADMIN' ? (
+                            <button onClick={() => handleBan(u.userId)} className="px-3 py-1.5 bg-red-500 text-white text-xs rounded-lg hover:bg-red-600 transition-colors">
+                              Ban
+                            </button>
+                          ) : null}
+                          {u.userType !== 'ADMIN' && u.userType !== 'SUPER_ADMIN' && (
+                            <button onClick={() => handleDelete(u.userId, u.name)} className="px-3 py-1.5 bg-gray-700 text-white text-xs rounded-lg hover:bg-gray-800 transition-colors">
+                              Delete
+                            </button>
+                          )}
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>

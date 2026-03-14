@@ -11,6 +11,8 @@ import {
   MapPinIcon,
   TagIcon,
   CheckCircleIcon,
+  ClockIcon,
+  XCircleIcon,
   ArrowRightIcon
 } from '@heroicons/react/24/outline'
 
@@ -18,6 +20,7 @@ export default function BecomeProvider() {
   const navigate = useNavigate()
   const { becomeProvider, user, isLoading, error, clearError } = useAuthStore()
   const [selectedLocation, setSelectedLocation] = useState(null)
+  const [submitted, setSubmitted] = useState(false)
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm()
 
@@ -28,7 +31,9 @@ export default function BecomeProvider() {
 
   const categories = categoriesData?.data?.data || []
 
-  if (user?.roles?.includes('PROVIDER') || user?.hasProviderProfile) {
+  const providerStatus = user?.providerApplicationStatus
+
+  if (user?.roles?.includes('PROVIDER') && providerStatus === 'VERIFIED') {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         <div className="bg-green-50 border border-green-200 rounded-2xl p-8">
@@ -42,6 +47,26 @@ export default function BecomeProvider() {
       </div>
     )
   }
+
+  if (providerStatus === 'PENDING' || submitted) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-8">
+          <ClockIcon className="h-16 w-16 text-amber-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Application Under Review</h2>
+          <p className="text-gray-600 mb-6">
+            Your provider application has been submitted and is pending admin approval.
+            You will be able to offer services once approved.
+          </p>
+          <button onClick={() => navigate('/')} className="btn-primary px-8 py-3">
+            Back to Home
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  const isRejected = providerStatus === 'REJECTED'
 
   const handleLocationSelect = (location) => {
     setSelectedLocation(location)
@@ -66,8 +91,8 @@ export default function BecomeProvider() {
 
     const result = await becomeProvider(payload)
     if (result.success) {
-      toast.success('Congratulations! You are now a service provider!')
-      navigate('/profile')
+      toast.success(result.message || 'Application submitted for review!')
+      setSubmitted(true)
     } else {
       toast.error(result.error)
     }
@@ -78,15 +103,27 @@ export default function BecomeProvider() {
       <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-6 sm:p-8 border border-gray-100">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
-            <WrenchScrewdriverIcon className="h-4 w-4" />
-            Become a Provider
+          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-4 ${
+            isRejected ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'
+          }`}>
+            {isRejected ? <XCircleIcon className="h-4 w-4" /> : <WrenchScrewdriverIcon className="h-4 w-4" />}
+            {isRejected ? 'Reapply as Provider' : 'Become a Provider'}
           </div>
-          <h2 className="text-2xl font-bold text-gray-900">Start Offering Your Services</h2>
+          <h2 className="text-2xl font-bold text-gray-900">
+            {isRejected ? 'Resubmit Your Application' : 'Start Offering Your Services'}
+          </h2>
           <p className="text-gray-500 mt-2">
-            Hi {user?.name}, set up your provider profile to start earning on HireLink
+            {isRejected
+              ? 'Your previous application was rejected. Update your details and try again.'
+              : `Hi ${user?.name}, set up your provider profile to start earning on HireLink`}
           </p>
         </div>
+
+        {isRejected && (
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-5 mb-6">
+            <p className="text-sm text-red-700 font-medium">Your previous application was rejected. Please review your details and resubmit.</p>
+          </div>
+        )}
 
         {/* Benefits */}
         <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-5 mb-8">
@@ -196,10 +233,14 @@ export default function BecomeProvider() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
-                Setting up your profile...
+                Submitting application...
               </span>
-            ) : 'Become a Provider'}
+            ) : isRejected ? 'Resubmit Application' : 'Submit Application'}
           </button>
+
+          <p className="text-center text-xs text-gray-400 mt-3">
+            Your application will be reviewed by our team. You'll be notified once approved.
+          </p>
         </form>
       </div>
     </div>

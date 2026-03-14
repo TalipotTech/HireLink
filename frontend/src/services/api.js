@@ -57,16 +57,21 @@ api.interceptors.response.use(
 
 // Auth API
 export const authAPI = {
-  register: (data) => api.post('/auth/register', data),     // { name, phone, otp, password, email? }
-  login: (data) => api.post('/auth/login', data),            // { phone/email, password }
+  register: (data) => api.post('/auth/register', data),               // { name, phone, otp, password, email? }
+  registerEmail: (data) => api.post('/auth/register-email', data),     // { name, email, password, phone? }
+  login: (data) => api.post('/auth/login', data),                      // { phone/email, password }
+  resendVerification: (data) => api.post('/auth/resend-verification', data), // { email }
   refresh: (refreshToken) => api.post('/auth/refresh', { refreshToken }),
   changePassword: (data) => api.post('/auth/change-password', data),
   setPassword: (data) => api.post('/auth/set-password', data),
 
-  sendOtp: (data) => api.post('/auth/send-otp', data),      // { phone } or { email }
-  verifyOtp: (data) => api.post('/auth/verify-otp', data),   // { phone/email, otp, name? }
+  sendOtp: (data) => api.post('/auth/send-otp', data),                // { phone } or { email }
+  verifyOtp: (data) => api.post('/auth/verify-otp', data),            // { phone/email, otp, name? }
 
-  googleLogin: (data) => api.post('/auth/google', data),     // { googleId, email, name?, imageUrl? }
+  googleLogin: (data) => api.post('/auth/google', data),               // { googleId, email, name?, imageUrl? }
+
+  forgotPassword: (data) => api.post('/auth/forgot-password', data),   // { email }
+  resetPassword: (data) => api.post('/auth/reset-password', data),     // { token, newPassword }
 
   becomeProvider: (data) => api.post('/users/become-provider', data),
 }
@@ -140,6 +145,10 @@ export const userAPI = {
   addAddress: (data) => api.post('/users/me/addresses', data),
   updateAddress: (id, data) => api.put(`/users/me/addresses/${id}`, data),
   deleteAddress: (id) => api.delete(`/users/me/addresses/${id}`),
+
+  sendEmailOtp: () => api.post('/users/me/send-email-otp'),
+  verifyEmailOtp: (otp) => api.post('/users/me/verify-email-otp', { otp }),
+  sendVerificationLink: () => api.post('/users/me/send-verification-link'),
 }
 
 export default api

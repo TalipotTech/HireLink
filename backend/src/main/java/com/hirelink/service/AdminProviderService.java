@@ -3,8 +3,12 @@ package com.hirelink.service;
 import com.hirelink.entity.AdminAuditLog;
 import com.hirelink.entity.ServiceProvider;
 import com.hirelink.entity.ServiceProvider.KycStatus;
+import com.hirelink.entity.User;
+import com.hirelink.entity.UserRole;
 import com.hirelink.repository.AdminAuditLogRepository;
 import com.hirelink.repository.ServiceProviderRepository;
+import com.hirelink.repository.UserRepository;
+import com.hirelink.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +22,8 @@ public class AdminProviderService {
 
     private final ServiceProviderRepository providerRepository;
     private final AdminAuditLogRepository auditLogRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final UserRepository userRepository;
 
     public List<ServiceProvider> getPendingProviders() {
         return providerRepository.findByKycStatus(KycStatus.PENDING);
@@ -34,6 +40,16 @@ public class AdminProviderService {
         provider.setKycStatus(KycStatus.VERIFIED);
         provider.setKycVerifiedAt(LocalDateTime.now());
         providerRepository.save(provider);
+
+        User user = provider.getUser();
+        if (!userRoleRepository.existsByUserUserIdAndRole(user.getUserId(), "PROVIDER")) {
+            userRoleRepository.save(UserRole.builder()
+                    .user(user)
+                    .role("PROVIDER")
+                    .build());
+            user.setUserType(User.UserType.PROVIDER);
+            userRepository.save(user);
+        }
 
         auditLogRepository.save(AdminAuditLog.builder()
                 .adminUserId(adminUserId)

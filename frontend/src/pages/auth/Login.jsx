@@ -270,6 +270,11 @@ export default function UnifiedLogin() {
         </div>
         {errors.password && <p className="text-red-500 text-sm mt-1.5">{errors.password.message}</p>}
       </div>
+      <div className="flex justify-end">
+        <Link to="/forgot-password" className="text-sm text-primary-600 hover:text-primary-700 font-medium">
+          Forgot password?
+        </Link>
+      </div>
       {error && <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm border border-red-100">{error}</div>}
       <button type="submit" disabled={isLoading} className="w-full btn-primary py-3.5 text-lg">
         {isLoading ? (

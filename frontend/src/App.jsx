@@ -9,6 +9,9 @@ import AdminLayout from './layouts/AdminLayout'
 // Auth Pages
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
+import ForgotPassword from './pages/auth/ForgotPassword'
+import ResetPassword from './pages/auth/ResetPassword'
+import EmailVerified from './pages/auth/EmailVerified'
 
 // Pages
 import Home from './pages/Home'
@@ -50,7 +53,12 @@ function App() {
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
       </Route>
+
+      {/* Standalone auth pages (no auth layout) */}
+      <Route path="/email-verified" element={<EmailVerified />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* Backward-compatible redirects for old auth routes */}
       <Route path="/customer/login" element={<Navigate to="/login" replace />} />

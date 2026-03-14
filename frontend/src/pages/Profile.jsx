@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from 'react-query'
 import { useForm } from 'react-hook-form'
 import { userAPI } from '../services/api'
@@ -15,10 +15,14 @@ import {
   LockClosedIcon,
   ShieldCheckIcon,
   CheckCircleIcon,
+  ExclamationTriangleIcon,
   EyeIcon,
   EyeSlashIcon,
   WrenchScrewdriverIcon,
-  ArrowRightIcon
+  ArrowRightIcon,
+  ArrowPathIcon,
+  LinkIcon,
+  ClockIcon
 } from '@heroicons/react/24/outline'
 import { Link } from 'react-router-dom'
 import LocationPicker from '../components/LocationPicker'
@@ -33,6 +37,69 @@ export default function Profile() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isSettingPassword, setIsSettingPassword] = useState(false)
   const [addressLocation, setAddressLocation] = useState(null)
+
+  // Email verification state
+  const [emailVerifyMethod, setEmailVerifyMethod] = useState(null) // 'otp' | 'link'
+  const [emailOtpSent, setEmailOtpSent] = useState(false)
+  const [emailOtp, setEmailOtp] = useState('')
+  const [emailVerifyLoading, setEmailVerifyLoading] = useState(false)
+  const [emailOtpCountdown, setEmailOtpCountdown] = useState(0)
+  const [linkSent, setLinkSent] = useState(false)
+
+  useEffect(() => {
+    if (emailOtpCountdown > 0) {
+      const timer = setTimeout(() => setEmailOtpCountdown(emailOtpCountdown - 1), 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [emailOtpCountdown])
+
+  const handleSendEmailOtp = async () => {
+    setEmailVerifyLoading(true)
+    try {
+      await userAPI.sendEmailOtp()
+      setEmailOtpSent(true)
+      setEmailOtpCountdown(60)
+      toast.success('OTP sent to your email!')
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to send OTP')
+    } finally {
+      setEmailVerifyLoading(false)
+    }
+  }
+
+  const handleVerifyEmailOtp = async () => {
+    if (!emailOtp || emailOtp.length !== 6) {
+      toast.error('Please enter a valid 6-digit OTP')
+      return
+    }
+    setEmailVerifyLoading(true)
+    try {
+      const response = await userAPI.verifyEmailOtp(emailOtp)
+      const updatedUser = response.data.data
+      updateUser(updatedUser)
+      setEmailVerifyMethod(null)
+      setEmailOtpSent(false)
+      setEmailOtp('')
+      toast.success('Email verified successfully!')
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Invalid OTP')
+    } finally {
+      setEmailVerifyLoading(false)
+    }
+  }
+
+  const handleSendVerificationLink = async () => {
+    setEmailVerifyLoading(true)
+    try {
+      await userAPI.sendVerificationLink()
+      setLinkSent(true)
+      toast.success('Verification link sent to your email!')
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to send verification link')
+    } finally {
+      setEmailVerifyLoading(false)
+    }
+  }
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     defaultValues: {
@@ -229,12 +296,180 @@ export default function Profile() {
                 <EnvelopeIcon className="h-5 w-5 text-gray-400" />
                 <div>
                   <p className="text-sm text-gray-500">Email</p>
-                  <p className="font-medium">{user?.email || 'Not provided'}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium">{user?.email || 'Not provided'}</p>
+                    {user?.email && (
+                      user?.isEmailVerified
+                        ? <span className="inline-flex items-center gap-1 text-xs text-green-700 bg-green-50 px-2 py-0.5 rounded-full"><CheckCircleIcon className="h-3 w-3" />Verified</span>
+                        : <span className="inline-flex items-center gap-1 text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full"><ExclamationTriangleIcon className="h-3 w-3" />Not verified</span>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           )}
         </div>
+
+        {/* Email Verification Banner */}
+        {user?.email && !user?.isEmailVerified && !isGoogleUser && (
+          <div className="card p-6 border-l-4 border-amber-400">
+            <div className="flex items-center gap-2 mb-4">
+              <ExclamationTriangleIcon className="h-5 w-5 text-amber-500" />
+              <h2 className="text-lg font-semibold text-gray-900">Verify Your Email</h2>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">
+              Your email <span className="font-medium text-gray-800">{user.email}</span> is not verified.
+              Verify it to secure your account and enable email-based login.
+            </p>
+
+            {/* Method selection */}
+            {!emailVerifyMethod && (
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() => setEmailVerifyMethod('otp')}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary-50 text-primary-700 border border-primary-200 rounded-xl text-sm font-medium hover:bg-primary-100 transition-colors"
+                >
+                  <EnvelopeIcon className="h-4 w-4" />
+                  Verify with OTP
+                </button>
+                <button
+                  onClick={() => setEmailVerifyMethod('link')}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-xl text-sm font-medium hover:bg-blue-100 transition-colors"
+                >
+                  <LinkIcon className="h-4 w-4" />
+                  Verify with Link
+                </button>
+              </div>
+            )}
+
+            {/* OTP flow */}
+            {emailVerifyMethod === 'otp' && (
+              <div className="space-y-4">
+                {!emailOtpSent ? (
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={handleSendEmailOtp}
+                      disabled={emailVerifyLoading}
+                      className="btn-primary text-sm"
+                    >
+                      {emailVerifyLoading ? (
+                        <span className="flex items-center gap-2">
+                          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                          </svg>
+                          Sending...
+                        </span>
+                      ) : 'Send OTP to Email'}
+                    </button>
+                    <button
+                      onClick={() => setEmailVerifyMethod(null)}
+                      className="text-sm text-gray-500 hover:text-gray-700"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="bg-blue-50 text-blue-700 p-3 rounded-xl text-sm">
+                      OTP sent to <span className="font-medium">{user.email}</span>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Enter 6-digit OTP</label>
+                      <input
+                        type="text"
+                        maxLength={6}
+                        value={emailOtp}
+                        onChange={(e) => setEmailOtp(e.target.value.replace(/\D/g, ''))}
+                        className="input text-center text-xl tracking-[0.4em] font-mono w-48"
+                        placeholder="------"
+                      />
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={handleVerifyEmailOtp}
+                        disabled={emailVerifyLoading || emailOtp.length !== 6}
+                        className="btn-primary text-sm"
+                      >
+                        {emailVerifyLoading ? 'Verifying...' : 'Verify'}
+                      </button>
+                      <button
+                        onClick={handleSendEmailOtp}
+                        disabled={emailOtpCountdown > 0 || emailVerifyLoading}
+                        className={`inline-flex items-center gap-1 text-sm ${
+                          emailOtpCountdown > 0 ? 'text-gray-400 cursor-not-allowed' : 'text-primary-600 hover:text-primary-700'
+                        }`}
+                      >
+                        <ArrowPathIcon className="h-3.5 w-3.5" />
+                        {emailOtpCountdown > 0 ? `Resend in ${emailOtpCountdown}s` : 'Resend OTP'}
+                      </button>
+                      <button
+                        onClick={() => { setEmailVerifyMethod(null); setEmailOtpSent(false); setEmailOtp('') }}
+                        className="text-sm text-gray-500 hover:text-gray-700"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Link flow */}
+            {emailVerifyMethod === 'link' && (
+              <div className="space-y-4">
+                {!linkSent ? (
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={handleSendVerificationLink}
+                      disabled={emailVerifyLoading}
+                      className="btn-primary text-sm"
+                    >
+                      {emailVerifyLoading ? (
+                        <span className="flex items-center gap-2">
+                          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                          </svg>
+                          Sending...
+                        </span>
+                      ) : 'Send Verification Link'}
+                    </button>
+                    <button
+                      onClick={() => setEmailVerifyMethod(null)}
+                      className="text-sm text-gray-500 hover:text-gray-700"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="bg-green-50 text-green-700 p-4 rounded-xl text-sm space-y-2">
+                      <p className="font-medium">Verification link sent!</p>
+                      <p>Check your inbox at <span className="font-medium">{user.email}</span> and click the link to verify.</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={handleSendVerificationLink}
+                        disabled={emailVerifyLoading}
+                        className="inline-flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700"
+                      >
+                        <ArrowPathIcon className={`h-3.5 w-3.5 ${emailVerifyLoading ? 'animate-spin' : ''}`} />
+                        Resend link
+                      </button>
+                      <button
+                        onClick={() => { setEmailVerifyMethod(null); setLinkSent(false) }}
+                        className="text-sm text-gray-500 hover:text-gray-700"
+                      >
+                        Done
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Addresses */}
         <div className="card p-6">
@@ -582,8 +817,8 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Become a Provider CTA - only for customers who aren't providers yet */}
-        {user?.roles?.includes('CUSTOMER') && !user?.roles?.includes('PROVIDER') && !user?.hasProviderProfile && (
+        {/* Become a Provider CTA - only for customers who haven't applied yet */}
+        {user?.roles?.includes('CUSTOMER') && !user?.roles?.includes('PROVIDER') && !user?.providerApplicationStatus && (
           <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 p-6 text-white shadow-lg">
             <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
             <div className="absolute bottom-0 left-0 -mb-6 -ml-6 w-24 h-24 bg-white/10 rounded-full blur-xl" />
@@ -603,6 +838,23 @@ export default function Profile() {
                   Get Started
                   <ArrowRightIcon className="h-4 w-4" />
                 </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Provider Application Pending */}
+        {user?.providerApplicationStatus === 'PENDING' && !user?.roles?.includes('PROVIDER') && (
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-400 via-amber-500 to-orange-500 p-6 text-white shadow-lg">
+            <div className="relative flex items-start gap-4">
+              <div className="shrink-0 w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                <ClockIcon className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-lg font-bold mb-1">Provider Application Pending</h3>
+                <p className="text-amber-100 text-sm leading-relaxed">
+                  Your provider application is under review. You'll be notified once it's approved by our team.
+                </p>
               </div>
             </div>
           </div>

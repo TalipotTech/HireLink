@@ -105,10 +105,11 @@ export default function BookingDetail() {
       const res = await paymentsAPI.createOrder(booking.bookingId)
       const orderData = res.data.data
 
-      // Mock mode: backend returns keyId="mock" when Razorpay keys are placeholders
       if (orderData.keyId === 'mock') {
+        const svc = orderData.serviceFee ?? 0
+        const plat = orderData.platformFee ?? 0
         const confirmed = window.confirm(
-          `[Demo Mode] Confirm booking charge of ₹${(orderData.amount / 100).toFixed(2)} for Booking #${orderData.bookingNumber}?`
+          `[Demo Mode] Pay ₹${(orderData.amount / 100).toFixed(2)} for Booking #${orderData.bookingNumber}?\n\nService Fee: ₹${svc}\nPlatform Fee: ₹${plat}`
         )
         if (confirmed) {
           try {
@@ -129,13 +130,20 @@ export default function BookingDetail() {
         return
       }
 
-      // Real Razorpay checkout flow
+      if (typeof window.Razorpay !== 'function') {
+        toast.error('Payment gateway failed to load. Please refresh and try again.')
+        setPayingInProgress(false)
+        return
+      }
+
+      const svc = orderData.serviceFee ?? 0
+      const plat = orderData.platformFee ?? 0
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID || orderData.keyId,
+        key: orderData.keyId,
         amount: orderData.amount,
         currency: orderData.currency,
         name: 'HireLink',
-        description: `Payment for Booking #${orderData.bookingNumber}`,
+        description: `Service Fee ₹${svc} + Platform Fee ₹${plat}`,
         order_id: orderData.orderId,
         prefill: {
           name: orderData.customerName || '',
@@ -174,7 +182,8 @@ export default function BookingDetail() {
       rzp.open()
     } catch (err) {
       setPayingInProgress(false)
-      toast.error(err.response?.data?.message || 'Failed to initiate payment')
+      const msg = err.response?.data?.message || err.message || 'Failed to initiate payment'
+      toast.error(msg)
     }
   }
 

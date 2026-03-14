@@ -64,4 +64,20 @@ public class AdminUserController {
         adminUserService.unbanUser(id, adminUser.getUserId());
         return ResponseEntity.ok(ApiResponse.success("User unbanned"));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<String>> deleteUser(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails adminUser) {
+        adminUserService.deleteUser(id, adminUser.getUserId());
+        return ResponseEntity.ok(ApiResponse.success("User deleted"));
+    }
+
+    @PostMapping("/{id}/restore")
+    public ResponseEntity<ApiResponse<String>> restoreUser(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails adminUser) {
+        adminUserService.restoreUser(id, adminUser.getUserId());
+        return ResponseEntity.ok(ApiResponse.success("User restored"));
+    }
 }

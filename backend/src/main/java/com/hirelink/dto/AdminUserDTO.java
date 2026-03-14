@@ -21,6 +21,7 @@ public class AdminUserDTO {
         private String authProvider;
         private Boolean isPhoneVerified;
         private Boolean isEmailVerified;
+        private Boolean isDeleted;
         private LocalDateTime createdAt;
         private LocalDateTime lastLoginAt;
     }

@@ -12,8 +12,7 @@ import java.util.List;
 public class AuthDTO {
 
     /**
-     * OTP-verified registration request.
-     * User must first call /send-otp, then submit this with the OTP code.
+     * OTP-verified registration (phone + OTP flow).
      */
     @Data
     @Builder
@@ -37,6 +36,40 @@ public class AuthDTO {
         @NotBlank(message = "Password is required")
         @Size(min = 8, message = "Password must be at least 8 characters")
         private String password;
+    }
+
+    /**
+     * Email-verified registration (email + password + verification link).
+     */
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class EmailRegisterRequest {
+        @NotBlank(message = "Name is required")
+        @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
+        private String name;
+
+        @NotBlank(message = "Email is required")
+        @Email(message = "Invalid email format")
+        private String email;
+
+        @NotBlank(message = "Password is required")
+        @Size(min = 8, message = "Password must be at least 8 characters")
+        private String password;
+
+        @Pattern(regexp = "^[+]?[0-9]{10,15}$", message = "Invalid phone number format")
+        private String phone;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ResendVerificationRequest {
+        @NotBlank(message = "Email is required")
+        @Email(message = "Invalid email format")
+        private String email;
     }
 
     /**
@@ -126,6 +159,7 @@ public class AuthDTO {
         private String userType;
         private List<String> roles;
         private Boolean hasProviderProfile;
+        private String providerApplicationStatus;
         private String accountStatus;
         private Boolean isEmailVerified;
         private Boolean isPhoneVerified;
@@ -203,6 +237,33 @@ public class AuthDTO {
         
         private String name;
         private String imageUrl;
+    }
+
+    // ============================================
+    // Forgot / Reset Password DTOs
+    // ============================================
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ForgotPasswordRequest {
+        @NotBlank(message = "Email is required")
+        @Email(message = "Invalid email format")
+        private String email;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ResetPasswordRequest {
+        @NotBlank(message = "Token is required")
+        private String token;
+
+        @NotBlank(message = "New password is required")
+        @Size(min = 8, message = "Password must be at least 8 characters")
+        private String newPassword;
     }
 
     /**

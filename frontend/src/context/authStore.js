@@ -68,6 +68,32 @@ export const useAuthStore = create(
         }
       },
 
+      registerEmail: async (userData) => {
+        set({ isLoading: true, error: null })
+        try {
+          await authAPI.registerEmail(userData)
+          set({ isLoading: false })
+          return { success: true }
+        } catch (error) {
+          const message = error.response?.data?.message || 'Registration failed'
+          set({ error: message, isLoading: false })
+          return { success: false, error: message }
+        }
+      },
+
+      resendVerification: async (email) => {
+        set({ isLoading: true, error: null })
+        try {
+          await authAPI.resendVerification({ email })
+          set({ isLoading: false })
+          return { success: true }
+        } catch (error) {
+          const message = error.response?.data?.message || 'Failed to resend verification email'
+          set({ error: message, isLoading: false })
+          return { success: false, error: message }
+        }
+      },
+
       logout: () => {
         localStorage.removeItem('accessToken')
         localStorage.removeItem('refreshToken')
@@ -102,7 +128,9 @@ export const useAuthStore = create(
       sendOtp: async (phone, email) => {
         set({ isLoading: true, error: null })
         try {
-          const data = phone ? { phone } : { email }
+          const data = {}
+          if (phone) data.phone = phone
+          if (email) data.email = email
           await authAPI.sendOtp(data)
           set({ isLoading: false })
           return { success: true }
@@ -185,23 +213,19 @@ export const useAuthStore = create(
         set({ isLoading: true, error: null })
         try {
           const response = await authAPI.becomeProvider(providerData)
-          const { accessToken, refreshToken, user } = response.data.data
+          const message = response.data?.message || response.data?.data?.message || 'Application submitted'
 
-          localStorage.setItem('accessToken', accessToken)
-          localStorage.setItem('refreshToken', refreshToken)
+          const profileRes = await import('../services/api').then(m => m.userAPI.getProfile())
+          const updatedUser = profileRes.data?.data
+          if (updatedUser) {
+            set({ user: updatedUser, isLoading: false })
+          } else {
+            set({ isLoading: false })
+          }
 
-          set({
-            user,
-            accessToken,
-            refreshToken,
-            isAuthenticated: true,
-            isLoading: false,
-            activeRole: 'PROVIDER',
-          })
-
-          return { success: true }
+          return { success: true, message }
         } catch (error) {
-          const message = error.response?.data?.message || 'Failed to become a provider'
+          const message = error.response?.data?.message || 'Failed to submit provider application'
           set({ error: message, isLoading: false })
           return { success: false, error: message }
         }

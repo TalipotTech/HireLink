@@ -13,7 +13,8 @@ import {
   ArrowRightOnRectangleIcon,
   MagnifyingGlassIcon,
   Cog6ToothIcon,
-  SparklesIcon
+  SparklesIcon,
+  ClockIcon
 } from '@heroicons/react/24/outline'
 
 export default function MainLayout() {
@@ -30,10 +31,11 @@ export default function MainLayout() {
     user?.userType === 'SUPER_ADMIN'
   )
 
+  const providerStatus = user?.providerApplicationStatus
   const isCustomerOnly = isAuthenticated &&
     user?.roles?.includes('CUSTOMER') &&
     !user?.roles?.includes('PROVIDER') &&
-    !user?.hasProviderProfile
+    !providerStatus
 
   const handleLogout = () => {
     logout()
@@ -237,13 +239,33 @@ export default function MainLayout() {
                     </NavLink>
                   )}
                   {isCustomerOnly && (
-                    <NavLink 
+                    <NavLink
                       to="/become-provider"
                       className={({ isActive }) => `flex items-center space-x-3 p-3 rounded-xl transition-all ${isActive ? 'bg-emerald-50 text-emerald-700' : 'text-emerald-600 hover:bg-emerald-50'}`}
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <SparklesIcon className="h-5 w-5" />
                       <span className="font-medium">Become a Provider</span>
+                    </NavLink>
+                  )}
+                  {providerStatus === 'PENDING' && (
+                    <NavLink
+                      to="/become-provider"
+                      className="flex items-center space-x-3 p-3 rounded-xl text-amber-600 bg-amber-50"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <ClockIcon className="h-5 w-5" />
+                      <span className="font-medium">Approval Pending</span>
+                    </NavLink>
+                  )}
+                  {providerStatus === 'REJECTED' && !user?.roles?.includes('PROVIDER') && (
+                    <NavLink
+                      to="/become-provider"
+                      className="flex items-center space-x-3 p-3 rounded-xl text-red-600 hover:bg-red-50"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <SparklesIcon className="h-5 w-5" />
+                      <span className="font-medium">Reapply as Provider</span>
                     </NavLink>
                   )}
                   <NavLink 

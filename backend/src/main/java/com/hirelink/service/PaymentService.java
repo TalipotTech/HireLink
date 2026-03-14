@@ -41,20 +41,38 @@ public class PaymentService {
             BookingRepository bookingRepository,
             @Value("${razorpay.key-id}") String razorpayKeyId,
             @Value("${razorpay.key-secret}") String razorpayKeySecret,
-            @Value("${hirelink.booking-charge:8}") BigDecimal bookingCharge) throws RazorpayException {
+            @Value("${hirelink.booking-charge:8}") BigDecimal bookingCharge) {
         this.paymentRepository = paymentRepository;
         this.bookingRepository = bookingRepository;
         this.razorpayKeyId = razorpayKeyId;
         this.razorpayKeySecret = razorpayKeySecret;
         this.bookingCharge = bookingCharge;
-        this.mockMode = razorpayKeyId.contains("xxxxx") || razorpayKeySecret.contains("xxxxx");
 
-        if (mockMode) {
-            log.warn("Razorpay keys are placeholders -- running in MOCK payment mode. "
-                    + "Replace keys in application.properties for real payments.");
+        boolean shouldMock = razorpayKeyId == null || razorpayKeySecret == null
+                || razorpayKeyId.isBlank() || razorpayKeySecret.isBlank()
+                || razorpayKeyId.contains("xxxxx") || razorpayKeySecret.contains("xxxxx")
+                || !razorpayKeyId.startsWith("rzp_");
+
+        if (shouldMock) {
+            log.warn("Razorpay keys are missing or invalid -- running in MOCK payment mode. "
+                    + "Set valid keys in application.properties for real payments.");
             this.razorpayClient = null;
+            this.mockMode = true;
         } else {
-            this.razorpayClient = new RazorpayClient(razorpayKeyId, razorpayKeySecret);
+            RazorpayClient client = null;
+            boolean mock = false;
+            try {
+                client = new RazorpayClient(razorpayKeyId, razorpayKeySecret);
+                String masked = razorpayKeyId.length() > 12
+                        ? razorpayKeyId.substring(0, 8) + "..." + razorpayKeyId.substring(razorpayKeyId.length() - 4)
+                        : "***";
+                log.info("Razorpay client initialized with key: {}", masked);
+            } catch (Exception e) {
+                log.warn("Failed to initialize Razorpay client: {} -- falling back to MOCK mode", e.getMessage());
+                mock = true;
+            }
+            this.razorpayClient = client;
+            this.mockMode = mock;
         }
     }
 
@@ -76,12 +94,14 @@ public class PaymentService {
             throw new BadRequestException("This booking has already been paid");
         }
 
-        BigDecimal amount = bookingCharge;
+        BigDecimal serviceFee = booking.getFinalAmount() != null ? booking.getFinalAmount()
+                : booking.getEstimatedAmount() != null ? booking.getEstimatedAmount() : BigDecimal.ZERO;
+        BigDecimal totalAmount = serviceFee.add(bookingCharge);
 
-        long amountInPaise = amount.multiply(BigDecimal.valueOf(100)).longValue();
+        long amountInPaise = totalAmount.multiply(BigDecimal.valueOf(100)).longValue();
 
         if (mockMode) {
-            return createMockOrder(booking, amount, amountInPaise);
+            return createMockOrder(booking, totalAmount, serviceFee, amountInPaise);
         }
 
         try {
@@ -97,8 +117,8 @@ public class PaymentService {
                     .booking(booking)
                     .payerUser(booking.getUser())
                     .payeeProvider(booking.getProvider())
-                    .grossAmount(amount)
-                    .netAmount(amount)
+                    .grossAmount(totalAmount)
+                    .netAmount(totalAmount)
                     .currency("INR")
                     .paymentGateway(Payment.PaymentGateway.RAZORPAY)
                     .gatewayOrderId(orderId)
@@ -115,28 +135,32 @@ public class PaymentService {
                     .customerName(booking.getUser().getName())
                     .customerEmail(booking.getUser().getEmail())
                     .customerPhone(booking.getUser().getPhone())
-                    .bookingCharge(bookingCharge)
+                    .serviceFee(serviceFee)
+                    .platformFee(bookingCharge)
                     .build();
 
         } catch (RazorpayException e) {
-            log.warn("Razorpay API call failed for booking {}: {} -- falling back to mock mode", bookingId, e.getMessage());
-            return createMockOrder(booking, amount, amountInPaise);
+            log.error("Razorpay API call failed for booking {}: {} -- falling back to mock mode", bookingId, e.getMessage(), e);
+            return createMockOrder(booking, totalAmount, serviceFee, amountInPaise);
+        } catch (Exception e) {
+            log.error("Unexpected error creating Razorpay order for booking {}: {}", bookingId, e.getMessage(), e);
+            return createMockOrder(booking, totalAmount, serviceFee, amountInPaise);
         }
     }
 
-    private PaymentDTO.CreateOrderResponse createMockOrder(Booking booking, BigDecimal amount, long amountInPaise) {
+    private PaymentDTO.CreateOrderResponse createMockOrder(Booking booking, BigDecimal totalAmount, BigDecimal serviceFee, long amountInPaise) {
         String mockOrderId = "mock_order_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
                 + "_" + String.format("%04d", new Random().nextInt(10000));
 
         log.info("[MOCK] Created mock payment order {} for booking {} amount={}",
-                mockOrderId, booking.getBookingNumber(), amount);
+                mockOrderId, booking.getBookingNumber(), totalAmount);
 
         Payment payment = Payment.builder()
                 .booking(booking)
                 .payerUser(booking.getUser())
                 .payeeProvider(booking.getProvider())
-                .grossAmount(amount)
-                .netAmount(amount)
+                .grossAmount(totalAmount)
+                .netAmount(totalAmount)
                 .currency("INR")
                 .paymentGateway(Payment.PaymentGateway.RAZORPAY)
                 .gatewayOrderId(mockOrderId)
@@ -153,7 +177,8 @@ public class PaymentService {
                 .customerName(booking.getUser().getName())
                 .customerEmail(booking.getUser().getEmail())
                 .customerPhone(booking.getUser().getPhone())
-                .bookingCharge(bookingCharge)
+                .serviceFee(serviceFee)
+                .platformFee(bookingCharge)
                 .build();
     }
 

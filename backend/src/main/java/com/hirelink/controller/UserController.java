@@ -52,12 +52,43 @@ public class UserController {
     }
 
     @PostMapping("/become-provider")
-    @Operation(summary = "Upgrade current user to also be a service provider")
-    public ResponseEntity<ApiResponse<AuthDTO.AuthResponse>> becomeProvider(
+    @Operation(summary = "Submit a provider application for admin review")
+    public ResponseEntity<ApiResponse<AuthDTO.MessageResponse>> becomeProvider(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody AuthDTO.BecomeProviderRequest request) {
-        AuthDTO.AuthResponse response = authService.becomeProvider(userDetails.getUserId(), request);
-        return ResponseEntity.ok(ApiResponse.success("You are now a provider!", response));
+        AuthDTO.MessageResponse response = authService.becomeProvider(userDetails.getUserId(), request);
+        return ResponseEntity.ok(ApiResponse.success(response.getMessage(), response));
+    }
+
+    // ============================================
+    // Profile Email Verification
+    // ============================================
+
+    @PostMapping("/me/send-email-otp")
+    @Operation(summary = "Send OTP to the current user's email for verification")
+    public ResponseEntity<ApiResponse<String>> sendEmailOtp(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        authService.sendProfileEmailOtp(userDetails.getUserId());
+        return ResponseEntity.ok(ApiResponse.success("OTP sent to your email", "Check your email for the verification code"));
+    }
+
+    @PostMapping("/me/verify-email-otp")
+    @Operation(summary = "Verify OTP to mark the current user's email as verified")
+    public ResponseEntity<ApiResponse<AuthDTO.UserDTO>> verifyEmailOtp(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody AuthDTO.VerifyOtpRequest request) {
+        authService.verifyProfileEmailOtp(userDetails.getUserId(), request.getOtp());
+        User user = userRepository.findById(userDetails.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return ResponseEntity.ok(ApiResponse.success("Email verified successfully", buildUserDTO(user)));
+    }
+
+    @PostMapping("/me/send-verification-link")
+    @Operation(summary = "Send a verification link to the current user's email")
+    public ResponseEntity<ApiResponse<String>> sendVerificationLink(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        authService.sendProfileVerificationLink(userDetails.getUserId());
+        return ResponseEntity.ok(ApiResponse.success("Verification link sent", "Check your email for the verification link"));
     }
 
     @PutMapping("/me")
@@ -214,7 +245,9 @@ public class UserController {
         if (roleNames.isEmpty()) {
             roleNames = List.of(user.getUserType().name());
         }
-        boolean hasProviderProfile = providerRepository.findByUserUserId(user.getUserId()).isPresent();
+        var providerOpt = providerRepository.findByUserUserId(user.getUserId());
+        boolean hasProviderProfile = providerOpt.isPresent();
+        String providerAppStatus = providerOpt.map(sp -> sp.getKycStatus().name()).orElse(null);
 
         return AuthDTO.UserDTO.builder()
                 .userId(user.getUserId())
@@ -225,6 +258,7 @@ public class UserController {
                 .userType(user.getUserType().name())
                 .roles(roleNames)
                 .hasProviderProfile(hasProviderProfile)
+                .providerApplicationStatus(providerAppStatus)
                 .accountStatus(user.getAccountStatus().name())
                 .isEmailVerified(user.getIsEmailVerified())
                 .isPhoneVerified(user.getIsPhoneVerified())

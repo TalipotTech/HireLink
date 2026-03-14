@@ -131,7 +131,83 @@ public class AdminUserService {
                 .build());
     }
 
+    @Transactional
+    public void deleteUser(Long id, Long adminUserId) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getUserType() == User.UserType.ADMIN || user.getUserType() == User.UserType.SUPER_ADMIN) {
+            throw new RuntimeException("Cannot delete admin users");
+        }
+
+        String originalEmail = user.getEmail();
+        String originalPhone = user.getPhone();
+
+        user.setDeletedAt(java.time.LocalDateTime.now());
+        user.setAccountStatus(User.AccountStatus.INACTIVE);
+        user.setEmail(null);
+        user.setPhone(null);
+        userRepository.save(user);
+
+        auditLogRepository.save(AdminAuditLog.builder()
+                .adminUserId(adminUserId)
+                .actionType("USER_DELETED")
+                .actionDescription("Soft-deleted user: " + (originalEmail != null ? originalEmail : originalPhone))
+                .targetType("USER")
+                .targetId(id)
+                .oldValues(String.format("{\"email\":\"%s\",\"phone\":\"%s\"}", originalEmail, originalPhone))
+                .build());
+    }
+
+    @Transactional
+    public void restoreUser(Long id, Long adminUserId) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getDeletedAt() == null) {
+            throw new RuntimeException("User is not deleted");
+        }
+
+        AdminAuditLog deleteLog = auditLogRepository
+                .findByTargetTypeAndTargetIdOrderByPerformedAtDesc("USER", id)
+                .stream()
+                .filter(log -> "USER_DELETED".equals(log.getActionType()) && log.getOldValues() != null)
+                .findFirst()
+                .orElse(null);
+
+        if (deleteLog != null && deleteLog.getOldValues() != null) {
+            String oldValues = deleteLog.getOldValues();
+            String email = extractJsonValue(oldValues, "email");
+            String phone = extractJsonValue(oldValues, "phone");
+            if (email != null && !"null".equals(email)) user.setEmail(email);
+            if (phone != null && !"null".equals(phone)) user.setPhone(phone);
+        }
+
+        user.setDeletedAt(null);
+        user.setAccountStatus(User.AccountStatus.ACTIVE);
+        userRepository.save(user);
+
+        auditLogRepository.save(AdminAuditLog.builder()
+                .adminUserId(adminUserId)
+                .actionType("USER_RESTORED")
+                .actionDescription("Restored user: " + (user.getEmail() != null ? user.getEmail() : user.getPhone()))
+                .targetType("USER")
+                .targetId(id)
+                .build());
+    }
+
+    private String extractJsonValue(String json, String key) {
+        String search = "\"" + key + "\":\"";
+        int start = json.indexOf(search);
+        if (start == -1) return null;
+        start += search.length();
+        int end = json.indexOf("\"", start);
+        if (end == -1) return null;
+        return json.substring(start, end);
+    }
+
     private UserListItem toListItem(User u) {
+        boolean deleted = u.getDeletedAt() != null;
         return UserListItem.builder()
                 .userId(u.getUserId())
                 .name(u.getName())
@@ -143,6 +219,7 @@ public class AdminUserService {
                 .authProvider(u.getAuthProvider() != null ? u.getAuthProvider().name() : "LOCAL")
                 .isPhoneVerified(u.getIsPhoneVerified())
                 .isEmailVerified(u.getIsEmailVerified())
+                .isDeleted(deleted)
                 .createdAt(u.getCreatedAt())
                 .lastLoginAt(u.getLastLoginAt())
                 .build();

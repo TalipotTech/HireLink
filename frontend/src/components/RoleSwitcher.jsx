@@ -4,6 +4,7 @@ import {
   UserIcon,
   WrenchScrewdriverIcon,
   SparklesIcon,
+  ClockIcon,
 } from '@heroicons/react/24/outline'
 
 export default function RoleSwitcher() {
@@ -13,9 +14,33 @@ export default function RoleSwitcher() {
   const hasCustomer = user?.roles?.includes('CUSTOMER')
   const hasProvider = user?.roles?.includes('PROVIDER')
   const hasMultipleRoles = hasCustomer && hasProvider
-  const isCustomerOnly = hasCustomer && !hasProvider
+  const providerStatus = user?.providerApplicationStatus
 
-  if (isCustomerOnly) {
+  if (providerStatus === 'PENDING') {
+    return (
+      <Link
+        to="/become-provider"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 transition-all"
+      >
+        <ClockIcon className="h-3.5 w-3.5" />
+        Approval Pending
+      </Link>
+    )
+  }
+
+  if (providerStatus === 'REJECTED' && !hasProvider) {
+    return (
+      <Link
+        to="/become-provider"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition-all"
+      >
+        <SparklesIcon className="h-3.5 w-3.5" />
+        Reapply as Provider
+      </Link>
+    )
+  }
+
+  if (hasCustomer && !hasProvider && !providerStatus) {
     return (
       <Link
         to="/become-provider"

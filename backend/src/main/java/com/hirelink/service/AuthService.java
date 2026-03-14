@@ -1,15 +1,19 @@
 package com.hirelink.service;
 
 import com.hirelink.dto.AuthDTO;
+import com.hirelink.entity.EmailVerificationToken;
 import com.hirelink.entity.OtpVerification;
 import com.hirelink.entity.OtpVerification.OtpType;
+import com.hirelink.entity.PasswordResetToken;
 import com.hirelink.entity.ServiceProvider;
 import com.hirelink.entity.User;
 import com.hirelink.entity.UserRole;
 import com.hirelink.exception.BadRequestException;
 import com.hirelink.exception.ResourceNotFoundException;
 import com.hirelink.exception.UnauthorizedException;
+import com.hirelink.repository.EmailVerificationTokenRepository;
 import com.hirelink.repository.OtpRepository;
+import com.hirelink.repository.PasswordResetTokenRepository;
 import com.hirelink.repository.ServiceCategoryRepository;
 import com.hirelink.repository.ServiceProviderRepository;
 import com.hirelink.repository.UserRepository;
@@ -27,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,11 +47,15 @@ public class AuthService {
     private final JwtService jwtService;
 
     private final OtpRepository otpRepository;
+    private final EmailVerificationTokenRepository verificationTokenRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final SmsService smsService;
     private final EmailService emailService;
 
     private static final int OTP_LENGTH = 6;
     private static final int OTP_EXPIRY_MINUTES = 10;
+    private static final int VERIFICATION_TOKEN_EXPIRY_HOURS = 24;
+    private static final int PASSWORD_RESET_TOKEN_EXPIRY_HOURS = 1;
 
     /**
      * OTP-verified registration.
@@ -55,7 +64,6 @@ public class AuthService {
      */
     @Transactional
     public AuthDTO.AuthResponse register(AuthDTO.RegisterRequest request) {
-        // Verify the OTP first
         OtpVerification otp = otpRepository
                 .findByIdentifierAndOtpCodeAndOtpTypeAndIsUsedFalse(
                         request.getPhone(), request.getOtp(), OtpType.PHONE)
@@ -65,22 +73,20 @@ public class AuthService {
             throw new UnauthorizedException("OTP has expired. Please request a new one.");
         }
 
-        // Mark OTP as used
         otp.setIsUsed(true);
         otpRepository.save(otp);
 
-        // Check if phone already exists
-        if (userRepository.existsByPhone(request.getPhone())) {
+        if (userRepository.existsByPhoneAndDeletedAtIsNull(request.getPhone())) {
             throw new BadRequestException("Phone number already registered. Please login instead.");
         }
 
-        // Check if email already exists (if provided)
         if (request.getEmail() != null && !request.getEmail().isEmpty() &&
-            userRepository.existsByEmail(request.getEmail())) {
+            userRepository.existsByEmailAndDeletedAtIsNull(request.getEmail())) {
             throw new BadRequestException("Email already registered");
         }
 
-        // Create user - always starts as CUSTOMER
+        clearDeletedUserCredentials(request.getPhone(), request.getEmail());
+
         User user = User.builder()
                 .name(request.getName())
                 .phone(request.getPhone())
@@ -94,16 +100,13 @@ public class AuthService {
 
         user = userRepository.save(user);
 
-        // Assign CUSTOMER role
         UserRole customerRole = UserRole.builder()
                 .user(user)
                 .role("CUSTOMER")
                 .build();
         userRoleRepository.save(customerRole);
-
         user.setRoles(List.of(customerRole));
 
-        // Generate tokens
         CustomUserDetails userDetails = new CustomUserDetails(user);
         String accessToken = jwtService.generateAccessToken(userDetails);
         String refreshToken = jwtService.generateRefreshToken(userDetails);
@@ -117,6 +120,121 @@ public class AuthService {
                 .expiresIn(jwtService.getAccessTokenExpiration())
                 .user(mapToUserDTO(user))
                 .build();
+    }
+
+    /**
+     * Email-verified registration.
+     * Creates the account in PENDING_VERIFICATION status and sends a verification link.
+     */
+    @Transactional
+    public AuthDTO.MessageResponse registerWithEmail(AuthDTO.EmailRegisterRequest request) {
+        if (userRepository.existsByEmailAndDeletedAtIsNull(request.getEmail())) {
+            throw new BadRequestException("Email already registered. Please login instead.");
+        }
+
+        if (request.getPhone() != null && !request.getPhone().isEmpty() &&
+            userRepository.existsByPhoneAndDeletedAtIsNull(request.getPhone())) {
+            throw new BadRequestException("Phone number already registered. Please login instead.");
+        }
+
+        clearDeletedUserCredentials(request.getPhone(), request.getEmail());
+
+        User user = User.builder()
+                .name(request.getName())
+                .email(request.getEmail())
+                .phone(request.getPhone())
+                .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .userType(User.UserType.CUSTOMER)
+                .accountStatus(User.AccountStatus.PENDING_VERIFICATION)
+                .isEmailVerified(false)
+                .build();
+
+        user = userRepository.save(user);
+
+        UserRole customerRole = UserRole.builder()
+                .user(user)
+                .role("CUSTOMER")
+                .build();
+        userRoleRepository.save(customerRole);
+        user.setRoles(List.of(customerRole));
+
+        sendVerificationToken(user);
+
+        log.info("New user registered, verification email sent to: {}", request.getEmail());
+
+        return AuthDTO.MessageResponse.builder()
+                .message("Registration successful. Please check your email to verify your account.")
+                .build();
+    }
+
+    /**
+     * Verify a user's email using the token from the verification link.
+     * Idempotent: succeeds silently if the email is already verified.
+     */
+    @Transactional
+    public void verifyEmail(String token) {
+        log.info("Processing email verification for token: {}...", token.substring(0, Math.min(8, token.length())));
+
+        Optional<EmailVerificationToken> tokenOpt = verificationTokenRepository.findByTokenAndIsUsedFalse(token);
+
+        if (tokenOpt.isEmpty()) {
+            // Token already used or doesn't exist.
+            // Check if it was already used successfully (idempotent).
+            Optional<EmailVerificationToken> anyToken = verificationTokenRepository.findByToken(token);
+            if (anyToken.isPresent() && Boolean.TRUE.equals(anyToken.get().getUser().getIsEmailVerified())) {
+                log.info("Email already verified (idempotent success) for token: {}...", token.substring(0, Math.min(8, token.length())));
+                return;
+            }
+            throw new BadRequestException("Invalid or already used verification link.");
+        }
+
+        EmailVerificationToken verificationToken = tokenOpt.get();
+
+        if (verificationToken.isExpired()) {
+            throw new BadRequestException("Verification link has expired. Please request a new one.");
+        }
+
+        verificationToken.setIsUsed(true);
+        verificationTokenRepository.save(verificationToken);
+
+        User user = verificationToken.getUser();
+        user.setIsEmailVerified(true);
+        user.setEmailVerifiedAt(LocalDateTime.now());
+        user.setAccountStatus(User.AccountStatus.ACTIVE);
+        userRepository.save(user);
+
+        log.info("Email verified for user: {}", user.getEmail());
+    }
+
+    /**
+     * Resend the verification email for an unverified account.
+     */
+    @Transactional
+    public void resendVerificationEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("No account found with this email."));
+
+        if (Boolean.TRUE.equals(user.getIsEmailVerified())) {
+            throw new BadRequestException("Email is already verified. Please login.");
+        }
+
+        verificationTokenRepository.deleteByUser(user);
+        sendVerificationToken(user);
+
+        log.info("Verification email resent to: {}", email);
+    }
+
+    private void sendVerificationToken(User user) {
+        String token = UUID.randomUUID().toString();
+
+        EmailVerificationToken verificationToken = EmailVerificationToken.builder()
+                .token(token)
+                .user(user)
+                .expiresAt(LocalDateTime.now().plusHours(VERIFICATION_TOKEN_EXPIRY_HOURS))
+                .build();
+        verificationTokenRepository.save(verificationToken);
+
+        emailService.sendVerificationEmail(user.getEmail(), token);
     }
 
     /**
@@ -137,6 +255,14 @@ public class AuthService {
                     .orElseThrow(() -> new UnauthorizedException("Invalid email or password"));
         } else {
             throw new BadRequestException("Phone or email is required");
+        }
+
+        // Block login for email-registered users who haven't verified yet.
+        // Phone-verified and Google users are not affected.
+        if (user.getAccountStatus() == User.AccountStatus.PENDING_VERIFICATION
+                && !Boolean.TRUE.equals(user.getIsPhoneVerified())
+                && !Boolean.TRUE.equals(user.getIsEmailVerified())) {
+            throw new UnauthorizedException("Please verify your email before signing in. Check your inbox for the verification link.");
         }
 
         if (user.getPasswordHash() == null || user.getPasswordHash().isEmpty()) {
@@ -225,6 +351,142 @@ public class AuthService {
     }
 
     // ============================================
+    // Profile-level Email Verification
+    // ============================================
+
+    /**
+     * Send an OTP to the authenticated user's email for verification from their profile.
+     */
+    @Transactional
+    public void sendProfileEmailOtp(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            throw new BadRequestException("No email address on your account. Please add one first.");
+        }
+
+        if (Boolean.TRUE.equals(user.getIsEmailVerified())) {
+            throw new BadRequestException("Email is already verified.");
+        }
+
+        sendEmailOtp(user.getEmail());
+    }
+
+    /**
+     * Verify an OTP submitted from the profile page to mark the user's email as verified.
+     */
+    @Transactional
+    public void verifyProfileEmailOtp(Long userId, String otpCode) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            throw new BadRequestException("No email address on your account.");
+        }
+
+        if (Boolean.TRUE.equals(user.getIsEmailVerified())) {
+            return; // idempotent
+        }
+
+        OtpVerification otp = otpRepository
+                .findByIdentifierAndOtpCodeAndOtpTypeAndIsUsedFalse(user.getEmail(), otpCode, OtpType.EMAIL)
+                .orElseThrow(() -> new UnauthorizedException("Invalid OTP code"));
+
+        if (otp.isExpired()) {
+            throw new UnauthorizedException("OTP has expired. Please request a new one.");
+        }
+
+        otp.setIsUsed(true);
+        otpRepository.save(otp);
+
+        user.setIsEmailVerified(true);
+        user.setEmailVerifiedAt(LocalDateTime.now());
+        if (user.getAccountStatus() == User.AccountStatus.PENDING_VERIFICATION) {
+            user.setAccountStatus(User.AccountStatus.ACTIVE);
+        }
+        userRepository.save(user);
+
+        log.info("Email verified via profile OTP for user: {}", userId);
+    }
+
+    /**
+     * Send a verification link to the authenticated user's email from their profile.
+     */
+    @Transactional
+    public void sendProfileVerificationLink(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            throw new BadRequestException("No email address on your account. Please add one first.");
+        }
+
+        if (Boolean.TRUE.equals(user.getIsEmailVerified())) {
+            throw new BadRequestException("Email is already verified.");
+        }
+
+        verificationTokenRepository.deleteByUser(user);
+        sendVerificationToken(user);
+
+        log.info("Verification link sent from profile for user: {}", userId);
+    }
+
+    // ============================================
+    // Forgot / Reset Password
+    // ============================================
+
+    /**
+     * Sends a password-reset link to the given email.
+     * Always returns success to prevent email enumeration.
+     */
+    @Transactional
+    public void forgotPassword(String email) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+
+        if (userOpt.isEmpty()) {
+            log.warn("Password reset requested for unknown email: {}", email);
+            return;
+        }
+
+        User user = userOpt.get();
+        passwordResetTokenRepository.deleteByUser(user);
+
+        String token = UUID.randomUUID().toString();
+        PasswordResetToken resetToken = PasswordResetToken.builder()
+                .token(token)
+                .user(user)
+                .expiresAt(LocalDateTime.now().plusHours(PASSWORD_RESET_TOKEN_EXPIRY_HOURS))
+                .build();
+        passwordResetTokenRepository.save(resetToken);
+
+        emailService.sendPasswordResetEmail(user.getEmail(), token);
+        log.info("Password reset email sent to: {}", email);
+    }
+
+    /**
+     * Validates the reset token and sets the new password.
+     */
+    @Transactional
+    public void resetPassword(String token, String newPassword) {
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByTokenAndIsUsedFalse(token)
+                .orElseThrow(() -> new BadRequestException("Invalid or already used reset link."));
+
+        if (resetToken.isExpired()) {
+            throw new BadRequestException("Reset link has expired. Please request a new one.");
+        }
+
+        resetToken.setIsUsed(true);
+        passwordResetTokenRepository.save(resetToken);
+
+        User user = resetToken.getUser();
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        log.info("Password reset successful for user: {}", user.getEmail());
+    }
+
+    // ============================================
     // OTP Authentication Methods
     // ============================================
 
@@ -235,7 +497,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void sendPhoneOtp(String phone) {
+    public void sendPhoneOtp(String phone, String email) {
         if (!smsService.isValidPhoneNumber(phone)) {
             throw new BadRequestException("Invalid phone number format");
         }
@@ -253,7 +515,12 @@ public class AuthService {
 
         smsService.sendOtp(phone, otpCode);
 
-        log.info("Phone OTP sent to: {}", phone);
+        if (email != null && !email.isEmpty()) {
+            emailService.sendOtpEmail(email, otpCode);
+            log.info("Phone OTP sent to: {} and also emailed to: {}", phone, email);
+        } else {
+            log.info("Phone OTP sent to: {}", phone);
+        }
     }
 
     @Transactional
@@ -455,11 +722,12 @@ public class AuthService {
     // ============================================
 
     /**
-     * Upgrade an existing CUSTOMER to also be a PROVIDER.
-     * Creates service_providers record and adds PROVIDER role.
+     * Submit a provider application for an existing CUSTOMER.
+     * Creates service_providers record with PENDING kycStatus. The PROVIDER role
+     * is granted only after admin approval.
      */
     @Transactional
-    public AuthDTO.AuthResponse becomeProvider(Long userId, AuthDTO.BecomeProviderRequest request) {
+    public AuthDTO.MessageResponse becomeProvider(Long userId, AuthDTO.BecomeProviderRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
@@ -467,10 +735,39 @@ public class AuthService {
             throw new BadRequestException("You are already registered as a provider");
         }
 
-        // Create service provider profile
+        Optional<ServiceProvider> existingProvider = providerRepository.findByUserUserId(userId);
+        if (existingProvider.isPresent()) {
+            ServiceProvider.KycStatus status = existingProvider.get().getKycStatus();
+            if (status == ServiceProvider.KycStatus.PENDING) {
+                throw new BadRequestException("Your provider application is already pending review");
+            }
+            if (status == ServiceProvider.KycStatus.VERIFIED) {
+                throw new BadRequestException("Your provider application is already approved");
+            }
+            if (status == ServiceProvider.KycStatus.REJECTED) {
+                ServiceProvider provider = existingProvider.get();
+                provider.setKycStatus(ServiceProvider.KycStatus.PENDING);
+                provider.setKycRejectionReason(null);
+                if (request.getCategoryId() != null) {
+                    categoryRepository.findById(request.getCategoryId())
+                            .ifPresent(provider::setPrimaryCategory);
+                }
+                if (request.getBaseAddress() != null) provider.setBaseAddress(request.getBaseAddress());
+                if (request.getBasePincode() != null) provider.setBasePincode(request.getBasePincode());
+                if (request.getBaseLatitude() != null) provider.setBaseLatitude(request.getBaseLatitude());
+                if (request.getBaseLongitude() != null) provider.setBaseLongitude(request.getBaseLongitude());
+                providerRepository.save(provider);
+                log.info("User {} resubmitted provider application", userId);
+                return AuthDTO.MessageResponse.builder()
+                        .message("Your provider application has been resubmitted for review")
+                        .build();
+            }
+        }
+
         ServiceProvider.ServiceProviderBuilder providerBuilder = ServiceProvider.builder()
                 .user(user)
-                .businessName(user.getName() + "'s Services");
+                .businessName(user.getName() + "'s Services")
+                .kycStatus(ServiceProvider.KycStatus.PENDING);
 
         if (request.getCategoryId() != null) {
             categoryRepository.findById(request.getCategoryId())
@@ -491,34 +788,10 @@ public class AuthService {
 
         providerRepository.save(providerBuilder.build());
 
-        // Add PROVIDER role
-        UserRole providerRole = UserRole.builder()
-                .user(user)
-                .role("PROVIDER")
-                .build();
-        userRoleRepository.save(providerRole);
+        log.info("User {} submitted provider application for admin review", userId);
 
-        // Update user_type to PROVIDER (primary role)
-        user.setUserType(User.UserType.PROVIDER);
-        user = userRepository.save(user);
-
-        // Reload roles
-        List<UserRole> roles = userRoleRepository.findByUserUserId(userId);
-        user.setRoles(roles);
-
-        log.info("User {} upgraded to PROVIDER", userId);
-
-        // Return fresh tokens with updated roles
-        CustomUserDetails userDetails = new CustomUserDetails(user);
-        String accessToken = jwtService.generateAccessToken(userDetails);
-        String refreshToken = jwtService.generateRefreshToken(userDetails);
-
-        return AuthDTO.AuthResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .tokenType("Bearer")
-                .expiresIn(jwtService.getAccessTokenExpiration())
-                .user(mapToUserDTO(user))
+        return AuthDTO.MessageResponse.builder()
+                .message("Your provider application has been submitted for review. You will be notified once approved.")
                 .build();
     }
 
@@ -572,6 +845,29 @@ public class AuthService {
                 .build();
     }
 
+    /**
+     * Nulls out email/phone on any soft-deleted users that still occupy the unique constraint,
+     * so a new user can register with the same credentials.
+     */
+    private void clearDeletedUserCredentials(String phone, String email) {
+        if (phone != null && !phone.isEmpty()) {
+            userRepository.findByPhone(phone).ifPresent(existing -> {
+                if (existing.getDeletedAt() != null) {
+                    existing.setPhone(null);
+                    userRepository.saveAndFlush(existing);
+                }
+            });
+        }
+        if (email != null && !email.isEmpty()) {
+            userRepository.findByEmail(email).ifPresent(existing -> {
+                if (existing.getDeletedAt() != null) {
+                    existing.setEmail(null);
+                    userRepository.saveAndFlush(existing);
+                }
+            });
+        }
+    }
+
     private AuthDTO.UserDTO mapToUserDTO(User user) {
         List<String> roleNames = List.of("CUSTOMER");
         if (user.getRoles() != null && !user.getRoles().isEmpty()) {
@@ -580,8 +876,9 @@ public class AuthService {
                     .collect(Collectors.toList());
         }
 
-        boolean hasProviderProfile = user.getServiceProvider() != null
-                || providerRepository.findByUserUserId(user.getUserId()).isPresent();
+        Optional<ServiceProvider> providerOpt = providerRepository.findByUserUserId(user.getUserId());
+        boolean hasProviderProfile = user.getServiceProvider() != null || providerOpt.isPresent();
+        String providerAppStatus = providerOpt.map(sp -> sp.getKycStatus().name()).orElse(null);
 
         return AuthDTO.UserDTO.builder()
                 .userId(user.getUserId())
@@ -592,6 +889,7 @@ public class AuthService {
                 .userType(user.getUserType().name())
                 .roles(roleNames)
                 .hasProviderProfile(hasProviderProfile)
+                .providerApplicationStatus(providerAppStatus)
                 .accountStatus(user.getAccountStatus().name())
                 .isEmailVerified(user.getIsEmailVerified())
                 .isPhoneVerified(user.getIsPhoneVerified())
