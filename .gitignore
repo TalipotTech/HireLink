@@ -31,3 +31,10 @@ mysql_data/
 
 # Uploads
 uploads/
+
+# Secrets — never commit real credentials
+rzp-key.csv
+*.csv
+application.properties
+application-local.properties
+!application.properties.example
