@@ -2,6 +2,8 @@ package com.hirelink.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -30,7 +32,7 @@ public class ServiceProvider {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "primary_category_id", columnDefinition = "bigint unsigned")
+    @JoinColumn(name = "primary_category_id")
     @ToString.Exclude
     private ServiceCategory primaryCategory;
 
@@ -47,10 +49,10 @@ public class ServiceProvider {
     @Builder.Default
     private Integer experienceYears = 0;
 
-    @Column(columnDefinition = "JSON")
+    @JdbcTypeCode(SqlTypes.JSON)
     private String specializations;
 
-    @Column(columnDefinition = "JSON")
+    @JdbcTypeCode(SqlTypes.JSON)
     private String certifications;
 
     @Column(name = "base_latitude", precision = 10, scale = 8)

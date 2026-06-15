@@ -127,10 +127,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
            "AND YEAR(b.createdAt) = YEAR(CURRENT_DATE)")
     BigDecimal sumRevenueThisMonth();
 
-    @Query("SELECT FUNCTION('DATE_FORMAT', b.createdAt, '%Y-%m') AS month, COUNT(b) " +
+    @Query("SELECT FUNCTION('TO_CHAR', b.createdAt, 'YYYY-MM') AS month, COUNT(b) " +
            "FROM Booking b " +
            "WHERE b.createdAt >= :since " +
-           "GROUP BY FUNCTION('DATE_FORMAT', b.createdAt, '%Y-%m') " +
+           "GROUP BY FUNCTION('TO_CHAR', b.createdAt, 'YYYY-MM') " +
            "ORDER BY month")
     List<Object[]> countBookingsByMonth(@Param("since") LocalDateTime since);
 

@@ -2,6 +2,8 @@ package com.hirelink.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -87,7 +89,8 @@ public class Booking {
     @Column(name = "issue_description", columnDefinition = "TEXT")
     private String issueDescription;
 
-    @Column(name = "issue_images", columnDefinition = "JSON")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "issue_images")
     private String issueImages;
 
     @Enumerated(EnumType.STRING)
@@ -154,7 +157,8 @@ public class Booking {
     @Column(name = "work_summary", columnDefinition = "TEXT")
     private String workSummary;
 
-    @Column(name = "completion_images", columnDefinition = "JSON")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "completion_images")
     private String completionImages;
 
     @Column(name = "user_rating", precision = 3, scale = 2)

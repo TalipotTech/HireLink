@@ -2,6 +2,8 @@ package com.hirelink.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.LocalDateTime;
 
 @Entity
@@ -32,10 +34,12 @@ public class AdminAuditLog {
     @Column(name = "target_id")
     private Long targetId;
 
-    @Column(name = "old_values", columnDefinition = "JSON")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "old_values")
     private String oldValues;
 
-    @Column(name = "new_values", columnDefinition = "JSON")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "new_values")
     private String newValues;
 
     @Column(name = "ip_address", length = 45)
