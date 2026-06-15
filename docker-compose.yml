@@ -1,23 +1,21 @@
-version: '3.8'
-
 services:
-  # MySQL Database
-  mysql:
-    image: mysql:8.0
-    container_name: hirelink-mysql
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16
+    container_name: hirelink-postgres
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
-      MYSQL_DATABASE: hirelink_db
-      MYSQL_USER: ${MYSQL_USER:-hirelink}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-hirelink123}
+      POSTGRES_DB: hirelink_db
+      POSTGRES_USER: hirelink
+      POSTGRES_PASSWORD: password
     ports:
-      - "3306:3306"
+      # Host port is configurable to avoid clashing with a locally-installed
+      # Postgres on 5432: `POSTGRES_HOST_PORT=5433 docker compose up`.
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
-      - ./database:/docker-entrypoint-initdb.d
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD-SHELL", "pg_isready -U hirelink -d hirelink_db"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -32,16 +30,18 @@ services:
     container_name: hirelink-backend
     restart: unless-stopped
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - DATABASE_URL=jdbc:mysql://mysql:3306/hirelink_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      - DATABASE_USERNAME=${MYSQL_USER:-hirelink}
-      - DATABASE_PASSWORD=${MYSQL_PASSWORD:-hirelink123}
-      - JWT_SECRET=${JWT_SECRET:-aGlyZWxpbmstc3VwZXItc2VjcmV0LWtleS10aGF0LXNob3VsZC1iZS1hdC1sZWFzdC0yNTYtYml0cy1sb25nLWZvci1oczI1Ng==}
+      # PG* variables match the placeholders in application.properties.
+      - PGHOST=postgres
+      - PGPORT=5432
+      - PGDATABASE=hirelink_db
+      - PGUSER=hirelink
+      - PGPASSWORD=password
+      - JWT_SECRET=${JWT_SECRET:-bG9jYWwtZGV2LW9ubHktand0LXNlY3JldC1jaGFuZ2UtbWUtaW4tcHJvZHVjdGlvbi1taW4tMjU2LWJpdHM=}
       - CORS_ORIGINS=http://localhost:3000,http://localhost
     ports:
       - "8080:8080"
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
@@ -70,7 +70,7 @@ services:
       - hirelink-network
 
 volumes:
-  mysql_data:
+  postgres_data:
     driver: local
 
 networks:
