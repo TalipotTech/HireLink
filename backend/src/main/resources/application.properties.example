@@ -13,10 +13,12 @@ server.port=${PORT:8080}
 # ============================================================================
 # Database Configuration
 # ============================================================================
-spring.datasource.url=${DATABASE_URL:jdbc:mysql://localhost:3306/hirelink_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&createDatabaseIfNotExist=true}
-spring.datasource.username=${DATABASE_USERNAME:hirelink_user}
-spring.datasource.password=${DATABASE_PASSWORD:CHANGE_ME}
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+# Railway injects PGHOST/PGPORT/PGDATABASE/PGUSER/PGPASSWORD automatically.
+# Defaults after ':' are for LOCAL dev against a local Postgres (see docker-compose).
+spring.datasource.url=jdbc:postgresql://${PGHOST:localhost}:${PGPORT:5432}/${PGDATABASE:hirelink_db}
+spring.datasource.username=${PGUSER:hirelink}
+spring.datasource.password=${PGPASSWORD:password}
+spring.datasource.driver-class-name=org.postgresql.Driver
 
 # Connection Pool (HikariCP)
 spring.datasource.hikari.maximum-pool-size=10
@@ -29,15 +31,16 @@ spring.datasource.hikari.connection-timeout=20000
 # ============================================================================
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=false
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 spring.jpa.properties.hibernate.format_sql=true
 spring.jpa.open-in-view=false
 
 # ============================================================================
 # JWT Configuration
 # ============================================================================
-# Generate a strong 256-bit secret, e.g.: openssl rand -base64 48
-jwt.secret=${JWT_SECRET:CHANGE_ME_GENERATE_A_STRONG_SECRET}
+# Must be a Base64-encoded HMAC key of >=256 bits (the code Base64-decodes it).
+# Generate one with: openssl rand -base64 48
+jwt.secret=${JWT_SECRET:CHANGE_ME_BASE64_ENCODED_256BIT_SECRET}
 jwt.access-token-expiration=86400000
 jwt.refresh-token-expiration=604800000
 
@@ -87,8 +90,8 @@ hirelink.booking-charge=8
 # Razorpay Configuration
 # ============================================================================
 # Sign up at https://dashboard.razorpay.com/ and use Test Mode keys
-razorpay.key-id=${RAZORPAY_KEY_ID:rzp_test_CHANGE_ME}
-razorpay.key-secret=${RAZORPAY_KEY_SECRET:CHANGE_ME}
+razorpay.key-id=${RAZORPAY_KEY:}
+razorpay.key-secret=${RAZORPAY_SECRET:}
 
 # ============================================================================
 # Email Configuration (Gmail SMTP)
@@ -100,8 +103,8 @@ razorpay.key-secret=${RAZORPAY_KEY_SECRET:CHANGE_ME}
 # ============================================================================
 spring.mail.host=smtp.gmail.com
 spring.mail.port=587
-spring.mail.username=${MAIL_USERNAME:your-email@example.com}
-spring.mail.password=${MAIL_PASSWORD:CHANGE_ME_GMAIL_APP_PASSWORD}
+spring.mail.username=${MAIL_USERNAME:}
+spring.mail.password=${MAIL_PASSWORD:}
 spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
 spring.mail.properties.mail.smtp.connectiontimeout=5000
