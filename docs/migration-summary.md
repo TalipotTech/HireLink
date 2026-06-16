@@ -101,8 +101,26 @@ PostgreSQL, targeting Railway. Executed per `docs/migration-prompts.md`, sequenc
 - **Detached, not started:** Prompt 7 (pgvector / PostGIS groundwork for AI + geo).
 
 ### Local dev quickstart
+
+**Option A — use a locally-installed PostgreSQL (e.g. PG 17 on 5432).** One-time
+setup as the `postgres` superuser, then run the backend with its defaults (no env
+overrides — defaults already target `localhost:5432`):
+```sql
+CREATE ROLE hirelink WITH LOGIN PASSWORD 'password';
+CREATE DATABASE hirelink_db OWNER hirelink;
+\connect hirelink_db
+GRANT ALL ON SCHEMA public TO hirelink;
+ALTER SCHEMA public OWNER TO hirelink;   -- so Hibernate can create tables (PG15+)
+```
 ```bash
-POSTGRES_HOST_PORT=5433 docker compose up -d postgres          # local PG on 5433
-cd backend && PGPORT=5433 mvn -DskipTests spring-boot:run       # boots on UTC
+cd backend && mvn -DskipTests spring-boot:run                          # boots on UTC, hits localhost:5432
+psql -U hirelink -h localhost -d hirelink_db -f database/seed_postgres.sql
+```
+
+**Option B — use Docker** (no local Postgres, or want parity with a clean PG 16).
+Host port is configurable to avoid clashing with a local Postgres on 5432:
+```bash
+POSTGRES_HOST_PORT=5433 docker compose up -d postgres
+cd backend && PGPORT=5433 mvn -DskipTests spring-boot:run
 docker compose exec -T postgres psql -U hirelink -d hirelink_db < database/seed_postgres.sql
 ```
