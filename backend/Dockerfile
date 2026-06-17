@@ -4,6 +4,10 @@ WORKDIR /app
 COPY pom.xml .
 RUN mvn dependency:go-offline -B
 COPY src ./src
+# application.properties is gitignored (repo keeps only the env-driven template),
+# so a clean checkout (Railway) has no config. Materialize it from the committed
+# example before packaging; all real values come from env vars at runtime.
+RUN cp src/main/resources/application.properties.example src/main/resources/application.properties
 RUN mvn clean package -DskipTests -B
 
 # Run stage
