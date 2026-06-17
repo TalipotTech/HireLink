@@ -28,11 +28,13 @@ public class Service {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "provider_id", nullable = false)
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private ServiceProvider provider;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private ServiceCategory category;
 
     @Column(name = "service_name", nullable = false, length = 200)

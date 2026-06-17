@@ -30,16 +30,19 @@ public class Payment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booking_id", nullable = false)
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Booking booking;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payer_user_id", nullable = false)
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private User payerUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payee_provider_id")
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private ServiceProvider payeeProvider;
 
     @Column(name = "gross_amount", nullable = false, precision = 12, scale = 2)

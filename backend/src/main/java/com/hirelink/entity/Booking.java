@@ -35,16 +35,19 @@ public class Booking {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "provider_id", nullable = false)
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private ServiceProvider provider;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "service_id", nullable = false)
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Service service;
 
     @Column(name = "scheduled_date", nullable = false)

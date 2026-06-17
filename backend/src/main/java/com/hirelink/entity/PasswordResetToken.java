@@ -23,6 +23,7 @@ public class PasswordResetToken {
     @JoinColumn(name = "user_id", nullable = false,
             foreignKey = @ForeignKey(name = "fk_prtoken_user", value = ConstraintMode.NO_CONSTRAINT))
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private User user;
 
     @Column(name = "expires_at", nullable = false)

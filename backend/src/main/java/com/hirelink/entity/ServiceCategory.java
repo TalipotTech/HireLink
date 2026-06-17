@@ -42,10 +42,12 @@ public class ServiceCategory {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_category_id")
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private ServiceCategory parentCategory;
 
     @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL)
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<ServiceCategory> subCategories;
 
     @Column(name = "category_level")
@@ -85,6 +87,7 @@ public class ServiceCategory {
 
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Service> services;
 
     public enum PriceUnit {

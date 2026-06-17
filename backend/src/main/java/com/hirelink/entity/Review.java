@@ -28,16 +28,19 @@ public class Review {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booking_id", nullable = false, unique = true)
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Booking booking;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reviewer_id", nullable = false)
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private User reviewer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reviewee_provider_id", nullable = false)
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private ServiceProvider revieweeProvider;
 
     @Column(name = "overall_rating", nullable = false, precision = 3, scale = 2)

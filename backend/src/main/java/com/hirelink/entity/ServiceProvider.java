@@ -29,11 +29,13 @@ public class ServiceProvider {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "primary_category_id")
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private ServiceCategory primaryCategory;
 
     @Column(name = "business_name", length = 200)
@@ -151,10 +153,12 @@ public class ServiceProvider {
 
     @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Service> services;
 
     @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Booking> bookings;
 
     public enum KycStatus {
