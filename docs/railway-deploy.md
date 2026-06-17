@@ -117,8 +117,61 @@ psql "<DATABASE_PUBLIC_URL>" -f database/seed_postgres.sql
 
 ---
 
-## 7. Still open
-- **Frontend service** not deployed. When it is: point its API base at
-  `https://hirelink-production.up.railway.app` and add its origin to `CORS_ORIGINS`.
+## 7. Frontend service (Railway)
+
+React 18 + Vite SPA in `frontend/`, served by **nginx** (the repo's `frontend/Dockerfile`).
+
+### Serving approach
+Multi-stage Docker: `node` builds the Vite `dist/`, then `nginx:alpine` serves it.
+nginx config (`frontend/nginx.conf`) does **SPA fallback** (`try_files … /index.html`) so
+deep links / refreshes don't 404, and listens on Railway's **`$PORT`** (rendered from the
+template by the nginx image's envsubst entrypoint). The old docker-compose `/api` proxy was
+removed — the SPA calls the backend **directly** via the baked API URL.
+
+### Build-time variables (the #1 trap)
+Vite **inlines `VITE_*` vars at BUILD time** — a runtime Railway var never reaches the
+bundle. They must be set as **build args/variables** on the frontend service:
+
+```
+VITE_API_BASE_URL    = https://hirelink-production.up.railway.app/api
+VITE_GOOGLE_CLIENT_ID = <the Google OAuth web client id>
+```
+The `Dockerfile` declares matching `ARG`/`ENV` so `npm run build` inlines them. Verified:
+both values appear in `dist/assets/*.js` after build.
+
+### Provision
+1. **+ New → GitHub Repo → TalipotTech/HireLink**, **Root Directory = `frontend`**.
+2. Set the two `VITE_*` variables above (Railway passes service variables as Docker build
+   args).
+3. **Generate Domain** → `https://<frontend-domain>.up.railway.app`.
+
+### CORS (backend side)
+The backend CORS is already env-driven and non-wildcard. Add the frontend origin to the
+**backend** service's `CORS_ORIGINS` (comma-separated, keep localhost):
+```
+CORS_ORIGINS = http://localhost:3000,http://localhost:3002,https://<frontend-domain>.up.railway.app
+```
+Redeploy the backend after setting it.
+
+### Google OAuth (manual, your Google Cloud account)
+Google login fails until the deployed origin is authorized:
+1. https://console.cloud.google.com/ → **APIs & Services → Credentials**.
+2. Open the OAuth 2.0 **Web** client.
+3. **Authorized JavaScript origins** → add `https://<frontend-domain>.up.railway.app`
+   (origin only — no path, no trailing slash). Add redirect URIs only if you use the
+   redirect flow (`@react-oauth/google` popup flow needs just the origin).
+4. Save (can take a few minutes to propagate).
+
+### Verification checklist
+- [ ] Frontend loads at its domain
+- [ ] Network tab shows API calls to `hirelink-production.up.railway.app`, **no CORS errors**
+- [ ] Email-OTP login works end to end
+- [ ] Google login works (after the origin is authorized)
+- [ ] An authenticated booking action succeeds
+- [ ] Refresh on a deep route (e.g. `/customer/bookings/123`) → no 404 (SPA fallback)
+
+---
+
+## 8. Still open
 - **Prompt 0 security**: rotate exposed secrets + scrub git history (still outstanding).
-- **Prompt 8 (payments)**: do after this is live (it is) — adds Razorpay Route + webhooks.
+- **Prompt 8 (payments)**: unblocked now that the stack is live — adds Razorpay Route + webhooks.
