@@ -73,6 +73,9 @@ logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} - %msg%n
 # ============================================================================
 management.endpoints.web.exposure.include=health,info,metrics
 management.endpoint.health.show-details=when-authorized
+# Don't let an unreachable/unconfigured SMTP server mark the whole app DOWN
+# (otherwise /actuator/health returns 503 and Railway fails the healthcheck).
+management.health.mail.enabled=false
 
 # ============================================================================
 # OpenAPI/Swagger Configuration
