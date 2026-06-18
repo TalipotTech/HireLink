@@ -15,10 +15,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String phone) throws UsernameNotFoundException {
-        User user = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with phone: " + phone));
-        
+    public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
+        // The JWT subject is the user's phone, or email for Google/email-only users.
+        User user = userRepository.findByPhone(identifier)
+                .or(() -> userRepository.findByEmail(identifier))
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + identifier));
+
         return new CustomUserDetails(user);
     }
 }

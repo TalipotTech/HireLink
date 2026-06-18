@@ -105,7 +105,7 @@ public class AuthService {
                 .role("CUSTOMER")
                 .build();
         userRoleRepository.save(customerRole);
-        user.setRoles(List.of(customerRole));
+        user.setRoles(new ArrayList<>(List.of(customerRole)));
 
         CustomUserDetails userDetails = new CustomUserDetails(user);
         String accessToken = jwtService.generateAccessToken(userDetails);
@@ -156,7 +156,7 @@ public class AuthService {
                 .role("CUSTOMER")
                 .build();
         userRoleRepository.save(customerRole);
-        user.setRoles(List.of(customerRole));
+        user.setRoles(new ArrayList<>(List.of(customerRole)));
 
         sendVerificationToken(user);
 
@@ -297,9 +297,10 @@ public class AuthService {
     }
 
     public AuthDTO.AuthResponse refreshToken(String refreshToken) {
-        String phone = jwtService.extractUsername(refreshToken);
+        String identifier = jwtService.extractUsername(refreshToken);
 
-        User user = userRepository.findByPhone(phone)
+        User user = userRepository.findByPhone(identifier)
+                .or(() -> userRepository.findByEmail(identifier))
                 .orElseThrow(() -> new UnauthorizedException("Invalid refresh token"));
 
         CustomUserDetails userDetails = new CustomUserDetails(user);
@@ -642,7 +643,7 @@ public class AuthService {
                 .build();
         userRoleRepository.save(customerRole);
 
-        user.setRoles(List.of(customerRole));
+        user.setRoles(new ArrayList<>(List.of(customerRole)));
 
         log.info("New CUSTOMER user created via OTP: {}", phone != null ? phone : email);
         return user;
@@ -711,7 +712,7 @@ public class AuthService {
                 .build();
         userRoleRepository.save(customerRole);
 
-        newUser.setRoles(List.of(customerRole));
+        newUser.setRoles(new ArrayList<>(List.of(customerRole)));
 
         log.info("New CUSTOMER user registered via Google: {}", request.getEmail());
         return generateAuthResponse(newUser);

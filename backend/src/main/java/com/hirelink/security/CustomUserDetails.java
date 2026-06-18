@@ -34,7 +34,9 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getPhone();
+        // JWT subject / principal: phone for phone users, email for Google/email-only
+        // users (who have no phone). Must be non-null so the auth filter can resolve them.
+        return user.getPhone() != null ? user.getPhone() : user.getEmail();
     }
 
     @Override
